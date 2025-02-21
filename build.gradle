@@ -1,0 +1,57 @@
+plugins {
+    id 'java'
+    id 'war'
+    id 'org.springframework.boot' version '3.4.3'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.bit.joe'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    developmentOnly
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-actuator:3.3.+'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.3.+'
+    implementation 'org.springframework.boot:spring-boot-starter-security:3.3.+'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:3.3.+'
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.3.+'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux:3.3.+'
+    implementation 'org.flywaydb:flyway-core:10.+'
+    implementation 'org.flywaydb:flyway-mysql:10.+'
+//    implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.+'
+    annotationProcessor 'org.projectlombok:lombok'
+    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat:3.+'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
