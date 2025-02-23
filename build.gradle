@@ -44,7 +44,7 @@ dependencies {
 //    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.+'
     runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
-    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat:3.+'
+    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 //    testImplementation 'io.projectreactor:reactor-test'
 //    testImplementation 'org.springframework.security:spring-security-test'
