@@ -1,4 +1,4 @@
-package com.bit.joe.shoppingmall.controller;
+package com.bit.joe.shoppingmall.controllerExample;
 
 import java.util.ArrayList;
 import java.util.List;
