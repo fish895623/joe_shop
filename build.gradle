@@ -51,6 +51,9 @@ dependencies {
 //    testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 //    developmentOnly("org.springframework.boot:spring-boot-devtools")
+
+    testImplementation 'org.testcontainers:junit-jupiter:1.24.0'
+    testImplementation 'org.testcontainers:mysql:1.24.0'
 }
 
 tasks.named('test') {
@@ -59,7 +62,7 @@ tasks.named('test') {
 
 spotless {
     java {
-        googleJavaFormat().aosp() 
+        googleJavaFormat().aosp()
 
         importOrder('java', 'javax', 'org', 'com')
         removeUnusedImports()
