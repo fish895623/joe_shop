@@ -1,0 +1,10 @@
+{
+  "[java]": {
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false
+  },
+  "java.format.settings.url": "settings/GoogleStyle.xml",
+  "java.sources.organizeImports.starThreshold": 99,
+  "java.sources.organizeImports.staticStarThreshold": 99,
+  "java.saveActions.organizeImports": true
+}
