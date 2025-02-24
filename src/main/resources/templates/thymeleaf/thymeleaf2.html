@@ -1,0 +1,29 @@
+<!-- url : localhost:8080/thymeleaf/ex2 -->
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h2 th:text="${pageTitle}"></h2>
+<table border="1">
+    <thead>
+    <tr>
+        <td>순번</td>
+        <td>USER NAME</td>
+        <td>USER EMAIL</td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user, status: ${users}">
+        <td th:text="${status.index}"></td>
+        <td th:text="${user.name}"></td>
+        <td th:text="${user.email}"></td>
+
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
