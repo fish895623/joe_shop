@@ -1,4 +1,3 @@
 package com.bit.joe.shoppingmall.service.Impl;
 
-public class CategoryServiceImpl {
-}
+public class CategoryServiceImpl {}
