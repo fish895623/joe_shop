@@ -31,6 +31,13 @@ jobs:
 
       - name: spotless
         run: ./gradlew spotlessCheck
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
 
       - name: Build with Gradle Wrapper
         run: ./gradlew build
