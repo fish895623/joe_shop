@@ -1,9 +1,10 @@
 package com.bit.joe.shoppingmall.repository;
 
-import com.bit.joe.shoppingmall.entity.User;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Optional;
+import com.bit.joe.shoppingmall.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 

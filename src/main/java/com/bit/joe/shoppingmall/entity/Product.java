@@ -1,9 +1,9 @@
 package com.bit.joe.shoppingmall.entity;
 
-import lombok.Data;
-import jakarta.persistence.*;
-
 import java.util.List;
+
+import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "products")
@@ -29,7 +29,7 @@ public class Product {
     private Category category;
 
     @OneToMany(mappedBy = "product")
-    private List<OrderItem> orderItems;  // 수정: orderLists -> orderItems
+    private List<OrderItem> orderItems; // 수정: orderLists -> orderItems
 
     @OneToMany(mappedBy = "product")
     private List<Cart> carts;

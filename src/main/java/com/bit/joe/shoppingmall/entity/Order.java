@@ -1,10 +1,10 @@
 package com.bit.joe.shoppingmall.entity;
 
-import lombok.Data;
-import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 import java.util.List;
+
+import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "orders")
@@ -33,5 +33,5 @@ public class Order {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "order")
-    private List<OrderItem> orderItems;  // 수정: orderLists -> orderItems
+    private List<OrderItem> orderItems; // 수정: orderLists -> orderItems
 }
