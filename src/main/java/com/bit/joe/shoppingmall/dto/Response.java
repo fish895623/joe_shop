@@ -1,11 +1,12 @@
 package com.bit.joe.shoppingmall.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Builder;
-import lombok.Data;
-
 import java.time.LocalDateTime;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import lombok.Builder;
+import lombok.Data;
 
 @Data
 @Builder
@@ -24,13 +25,13 @@ public class Response {
     private ProductDto product;
     private List<ProductDto> productList;
 
-//    private UserDto user;
-//    private List<UserDto> userList;
+    //    private UserDto user;
+    //    private List<UserDto> userList;
 
-//    private OrderItemDto orderItem;
-//    private List<OrderItemDto> orderItemList;
+    //    private OrderItemDto orderItem;
+    //    private List<OrderItemDto> orderItemList;
 
-//    private OrderDto order;
-//    private List<OrderDto> orderList;
+    //    private OrderDto order;
+    //    private List<OrderDto> orderList;
 
 }
