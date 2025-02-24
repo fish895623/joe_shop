@@ -1,7 +1,7 @@
 package com.bit.joe.shoppingmall.entity;
 
-import lombok.Data;
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "order_item")

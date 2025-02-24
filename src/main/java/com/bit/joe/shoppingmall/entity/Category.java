@@ -1,9 +1,9 @@
 package com.bit.joe.shoppingmall.entity;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.Data;
-
-import java.util.List;
 
 @Entity
 @Table(name = "categories")

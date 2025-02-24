@@ -1,9 +1,10 @@
 package com.bit.joe.shoppingmall.repository;
 
-import com.bit.joe.shoppingmall.entity.Product;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import com.bit.joe.shoppingmall.entity.Product;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategoryId(Long categoryId);
