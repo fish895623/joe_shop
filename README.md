@@ -8,6 +8,8 @@ ex) `bsh-authorization-button`
 
 # 2. 코드 내용 적용
 
+코드를 올리기 전 `./gradlew spotlessApply` 를 실행하여 코드 컨벤션 적용
+
 `git add` 와 `git commit -m` 을 이용하여 수정한 파일 추가, 코드 변경내용 요약하여 기록하기
 
 [상세 설명](https://hihiha2.tistory.com/4)
