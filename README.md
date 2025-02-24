@@ -45,3 +45,4 @@ gh pr create --web
 `git checkout master` 를 이용하여 원래 브랜치로 이동
 
 `git pull`를 이용하여 업데이트 된 내용 받기
+.
