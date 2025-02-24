@@ -22,13 +22,17 @@ ex) `bsh-authorization-button`
 
 `git push -u origin` 적용
 
-# 4. Pull Request 요청
+# 4. Pull Request 요청 ( 택 1 )
 
 ## 방법 1.
 
 `git push` 작업후 페이지에서 `Pull Request` 작업 진행
 
 ## 방법 2.
+
+https://cli.github.com/
+
+위 툴을 설치.
 
 ```
 gh pr create --web
