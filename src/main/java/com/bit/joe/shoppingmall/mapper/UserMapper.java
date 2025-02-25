@@ -1,8 +1,11 @@
 package com.bit.joe.shoppingmall.mapper;
 
+import org.springframework.stereotype.Component;
+
 import com.bit.joe.shoppingmall.dto.UserDto;
 import com.bit.joe.shoppingmall.entity.User;
 
+@Component
 public class UserMapper {
 
     public static UserDto toDto(User user) {
