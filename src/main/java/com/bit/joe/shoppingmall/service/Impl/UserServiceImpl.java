@@ -23,7 +23,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public Response createUser(UserDto userRequest) throws Exception {
+    public Response createUser(UserDto userRequest){
 
         User user = UserMapper.toEntity(userRequest);
         // Convert UserDto to User
@@ -99,8 +99,9 @@ public class UserServiceImpl implements UserService {
         // return success response
     }
 
+    // Get all users -> just for testing
     @Override
-    public Response getAllUsers() throws Exception {
+    public Response getAllUsers(){
 
         List<UserDto> userList = userRepository.findAll().stream().map(UserMapper::toDto).toList();
         // Get all users and convert them to UserDto
