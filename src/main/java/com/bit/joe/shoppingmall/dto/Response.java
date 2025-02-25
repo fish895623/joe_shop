@@ -25,8 +25,8 @@ public class Response {
     private ProductDto product;
     private List<ProductDto> productList;
 
-    //    private UserDto user;
-    //    private List<UserDto> userList;
+    private UserDto user;
+    private List<UserDto> userList;
 
     //    private OrderItemDto orderItem;
     //    private List<OrderItemDto> orderItemList;
