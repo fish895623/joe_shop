@@ -11,6 +11,7 @@ import com.bit.joe.shoppingmall.dto.Response;
 import com.bit.joe.shoppingmall.entity.Category;
 import com.bit.joe.shoppingmall.entity.Product;
 import com.bit.joe.shoppingmall.exception.NotFoundException;
+import com.bit.joe.shoppingmall.mapper.ProductMapper;
 import com.bit.joe.shoppingmall.repository.CategoryRepository;
 import com.bit.joe.shoppingmall.repository.ProductRepository;
 import com.bit.joe.shoppingmall.service.ProductService;
@@ -88,7 +89,7 @@ public class ProductServiceImpl implements ProductService {
                 productRepository
                         .findById(productId)
                         .orElseThrow(() -> new NotFoundException("Product not found"));
-        ProductDto productDto = new ProductDto();
+        ProductDto productDto = ProductMapper.productToDto(product);
 
         return Response.builder()
                 .status(200)
@@ -101,15 +102,7 @@ public class ProductServiceImpl implements ProductService {
     public Response getAllProducts() {
         List<ProductDto> productList =
                 productRepository.findAll(Sort.by(Sort.Direction.DESC, "id")).stream()
-                        .map(
-                                product -> {
-                                    ProductDto productDto = new ProductDto();
-                                    productDto.setId(product.getId());
-                                    productDto.setName(product.getName());
-                                    productDto.setPrice(product.getPrice());
-                                    productDto.setQuantity(product.getQuantity());
-                                    return productDto;
-                                })
+                        .map(ProductMapper::productToDto)
                         .collect(Collectors.toList());
 
         return Response.builder()
@@ -126,17 +119,7 @@ public class ProductServiceImpl implements ProductService {
             throw new NotFoundException("No Products found for this category");
         }
         List<ProductDto> productDtoList =
-                products.stream()
-                        .map(
-                                product -> {
-                                    ProductDto productDto = new ProductDto();
-                                    productDto.setId(product.getId());
-                                    productDto.setName(product.getName());
-                                    productDto.setPrice(product.getPrice());
-                                    productDto.setQuantity(product.getQuantity());
-                                    return productDto;
-                                })
-                        .collect(Collectors.toList());
+                products.stream().map(ProductMapper::productToDto).collect(Collectors.toList());
 
         return Response.builder()
                 .status(200)

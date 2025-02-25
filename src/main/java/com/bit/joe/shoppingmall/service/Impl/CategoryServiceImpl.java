@@ -9,6 +9,7 @@ import com.bit.joe.shoppingmall.dto.CategoryDto;
 import com.bit.joe.shoppingmall.dto.Response;
 import com.bit.joe.shoppingmall.entity.Category;
 import com.bit.joe.shoppingmall.exception.NotFoundException;
+import com.bit.joe.shoppingmall.mapper.CategoryMapper;
 import com.bit.joe.shoppingmall.repository.CategoryRepository;
 import com.bit.joe.shoppingmall.service.CategoryService;
 
@@ -45,15 +46,7 @@ public class CategoryServiceImpl implements CategoryService {
     public Response getAllCategories() {
         List<Category> categories = categoryRepository.findAll();
         List<CategoryDto> categoryDtoList =
-                categories.stream()
-                        .map(
-                                category -> {
-                                    CategoryDto categoryDto = new CategoryDto();
-                                    categoryDto.setId(category.getId());
-                                    categoryDto.setCategoryName(category.getCategoryName());
-                                    return categoryDto;
-                                })
-                        .collect(Collectors.toList());
+                categories.stream().map(CategoryMapper::categoryToDto).collect(Collectors.toList());
 
         return Response.builder().status(200).categoryList(categoryDtoList).build();
     }
@@ -64,9 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
                 categoryRepository
                         .findById(categoryId)
                         .orElseThrow(() -> new NotFoundException("Category Not Found"));
-        CategoryDto categoryDto = new CategoryDto();
-        categoryDto.setId(category.getId());
-        categoryDto.setCategoryName(category.getCategoryName());
+        CategoryDto categoryDto = CategoryMapper.categoryToDto(category);
 
         return Response.builder().status(200).category(categoryDto).build();
     }
