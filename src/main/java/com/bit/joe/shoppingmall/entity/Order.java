@@ -3,6 +3,8 @@ package com.bit.joe.shoppingmall.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.bit.joe.shoppingmall.enums.OrderStatus;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -23,11 +25,9 @@ public class Order {
     @Column(name = "order_date", nullable = false)
     private String orderDate;
 
-    @Column(name = "total_amount", nullable = false)
-    private int totalAmount;
-
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private String status;
+    private OrderStatus status;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

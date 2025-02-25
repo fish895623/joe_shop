@@ -23,7 +23,4 @@ public class OrderItem {
 
     @Column(name = "quantity", nullable = false)
     private int quantity;
-
-    @Column(name = "unit_price", nullable = false)
-    private int unitPrice;
 }
