@@ -16,16 +16,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserDto {
 
-  private Long id;
-  private String name;
-  private UserGender gender;
-  private UserRole role;
-  private String birth;
-  private String email;
-  private String password;
+    private Long id;
+    private String name;
+    private UserGender gender;
+    private UserRole role;
+    private String birth;
+    private String email;
+    private String password;
 
-  // Order, Cart 파트는 아직 구현 전이라 주석 처리
-  // private List<OrderDto> orders;
-  // private List<CartDto> carts;
+    // Order, Cart 파트는 아직 구현 전이라 주석 처리
+    // private List<OrderDto> orders;
+    // private List<CartDto> carts;
 
 }
