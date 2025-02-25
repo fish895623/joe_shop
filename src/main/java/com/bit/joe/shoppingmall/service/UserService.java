@@ -4,17 +4,17 @@ import com.bit.joe.shoppingmall.dto.Response;
 import com.bit.joe.shoppingmall.dto.UserDto;
 
 public interface UserService {
-    Response createUser(UserDto userRequest) throws Exception;
+    Response createUser(UserDto userRequest);
 
-    Response updateUser(Long userId, UserDto userRequest) throws Exception;
+    Response updateUser(Long userId, UserDto userRequest);
 
-    Response getAllUsers() throws Exception;
+    Response getAllUsers();
 
-    Response getUserById(Long userId) throws Exception;
+    Response getUserById(Long userId);
 
-    Response getUserByEmail(String email) throws Exception;
+    Response getUserByEmail(String email);
 
-    Response deleteUser(Long userId) throws Exception;
+    Response deleteUser(Long userId);
 
     Response login(String email, String password) throws Exception;
 
