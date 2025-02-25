@@ -22,18 +22,14 @@ import lombok.extern.slf4j.Slf4j;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     public Response createUser(UserDto userRequest) {
-
         User user = UserMapper.toEntity(userRequest);
-        // Convert UserDto to User
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         userRepository.save(user);
-        // Save user
         return Response.builder().status(200).message("User created successfully").build();
-        // return success response
     }
 
     @Override
