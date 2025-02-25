@@ -15,12 +15,9 @@ public class Cart {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user; // Long 타입의 user_id 참조
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
-    private Product product; // Long 타입의 product_id 참조
-
-    @Column(name = "quantity", nullable = false)
-    private int quantity;
+    private Product product;
 }
