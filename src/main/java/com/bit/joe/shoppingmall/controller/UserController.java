@@ -1,6 +1,6 @@
 package com.bit.joe.shoppingmall.controller;
 
-import com.bit.joe.shoppingmall.mapper.UserMapper;
+import com.bit.joe.shoppingmall.enums.UserRole;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -82,6 +82,10 @@ public class UserController {
         UserDto sessionUser = (UserDto) session.getAttribute("user");
         // Get user from session
 
+        Response resp =
+            Response.builder().status(HttpStatus.FORBIDDEN.value()).message("User Deletion Forbidden").build();
+        // Create Default response
+
         // Check if user is logged in
         if (sessionUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -95,10 +99,12 @@ public class UserController {
                 .body(Response.builder().status(403).message("Forbidden").build());
             // return forbidden response with status code 403 -> user is not allowed to delete other
             // user's account
+        } else {
+            if (sessionUser.getRole().equals(UserRole.ADMIN)) {
+                resp = userService.deleteUser(userId);
+                // Delete user by userId and get response
+            }
         }
-
-        Response resp = userService.deleteUser(userId);
-        // Delete user by userId and get response
 
         session.invalidate();
         // Invalidate session -> logout user
@@ -115,10 +121,19 @@ public class UserController {
         Response resp = userService.login(userDto.getEmail(), userDto.getPassword());
         // Login user with email and password and get response
 
-        session.setAttribute("user", UserMapper.toEntity(resp.getUser()));
+        session.setAttribute("user", resp.getUser());
         // Set user to session
 
         return ResponseEntity.status(HttpStatus.OK).body(resp);
         // return success response with status code 200 (OK)
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<Response> logout(HttpSession session) {
+
+        Response resp = userService.logout(session);
+        // Logout user and get response
+
+        return ResponseEntity.status(HttpStatus.OK).body(resp);
     }
 }
