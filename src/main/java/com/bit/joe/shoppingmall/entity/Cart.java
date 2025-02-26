@@ -1,11 +1,10 @@
 package com.bit.joe.shoppingmall.entity;
 
-import jakarta.persistence.*;
-
-import lombok.*;
-
 import java.time.LocalDateTime;
 import java.util.List;
+
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "cart")
