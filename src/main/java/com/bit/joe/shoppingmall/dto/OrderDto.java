@@ -1,18 +1,17 @@
 package com.bit.joe.shoppingmall.dto;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import com.bit.joe.shoppingmall.entity.OrderItem;
+import com.bit.joe.shoppingmall.entity.CartItem;
 import com.bit.joe.shoppingmall.entity.User;
 import com.bit.joe.shoppingmall.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -25,5 +24,5 @@ public class OrderDto {
     private String orderDate;
     private OrderStatus status;
     private LocalDateTime createdAt;
-    private List<OrderItem> orderItems; // 수정: orderLists -> orderItems
+    private List<CartItem> orderItems; // 수정: orderLists -> orderItems
 }

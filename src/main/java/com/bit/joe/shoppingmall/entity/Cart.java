@@ -1,11 +1,18 @@
 package com.bit.joe.shoppingmall.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+
+import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "cart")
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 public class Cart {
 
     @Id
@@ -13,11 +20,13 @@ public class Cart {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private List<CartItem> cartItems;
+
+    private LocalDateTime createdAt;
 }
