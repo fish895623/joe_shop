@@ -1,7 +1,6 @@
 package com.bit.joe.shoppingmall.entity;
 
 import jakarta.persistence.*;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +17,6 @@ public class CartItem {
     @JoinColumn(name = "cart_id", nullable = false)
     private Cart cart;
 
-    @ManyToOne
-    private Product product;
+    @ManyToOne private Product product;
     private double price;
 }

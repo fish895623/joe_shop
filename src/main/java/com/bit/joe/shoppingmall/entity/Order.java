@@ -1,14 +1,13 @@
 package com.bit.joe.shoppingmall.entity;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import com.bit.joe.shoppingmall.enums.OrderStatus;
 
 import jakarta.persistence.*;
-
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "orders")
