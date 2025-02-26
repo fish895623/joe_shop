@@ -67,6 +67,19 @@ public class CartService {
         // Put product into CartItem
         CartItem cartItem = CartItem.builder().product(product).quantity(quantity).build();
 
+        // Add cartItem to cart
+        List<CartItem> cartItems = cart.getCartItems();
+        if (cartItems == null) {
+            cartItems = new ArrayList<>();
+        }
+        cartItems.add(cartItem);
+        cart.setCartItems(cartItems);
+
+        // Save cart
+        cartRepository.save(cart);
+
+        log.info("{}", cartItem.toString());
+
         return Response.builder()
                 .status(200)
                 .message("Product appended to cart successfully")
