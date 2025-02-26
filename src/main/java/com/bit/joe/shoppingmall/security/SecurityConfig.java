@@ -31,14 +31,21 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         return http.csrf(AbstractHttpConfigurer::disable) // CSRF 보호 비활성화
-            .authorizeHttpRequests(
-                request -> request.requestMatchers("/user/get-all").hasAuthority(UserRole.ADMIN.name()).anyRequest().permitAll())
-            // 모든
-            // 경로에 대해 permitAll()
-            .httpBasic(Customizer.withDefaults()) // HTTP 기본 인증
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // 세션 관리 정책
-            .logout((logout) -> logout.logoutSuccessUrl("/login")) // 로그아웃 이후 리다이렉트 endpoint
-            .build();
+                .authorizeHttpRequests(
+                        request ->
+                                request.requestMatchers("/user/get-all")
+                                        .hasAuthority(UserRole.ADMIN.name())
+                                        .anyRequest()
+                                        .permitAll())
+                // 모든
+                // 경로에 대해 permitAll()
+                .httpBasic(Customizer.withDefaults()) // HTTP 기본 인증
+                .sessionManagement(
+                        session ->
+                                session.sessionCreationPolicy(
+                                        SessionCreationPolicy.IF_REQUIRED)) // 세션 관리 정책
+                .logout((logout) -> logout.logoutSuccessUrl("/login")) // 로그아웃 이후 리다이렉트 endpoint
+                .build();
     }
 
     @Bean
@@ -53,9 +60,10 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder =
-            http.getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder.userDetailsService(userDetailsService)
-            .passwordEncoder(new BCryptPasswordEncoder());
+                http.getSharedObject(AuthenticationManagerBuilder.class);
+        authenticationManagerBuilder
+                .userDetailsService(userDetailsService)
+                .passwordEncoder(new BCryptPasswordEncoder());
 
         return authenticationManagerBuilder.build();
     }

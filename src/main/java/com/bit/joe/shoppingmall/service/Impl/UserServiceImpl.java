@@ -2,7 +2,6 @@ package com.bit.joe.shoppingmall.service.Impl;
 
 import java.util.List;
 
-import jakarta.servlet.http.HttpSession;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +13,7 @@ import com.bit.joe.shoppingmall.mapper.UserMapper;
 import com.bit.joe.shoppingmall.repository.UserRepository;
 import com.bit.joe.shoppingmall.service.UserService;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,7 +36,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public Response updateUser(Long userId, UserDto userRequest) {
 
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User data not found"));
+        userRepository
+                .findById(userId)
+                .orElseThrow(() -> new NotFoundException("User data not found"));
         // Check if user exists
         User user = UserMapper.toEntity(userRequest);
         // Convert UserDto to User
@@ -51,7 +53,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public Response deleteUser(Long userId) {
 
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User data not fount"));
+        userRepository
+                .findById(userId)
+                .orElseThrow(() -> new NotFoundException("User data not fount"));
         // Check if user exists
         userRepository.deleteById(userId);
         // Delete user
@@ -62,22 +66,36 @@ public class UserServiceImpl implements UserService {
     @Override
     public Response getUserById(Long userId) {
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User data not found"));
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseThrow(() -> new NotFoundException("User data not found"));
         // Check if user exists and get user
         UserDto userDto = UserMapper.toDto(user);
         // Convert User to UserDto
-        return Response.builder().status(200).message("User data retrieved successfully").user(userDto).build();
+        return Response.builder()
+                .status(200)
+                .message("User data retrieved successfully")
+                .user(userDto)
+                .build();
         // return success response
     }
 
     @Override
     public Response getUserByEmail(String email) {
 
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("User data not found"));
+        User user =
+                userRepository
+                        .findByEmail(email)
+                        .orElseThrow(() -> new NotFoundException("User data not found"));
         // Check if user exists and get user
         UserDto userDto = UserMapper.toDto(user);
         // Convert User to UserDto
-        return Response.builder().status(200).message("User data retrieved successfully").user(userDto).build();
+        return Response.builder()
+                .status(200)
+                .message("User data retrieved successfully")
+                .user(userDto)
+                .build();
         // return success response
     }
 
@@ -87,14 +105,21 @@ public class UserServiceImpl implements UserService {
 
         List<UserDto> userList = userRepository.findAll().stream().map(UserMapper::toDto).toList();
         // Get all users and convert them to UserDto
-        return Response.builder().status(200).message("All users retrieved successfully").userList(userList).build();
+        return Response.builder()
+                .status(200)
+                .message("All users retrieved successfully")
+                .userList(userList)
+                .build();
         // reuturn success response
     }
 
     @Override
     public Response login(String email, String password) {
 
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("User data not found"));
+        User user =
+                userRepository
+                        .findByEmail(email)
+                        .orElseThrow(() -> new NotFoundException("User data not found"));
         // Get user by email , check if user exists
 
         if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
@@ -102,7 +127,11 @@ public class UserServiceImpl implements UserService {
         }
         // Check if password is correct (use BCryptPasswordEncoder)
 
-        return Response.builder().status(200).message("Login successful").user(UserMapper.toDto(user)).build();
+        return Response.builder()
+                .status(200)
+                .message("Login successful")
+                .user(UserMapper.toDto(user))
+                .build();
         // Return success response if login is successful
     }
 
