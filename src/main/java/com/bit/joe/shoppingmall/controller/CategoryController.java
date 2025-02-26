@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bit.joe.shoppingmall.dto.CategoryDto;
-import com.bit.joe.shoppingmall.response.Response;
+import com.bit.joe.shoppingmall.dto.response.Response;
 import com.bit.joe.shoppingmall.service.CategoryService;
 
 import lombok.RequiredArgsConstructor;

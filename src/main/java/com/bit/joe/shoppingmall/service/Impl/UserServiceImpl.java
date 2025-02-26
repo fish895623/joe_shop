@@ -6,11 +6,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.bit.joe.shoppingmall.dto.UserDto;
+import com.bit.joe.shoppingmall.dto.response.Response;
 import com.bit.joe.shoppingmall.entity.User;
 import com.bit.joe.shoppingmall.exception.NotFoundException;
 import com.bit.joe.shoppingmall.mapper.UserMapper;
 import com.bit.joe.shoppingmall.repository.UserRepository;
-import com.bit.joe.shoppingmall.response.Response;
 import com.bit.joe.shoppingmall.service.UserService;
 
 import jakarta.servlet.http.HttpSession;

@@ -1,6 +1,6 @@
 package com.bit.joe.shoppingmall.service;
 
-import com.bit.joe.shoppingmall.response.Response;
+import com.bit.joe.shoppingmall.dto.response.Response;
 
 public interface ProductService {
 

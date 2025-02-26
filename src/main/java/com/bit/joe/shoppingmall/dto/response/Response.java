@@ -1,4 +1,4 @@
-package com.bit.joe.shoppingmall.response;
+package com.bit.joe.shoppingmall.dto.response;
 
 import java.time.LocalDateTime;
 import java.util.List;
