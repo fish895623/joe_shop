@@ -22,7 +22,7 @@ public class CartMapper {
                 .build();
     }
 
-public static Cart toEntity(CartDto data) {
+    public static Cart toEntity(CartDto data) {
         return Cart.builder()
                 .id(data.getId())
                 .user(UserMapper.toEntity(data.getUser()))
@@ -32,4 +32,5 @@ public static Cart toEntity(CartDto data) {
                                 .collect(Collectors.toList()))
                 .createdAt(data.getCreatedAt())
                 .build();
-    }}
+    }
+}

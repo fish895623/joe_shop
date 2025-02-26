@@ -1,8 +1,5 @@
 package com.bit.joe.shoppingmall.service.Impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 
 import com.bit.joe.shoppingmall.dto.Response;
@@ -10,23 +7,21 @@ import com.bit.joe.shoppingmall.entity.Cart;
 import com.bit.joe.shoppingmall.entity.CartItem;
 import com.bit.joe.shoppingmall.entity.Product;
 import com.bit.joe.shoppingmall.entity.User;
-import com.bit.joe.shoppingmall.repository.CartRepository;
-import com.bit.joe.shoppingmall.repository.OrderRepository;
-import com.bit.joe.shoppingmall.repository.ProductRepository;
-import com.bit.joe.shoppingmall.repository.UserRepository;
+import com.bit.joe.shoppingmall.repository.*;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Service
 @RequiredArgsConstructor
+@Service
 @Slf4j
 public class CartService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
 
     public Response createCart(Long userId) {
         User user =
@@ -39,45 +34,29 @@ public class CartService {
     }
 
     @Transactional
-    public Response appendProductToCart(Long cartId, Long userId, Long productId, int quantity) {
-
-        // Find user by userId
-        User user =
-                userRepository
-                        .findById(userId)
-                        .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        // Find cart by cartId or create new cart if not found
+    public Response appendProductToCart(Long cartId, Long productId, int quantity) {
         Cart cart =
                 cartRepository
                         .findById(cartId)
-                        .orElseGet(
-                                () -> {
-                                    log.info("Cart not found, creating new cart");
-                                    return Cart.builder().id(cartId).user(user).build();
-                                });
+                        .orElseThrow(() -> new IllegalArgumentException("Cart not found"));
 
-        // Find product by productId
+        log.info("{} {}", cart.getCreatedAt(), cart.getUser().getName());
+
         Product product =
                 productRepository
                         .findById(productId)
                         .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
-        // Put product into CartItem
-        CartItem cartItem = CartItem.builder().product(product).quantity(quantity).build();
+        CartItem cartItem =
+                CartItem.builder().cart(cart).quantity(quantity).product(product).build();
+        cartItemRepository.save(cartItem);
+        cartItem.setId(cartItem.getId());
 
-        // Add cartItem to cart
-        List<CartItem> cartItems = cart.getCartItems();
-        if (cartItems == null) {
-            cartItems = new ArrayList<>();
-        }
-        cartItems.add(cartItem);
-        cart.setCartItems(cartItems);
+        log.info("{} {}", cartItem.getId(), cartItem.getProduct().getName());
 
-        // Save cart
+        cart.getCartItems().add(cartItem);
+
         cartRepository.save(cart);
-
-        log.info("{}", cartItem.toString());
 
         return Response.builder()
                 .status(200)

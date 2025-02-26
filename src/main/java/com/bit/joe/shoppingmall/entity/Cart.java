@@ -30,4 +30,9 @@ public class Cart {
     private List<CartItem> cartItems;
 
     private LocalDateTime createdAt;
+
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+    }
 }

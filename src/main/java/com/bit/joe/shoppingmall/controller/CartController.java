@@ -18,21 +18,12 @@ public class CartController {
 
     private final CartService cartService;
 
-    @GetMapping("/add/{userId}/{cartId}/{productId}/{quantity}")
+    @GetMapping("/add/{cartId}/{productId}/{quantity}")
     public ResponseEntity<Response> appendProductToCart(
-            @PathVariable Long userId,
-            @PathVariable Long cartId,
-            @PathVariable Long productId,
-            @PathVariable int quantity) {
-        log.info(
-                "appendProductToCart: userId={}, cartId={}, productId={}, quantity={}",
-                userId,
-                cartId,
-                productId,
-                quantity);
+            @PathVariable Long cartId, @PathVariable Long productId, @PathVariable int quantity) {
+        log.info("cartId: {}, productId: {}, quantity: {}", cartId, productId, quantity);
 
-        return ResponseEntity.ok(
-                cartService.appendProductToCart(cartId, userId, productId, quantity));
+        return ResponseEntity.ok(cartService.appendProductToCart(cartId, productId, quantity));
     }
 
     @PostMapping("/remove/{cartId}/{productId}")
