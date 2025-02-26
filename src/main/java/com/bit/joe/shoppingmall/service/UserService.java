@@ -1,7 +1,7 @@
 package com.bit.joe.shoppingmall.service;
 
-import com.bit.joe.shoppingmall.dto.Response;
 import com.bit.joe.shoppingmall.dto.UserDto;
+import com.bit.joe.shoppingmall.response.Response;
 
 import jakarta.servlet.http.HttpSession;
 
