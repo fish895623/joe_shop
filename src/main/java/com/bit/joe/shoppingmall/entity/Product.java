@@ -28,11 +28,5 @@ public class Product {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @OneToMany(mappedBy = "product")
-    private List<OrderItem> orderItems; // 수정: orderLists -> orderItems
-
-    @OneToMany(mappedBy = "product")
-    private List<Cart> carts;
-
     private String imageURL;
 }

@@ -1,16 +1,19 @@
 package com.bit.joe.shoppingmall.entity;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 import com.bit.joe.shoppingmall.enums.OrderStatus;
 
 import jakarta.persistence.*;
-import lombok.Data;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
-@Data
+@Getter
+@Setter
 public class Order {
 
     @Id
@@ -22,8 +25,8 @@ public class Order {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "order_date", nullable = false)
-    private String orderDate;
+    @Column(name = "order_date")
+    private LocalDateTime orderDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
@@ -32,6 +35,7 @@ public class Order {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "order")
-    private List<OrderItem> orderItems; // 수정: orderLists -> orderItems
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "order_id")
+    private List<CartItem> orderItems;
 }

@@ -6,10 +6,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @AllArgsConstructor
@@ -26,6 +28,4 @@ public class UserDto {
 
     // Order, Cart 파트는 아직 구현 전이라 주석 처리
     // private List<OrderDto> orders;
-    // private List<CartDto> carts;
-
 }
