@@ -25,7 +25,7 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping("/create")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    //    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Response> createProduct(
             @RequestParam Long categoryId,
             @RequestParam String image,
