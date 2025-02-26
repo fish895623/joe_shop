@@ -3,6 +3,8 @@ package com.bit.joe.shoppingmall.service;
 import com.bit.joe.shoppingmall.dto.UserDto;
 import com.bit.joe.shoppingmall.response.Response;
 
+import jakarta.servlet.http.HttpSession;
+
 public interface UserService {
     Response createUser(UserDto userRequest);
 
@@ -16,7 +18,7 @@ public interface UserService {
 
     Response deleteUser(Long userId);
 
-    Response login(String email, String password) throws Exception;
+    Response login(String email, String password);
 
-    Response logout(String email) throws Exception;
+    Response logout(HttpSession session);
 }
