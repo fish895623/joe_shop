@@ -1,7 +1,5 @@
 package com.bit.joe.shoppingmall.entity;
 
-import java.util.List;
-
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -27,12 +25,6 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
-
-    @OneToMany(mappedBy = "product")
-    private List<OrderItem> orderItems; // 수정: orderLists -> orderItems
-
-    @OneToMany(mappedBy = "product")
-    private List<Cart> carts;
 
     private String imageURL;
 }
