@@ -2,7 +2,7 @@ package com.bit.joe.shoppingmall.mapper;
 
 import org.springframework.stereotype.Component;
 
-import com.bit.joe.shoppingmall.dto.ProductDto;
+import com.bit.joe.shoppingmall.dto.shopDto.ProductDto;
 import com.bit.joe.shoppingmall.entity.Product;
 
 @Component

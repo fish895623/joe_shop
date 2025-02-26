@@ -1,4 +1,4 @@
-package com.bit.joe.shoppingmall.request;
+package com.bit.joe.shoppingmall.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;

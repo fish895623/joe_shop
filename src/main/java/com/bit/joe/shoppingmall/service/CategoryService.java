@@ -1,7 +1,7 @@
 package com.bit.joe.shoppingmall.service;
 
-import com.bit.joe.shoppingmall.dto.CategoryDto;
-import com.bit.joe.shoppingmall.response.Response;
+import com.bit.joe.shoppingmall.dto.response.Response;
+import com.bit.joe.shoppingmall.dto.shopDto.CategoryDto;
 
 public interface CategoryService {
     Response createCategory(CategoryDto categoryRequest);

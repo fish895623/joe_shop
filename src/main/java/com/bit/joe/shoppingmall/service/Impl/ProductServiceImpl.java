@@ -6,14 +6,14 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.bit.joe.shoppingmall.dto.ProductDto;
+import com.bit.joe.shoppingmall.dto.response.Response;
+import com.bit.joe.shoppingmall.dto.shopDto.ProductDto;
 import com.bit.joe.shoppingmall.entity.Category;
 import com.bit.joe.shoppingmall.entity.Product;
 import com.bit.joe.shoppingmall.exception.NotFoundException;
 import com.bit.joe.shoppingmall.mapper.ProductMapper;
 import com.bit.joe.shoppingmall.repository.CategoryRepository;
 import com.bit.joe.shoppingmall.repository.ProductRepository;
-import com.bit.joe.shoppingmall.response.Response;
 import com.bit.joe.shoppingmall.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
