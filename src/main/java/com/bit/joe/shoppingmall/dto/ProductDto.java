@@ -1,4 +1,4 @@
-package com.bit.joe.shoppingmall.dto.shopDto;
+package com.bit.joe.shoppingmall.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

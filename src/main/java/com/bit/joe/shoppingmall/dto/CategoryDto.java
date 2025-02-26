@@ -1,4 +1,4 @@
-package com.bit.joe.shoppingmall.dto.shopDto;
+package com.bit.joe.shoppingmall.dto;
 
 import java.util.List;
 

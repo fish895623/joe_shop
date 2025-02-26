@@ -1,4 +1,4 @@
-package com.bit.joe.shoppingmall.dto.shopDto;
+package com.bit.joe.shoppingmall.dto;
 
 import com.bit.joe.shoppingmall.enums.UserGender;
 import com.bit.joe.shoppingmall.enums.UserRole;
