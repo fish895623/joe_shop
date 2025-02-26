@@ -15,4 +15,13 @@ public class CartItemMapper {
                 .price(data.getPrice())
                 .build();
     }
+
+    public static CartItem toEntity(CartItemDto data) {
+        return CartItem.builder()
+                .id(data.getId())
+                .cart(CartMapper.toEntity(data.getCart()))
+                .product(ProductMapper.toEntity(data.getProduct()))
+                .price(data.getPrice())
+                .build();
+    }
 }

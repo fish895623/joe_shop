@@ -16,4 +16,13 @@ public class ProductMapper {
         productDto.setQuantity(product.getQuantity());
         return productDto;
     }
+
+    public static Product toEntity(ProductDto productDto) {
+        Product product = new Product();
+        product.setId(productDto.getId());
+        product.setName(productDto.getName());
+        product.setPrice(productDto.getPrice());
+        product.setQuantity(productDto.getQuantity());
+        return product;
+    }
 }

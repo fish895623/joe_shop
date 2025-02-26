@@ -21,4 +21,15 @@ public class CartMapper {
                 .createdAt(data.getCreatedAt())
                 .build();
     }
-}
+
+public static Cart toEntity(CartDto data) {
+        return Cart.builder()
+                .id(data.getId())
+                .user(UserMapper.toEntity(data.getUser()))
+                .cartItems(
+                        data.getCartItemDto().stream()
+                                .map(CartItemMapper::toEntity)
+                                .collect(Collectors.toList()))
+                .createdAt(data.getCreatedAt())
+                .build();
+    }}
