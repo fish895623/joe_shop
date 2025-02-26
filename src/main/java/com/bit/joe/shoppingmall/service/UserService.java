@@ -16,7 +16,7 @@ public interface UserService {
 
     Response deleteUser(Long userId);
 
-    Response login(String email, String password) throws Exception;
+    Response login(String email, String password);
 
     Response logout(String email) throws Exception;
 }

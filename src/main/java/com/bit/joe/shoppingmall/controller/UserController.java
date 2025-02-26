@@ -1,5 +1,6 @@
 package com.bit.joe.shoppingmall.controller;
 
+import com.bit.joe.shoppingmall.mapper.UserMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,18 +35,12 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Response> registerUser(
-            HttpSession session, @RequestBody UserDto userDto) {
+    public ResponseEntity<Response> registerUser(HttpSession session, @RequestBody UserDto userDto) {
 
         // Check is requset body is empty
-        if (userDto.getEmail() == null
-                || userDto.getPassword() == null
-                || userDto.getName() == null
-                || userDto.getRole() == null
-                || userDto.getGender() == null
-                || userDto.getBirth() == null) {
+        if (userDto.getEmail() == null || userDto.getPassword() == null || userDto.getName() == null || userDto.getRole() == null || userDto.getGender() == null || userDto.getBirth() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Response.builder().status(400).message("Bad Request").build());
+                .body(Response.builder().status(400).message("Bad Request").build());
             // return bad request response with status code 400
         }
 
@@ -57,18 +52,14 @@ public class UserController {
     }
 
     @PutMapping("/update/{userId}")
-    public ResponseEntity<Response> updateUser(
-            HttpSession session, @PathVariable Long userId, @RequestBody UserDto userDto) {
+    public ResponseEntity<Response> updateUser(HttpSession session, @PathVariable Long userId,
+        @RequestBody UserDto userDto) {
 
         UserDto user = (UserDto) session.getAttribute("user");
         // Get user from session
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(
-                            Response.builder()
-                                    .status(401)
-                                    .message("Unauthorized(in controller): User is not logged in")
-                                    .build());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                Response.builder().status(401).message("Unauthorized(in controller): User is not logged in").build());
             // return unauthorized response with status code 401 -> user is not logged in
         }
 
@@ -76,7 +67,7 @@ public class UserController {
         // Get user's id
         if (!sessionUserId.equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Response.builder().status(403).message("Forbidden").build());
+                .body(Response.builder().status(403).message("Forbidden").build());
             // return forbidden response with status code 403 -> user is not allowed to update other
             // user's data
         }
@@ -94,14 +85,14 @@ public class UserController {
         // Check if user is logged in
         if (sessionUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Response.builder().status(401).message("Unauthorized").build());
+                .body(Response.builder().status(401).message("Unauthorized").build());
             // return unauthorized response with status code 401 -> user is not logged in
         }
 
         // Check if user is trying to delete his/her own account
         if (!sessionUser.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Response.builder().status(403).message("Forbidden").build());
+                .body(Response.builder().status(403).message("Forbidden").build());
             // return forbidden response with status code 403 -> user is not allowed to delete other
             // user's account
         }
@@ -121,30 +112,13 @@ public class UserController {
         session.removeAttribute("user");
         // Set user to null -> logout user
 
-        System.out.println("User email :" + userDto.getEmail());
-        // Print user email to console
+        Response resp = userService.login(userDto.getEmail(), userDto.getPassword());
+        // Login user with email and password and get response
 
-        UserDto user = userService.getUserByEmail(userDto.getEmail()).getUser();
-        // Get user by email from database
-
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Response.builder().status(404).message("Not Found").build());
-            // return not found response with status code 404 -> user not found
-        }
-
-        // check password
-        if (!user.getPassword().equals(userDto.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Response.builder().status(401).message("Unauthorized").build());
-            // return unauthorized response with status code 401 -> password is incorrect
-        }
-
-        session.setAttribute("user", user);
+        session.setAttribute("user", UserMapper.toEntity(resp.getUser()));
         // Set user to session
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(Response.builder().status(200).message("Login Success").build());
+        return ResponseEntity.status(HttpStatus.OK).body(resp);
         // return success response with status code 200 (OK)
     }
 }

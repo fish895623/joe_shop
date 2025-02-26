@@ -113,8 +113,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Response login(String email, String password) throws Exception {
-        throw new Exception("Not implemented");
+    public Response login(String email, String password) {
+
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("User data not found"));
+        // Get user by email , check if user exists
+
+        if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
+            return Response.builder().status(401).message("Wrong Password").build();
+        }
+        // Check if password is correct (use BCryptPasswordEncoder)
+
+        return Response.builder().status(200).message("Login successful").user(UserMapper.toDto(user)).build();
+        // Return success response if login is successful
     }
 
     @Override
