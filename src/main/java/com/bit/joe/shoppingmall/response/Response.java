@@ -1,8 +1,11 @@
-package com.bit.joe.shoppingmall.dto;
+package com.bit.joe.shoppingmall.response;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.bit.joe.shoppingmall.dto.CategoryDto;
+import com.bit.joe.shoppingmall.dto.ProductDto;
+import com.bit.joe.shoppingmall.dto.UserDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.Builder;

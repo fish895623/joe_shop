@@ -6,11 +6,11 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.bit.joe.shoppingmall.dto.CategoryDto;
-import com.bit.joe.shoppingmall.dto.Response;
 import com.bit.joe.shoppingmall.entity.Category;
 import com.bit.joe.shoppingmall.exception.NotFoundException;
 import com.bit.joe.shoppingmall.mapper.CategoryMapper;
 import com.bit.joe.shoppingmall.repository.CategoryRepository;
+import com.bit.joe.shoppingmall.response.Response;
 import com.bit.joe.shoppingmall.service.CategoryService;
 
 import lombok.RequiredArgsConstructor;

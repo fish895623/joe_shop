@@ -26,7 +26,11 @@ public class SecurityConfig {
 
         return http.csrf(customizer -> customizer.disable()) // CSRF 보호 비활성화
                 .authorizeHttpRequests(
-                        request -> request.anyRequest().permitAll()) // 모든 경로에 대해 permitAll()
+                        request ->
+                                request.requestMatchers("user/get-all")
+                                        .hasAuthority("ADMIN")
+                                        .anyRequest()
+                                        .permitAll()) // 모든 경로에 대해 permitAll()
                 .httpBasic(Customizer.withDefaults()) // HTTP 기본 인증
                 .sessionManagement(
                         session ->

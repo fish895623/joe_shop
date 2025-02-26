@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bit.joe.shoppingmall.dto.Response;
 import com.bit.joe.shoppingmall.dto.UserDto;
+import com.bit.joe.shoppingmall.response.Response;
 import com.bit.joe.shoppingmall.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
