@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bit.joe.shoppingmall.dto.Response;
 import com.bit.joe.shoppingmall.dto.UserDto;
+import com.bit.joe.shoppingmall.enums.UserRole;
 import com.bit.joe.shoppingmall.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
@@ -91,6 +92,13 @@ public class UserController {
         UserDto sessionUser = (UserDto) session.getAttribute("user");
         // Get user from session
 
+        Response resp =
+                Response.builder()
+                        .status(HttpStatus.FORBIDDEN.value())
+                        .message("User Deletion Forbidden")
+                        .build();
+        // Create Default response
+
         // Check if user is logged in
         if (sessionUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -104,10 +112,12 @@ public class UserController {
                     .body(Response.builder().status(403).message("Forbidden").build());
             // return forbidden response with status code 403 -> user is not allowed to delete other
             // user's account
+        } else {
+            if (sessionUser.getRole().equals(UserRole.ADMIN)) {
+                resp = userService.deleteUser(userId);
+                // Delete user by userId and get response
+            }
         }
-
-        Response resp = userService.deleteUser(userId);
-        // Delete user by userId and get response
 
         session.invalidate();
         // Invalidate session -> logout user
@@ -121,30 +131,22 @@ public class UserController {
         session.removeAttribute("user");
         // Set user to null -> logout user
 
-        System.out.println("User email :" + userDto.getEmail());
-        // Print user email to console
+        Response resp = userService.login(userDto.getEmail(), userDto.getPassword());
+        // Login user with email and password and get response
 
-        UserDto user = userService.getUserByEmail(userDto.getEmail()).getUser();
-        // Get user by email from database
-
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Response.builder().status(404).message("Not Found").build());
-            // return not found response with status code 404 -> user not found
-        }
-
-        // check password
-        if (!user.getPassword().equals(userDto.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Response.builder().status(401).message("Unauthorized").build());
-            // return unauthorized response with status code 401 -> password is incorrect
-        }
-
-        session.setAttribute("user", user);
+        session.setAttribute("user", resp.getUser());
         // Set user to session
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(Response.builder().status(200).message("Login Success").build());
+        return ResponseEntity.status(HttpStatus.OK).body(resp);
         // return success response with status code 200 (OK)
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<Response> logout(HttpSession session) {
+
+        Response resp = userService.logout(session);
+        // Logout user and get response
+
+        return ResponseEntity.status(HttpStatus.OK).body(resp);
     }
 }
