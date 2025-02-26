@@ -77,8 +77,8 @@ public class UserController {
         if (!sessionUserId.equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Response.builder().status(403).message("Forbidden").build());
-            // return forbidden response with status code 403 -> user is not allowed to update other
-            // user's data
+            // return forbidden response with status code 403 -> user is not allowed to
+            // update other user's data
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(userId, userDto));
@@ -102,8 +102,8 @@ public class UserController {
         if (!sessionUser.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Response.builder().status(403).message("Forbidden").build());
-            // return forbidden response with status code 403 -> user is not allowed to delete other
-            // user's account
+            // return forbidden response with status code 403 -> user is not allowed to
+            // delete other user's account
         }
 
         Response resp = userService.deleteUser(userId);
