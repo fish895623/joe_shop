@@ -8,7 +8,7 @@ import com.bit.joe.shoppingmall.entity.Product;
 @Component
 public class ProductMapper {
 
-    public static ProductDto productToDto(Product product) {
+    public static ProductDto toDto(Product product) {
         ProductDto productDto = new ProductDto();
         productDto.setId(product.getId());
         productDto.setName(product.getName());
