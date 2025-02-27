@@ -20,16 +20,18 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
-                        request -> request
-                            // add more requestMatchers here to restrict access to certain endpoints
-                            .requestMatchers("/user/get-all")
-                            .hasAuthority(UserRole.ADMIN.name())
-                            .requestMatchers("/category/create")
-                            .hasAuthority(UserRole.ADMIN.name())
-                            .requestMatchers("/product/create")
-                            .hasAuthority(UserRole.ADMIN.name())
-                            .anyRequest()
-                            .permitAll())
+                        request ->
+                                request
+                                        // add more requestMatchers here to restrict access to
+                                        // certain endpoints
+                                        .requestMatchers("/user/get-all")
+                                        .hasAuthority(UserRole.ADMIN.name())
+                                        .requestMatchers("/category/create")
+                                        .hasAuthority(UserRole.ADMIN.name())
+                                        .requestMatchers("/product/create")
+                                        .hasAuthority(UserRole.ADMIN.name())
+                                        .anyRequest()
+                                        .permitAll())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
@@ -41,5 +43,4 @@ public class SecurityConfig {
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder(12);
     }
-
 }

@@ -1,20 +1,20 @@
-//package com.bit.joe.shoppingmall.security;
+// package com.bit.joe.shoppingmall.security;
 //
-//import java.util.Optional;
+// import java.util.Optional;
 //
-//import org.springframework.security.core.userdetails.UserDetails;
-//import org.springframework.security.core.userdetails.UserDetailsService;
-//import org.springframework.security.core.userdetails.UsernameNotFoundException;
-//import org.springframework.stereotype.Service;
+// import org.springframework.security.core.userdetails.UserDetails;
+// import org.springframework.security.core.userdetails.UserDetailsService;
+// import org.springframework.security.core.userdetails.UsernameNotFoundException;
+// import org.springframework.stereotype.Service;
 //
-//import com.bit.joe.shoppingmall.entity.User;
-//import com.bit.joe.shoppingmall.repository.UserRepository;
+// import com.bit.joe.shoppingmall.entity.User;
+// import com.bit.joe.shoppingmall.repository.UserRepository;
 //
-//import lombok.RequiredArgsConstructor;
+// import lombok.RequiredArgsConstructor;
 //
-//@Service
-//@RequiredArgsConstructor
-//public class CustomUserDetailsService implements UserDetailsService {
+// @Service
+// @RequiredArgsConstructor
+// public class CustomUserDetailsService implements UserDetailsService {
 //
 //    private final UserRepository userRepository;
 //
@@ -28,4 +28,4 @@
 //
 //        return new CustomUserDetails(user.get()); // Get the actual User object from Optional
 //    }
-//}
+// }

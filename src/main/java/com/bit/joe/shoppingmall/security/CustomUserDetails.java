@@ -1,15 +1,15 @@
-//package com.bit.joe.shoppingmall.security;
+// package com.bit.joe.shoppingmall.security;
 //
-//import java.util.Collection;
-//import java.util.List;
+// import java.util.Collection;
+// import java.util.List;
 //
-//import org.springframework.security.core.GrantedAuthority;
-//import org.springframework.security.core.authority.SimpleGrantedAuthority;
-//import org.springframework.security.core.userdetails.UserDetails;
+// import org.springframework.security.core.GrantedAuthority;
+// import org.springframework.security.core.authority.SimpleGrantedAuthority;
+// import org.springframework.security.core.userdetails.UserDetails;
 //
-//import com.bit.joe.shoppingmall.entity.User;
+// import com.bit.joe.shoppingmall.entity.User;
 //
-//public class CustomUserDetails implements UserDetails {
+// public class CustomUserDetails implements UserDetails {
 //
 //    private final User user;
 //
@@ -51,4 +51,4 @@
 //    public boolean isEnabled() {
 //        return true;
 //    }
-//}
+// }
