@@ -51,6 +51,10 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     developmentOnly("org.springframework.boot:spring-boot-devtools")
+    
+    testImplementation group: "org.testcontainers", name: 'junit-jupiter', version: '1.+'
+    testImplementation group: 'org.testcontainers', name: 'mysql', version: '1.+'
+    testImplementation group: 'org.testcontainers', name: 'mariadb', version: '1.+'
 }
 
 tasks.named('test') {
