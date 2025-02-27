@@ -15,8 +15,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.bit.joe.shoppingmall.enums.UserRole;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -29,17 +27,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        return http.csrf(AbstractHttpConfigurer::disable) // CSRF 보호 비활성화
-                .authorizeHttpRequests(
-                        request ->
-                                request.requestMatchers("/user/get-all")
-                                        .hasAuthority(UserRole.ADMIN.name())
-                                        .anyRequest()
-                                        .permitAll())
-                // 모든
-                // 경로에 대해 permitAll()
-                .httpBasic(Customizer.withDefaults()) // HTTP 기본 인증
+        return http.csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(request -> request.anyRequest().permitAll())
+                .httpBasic(Customizer.withDefaults())
                 .sessionManagement(
                         session ->
                                 session.sessionCreationPolicy(
