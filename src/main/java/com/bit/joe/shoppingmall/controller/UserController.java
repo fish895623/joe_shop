@@ -35,8 +35,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Response> registerUser(
-            HttpSession session, @RequestBody UserDto userDto) {
+    public ResponseEntity<Response> registerUser(@RequestBody UserDto userDto) {
 
         // Check is requset body is empty
         if (userDto.getEmail() == null
@@ -110,9 +109,9 @@ public class UserController {
         if (!sessionUser.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Response.builder().status(403).message("Forbidden").build());
-            // return forbidden response with status code 403 -> user is not allowed to delete other
-            // user's account
+            // return forbidden response (403) -> user is not allowed to delete other user's account
         } else {
+            // Check if user is admin
             if (sessionUser.getRole().equals(UserRole.ADMIN)) {
                 resp = userService.deleteUser(userId);
                 // Delete user by userId and get response
