@@ -19,8 +19,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findByEmail(email);
+    public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
+        Optional<User> user = userRepository.findByName(name);
         if (user.isEmpty()) { // Use isEmpty() to check if the user was found
             System.out.println("User Not Found");
             throw new UsernameNotFoundException("user not found");
