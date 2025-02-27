@@ -2,14 +2,13 @@ package com.bit.joe.shoppingmall.service.Impl;
 
 import org.springframework.stereotype.Service;
 
-import com.bit.joe.shoppingmall.dto.Response;
+import com.bit.joe.shoppingmall.dto.response.Response;
 import com.bit.joe.shoppingmall.entity.Cart;
 import com.bit.joe.shoppingmall.entity.CartItem;
 import com.bit.joe.shoppingmall.entity.Product;
 import com.bit.joe.shoppingmall.entity.User;
 import com.bit.joe.shoppingmall.repository.*;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,7 +32,6 @@ public class CartService {
         return Response.builder().status(200).message("Cart created successfully").build();
     }
 
-    @Transactional
     public Response appendProductToCart(Long cartId, Long productId, int quantity) {
         Cart cart =
                 cartRepository

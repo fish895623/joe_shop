@@ -9,7 +9,6 @@ import com.bit.joe.shoppingmall.entity.Cart;
 
 @Component
 public class CartMapper {
-
     public static CartDto toDto(Cart data) {
         return CartDto.builder()
                 .id(data.getId())

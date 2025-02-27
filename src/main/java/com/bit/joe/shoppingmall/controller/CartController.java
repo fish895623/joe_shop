@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import com.bit.joe.shoppingmall.dto.Response;
+import com.bit.joe.shoppingmall.dto.response.Response;
 import com.bit.joe.shoppingmall.service.Impl.CartService;
 
 import lombok.RequiredArgsConstructor;
