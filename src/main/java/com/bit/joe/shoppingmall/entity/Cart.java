@@ -31,8 +31,11 @@ public class Cart {
 
     private LocalDateTime createdAt;
 
+    private Boolean isOrdered;
+
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
+        isOrdered = false;
     }
 }
