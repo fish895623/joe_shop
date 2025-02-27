@@ -35,8 +35,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Response> registerUser(
-            HttpSession session, @RequestBody UserDto userDto) {
+    public ResponseEntity<Response> registerUser(@RequestBody UserDto userDto) {
 
         // Check is requset body is empty
         if (userDto.getEmail() == null
