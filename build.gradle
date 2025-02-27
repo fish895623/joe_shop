@@ -69,25 +69,25 @@ jacocoTestReport {
 		xml.required = true
 		html.required = true
 	}
-	classDirectories.setFrom(files(classDirectories.files.collect {
-		fileTree(dir: it, exclude: [
-			'com/bit/joe/shopping/BitApplication.class',
-			'com/bit/joe/shopping/ServletInitializer.class',
-		])
-	}))
+	// classDirectories.setFrom(files(classDirectories.files.collect {
+	// 	fileTree(dir: it, exclude: [
+	// 		'com/bit/joe/shopping/BitApplication.class',
+	// 		'com/bit/joe/shopping/ServletInitializer.class',
+	// 	])
+	// }))
 }
 
 jacocoTestCoverageVerification {
-    violationRules {
-        rule {
-            element = 'CLASS'
-            limit {
-                counter = 'LINE'
-                value = 'COVEREDRATIO'
-                minimum = 0.0
-            }
-        }
-    }
+    // violationRules {
+    //     rule {
+    //         element = 'CLASS'
+    //         limit {
+    //             counter = 'LINE'
+    //             value = 'COVEREDRATIO'
+    //             minimum = 0.0
+    //         }
+    //     }
+    // }
 }
 
 spotless {
