@@ -15,7 +15,7 @@ class DemoApplicationTests {
     private static final String DATABASE_NAME = "shoppingmall";
 
     static MySQLContainer<?> mySQLContainer =
-            new MySQLContainer<>("mysql:8.0")
+            new MySQLContainer<>("mysql:lts")
                     .withUsername(USERNAME)
                     .withPassword(PASSWORD)
                     .withDatabaseName(DATABASE_NAME);
