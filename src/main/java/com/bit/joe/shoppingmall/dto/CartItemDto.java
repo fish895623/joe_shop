@@ -1,5 +1,7 @@
 package com.bit.joe.shoppingmall.dto;
 
+import java.math.BigDecimal;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -18,5 +20,5 @@ public class CartItemDto {
     private Long id;
     private CartDto cart;
     private ProductDto product;
-    private double price;
+    private BigDecimal price;
 }
