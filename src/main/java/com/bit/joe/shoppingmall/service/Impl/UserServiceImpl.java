@@ -27,10 +27,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Response createUser(UserDto userRequest) {
+
         User user = UserMapper.toEntity(userRequest);
+        // Convert UserDto to User
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        // Encrypt password using BCryptPasswordEncoder
         userRepository.save(user);
+        // Save user
         return Response.builder().status(200).message("User created successfully").build();
+        // return success response
     }
 
     @Override
