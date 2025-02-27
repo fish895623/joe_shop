@@ -17,7 +17,7 @@ public class OrderItem {
     private Product product;
 
     private int quantity;
-    
+
     private BigDecimal price;
 
     @ManyToOne
@@ -26,4 +26,3 @@ public class OrderItem {
 
     // Getters and Setters
 }
-
