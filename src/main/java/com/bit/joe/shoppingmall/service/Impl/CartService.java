@@ -22,12 +22,12 @@ public class CartService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
 
-    public Response createCart(Long userId) {
+    public Response createCart(Long userId, Long cartId) {
         User user =
                 userRepository
                         .findById(userId)
                         .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        Cart cart = Cart.builder().user(user).build();
+        Cart cart = Cart.builder().id(cartId).user(user).build();
         cartRepository.save(cart);
         return Response.builder().status(200).message("Cart created successfully").build();
     }
@@ -48,6 +48,11 @@ public class CartService {
         CartItem cartItem =
                 CartItem.builder().cart(cart).quantity(quantity).product(product).build();
         cartItemRepository.save(cartItem);
+        cartItem =
+                cartItemRepository
+                        .findByProduct(product)
+                        .orElseThrow(() -> new IllegalArgumentException("Cart item not found"));
+
         cartItem.setId(cartItem.getId());
 
         log.info("{} {}", cartItem.getId(), cartItem.getProduct().getName());
