@@ -59,6 +59,10 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
+tasks.named('spotlessCheck') {
+    dependsOn 'spotlessApply'
+}
+
 spotless {
     java {
         googleJavaFormat().aosp() 
