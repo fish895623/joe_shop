@@ -1,7 +1,9 @@
 package com.bit.joe.shoppingmall.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Base64;
 
@@ -101,13 +103,22 @@ class UserControllerTests {
 
     @Test
     @Order(4)
-    public void loginUser() throws Exception {}
+    public void loginUser() throws Exception {
+        MockHttpSession mockHttpSession = new MockHttpSession();
+
+        String basicAuthHeader =
+                "Basic " + Base64.getEncoder().encodeToString("admin:admin".getBytes());
+
+        mockMvc.perform(
+                        post("/user/login")
+                                .header("Authorization", basicAuthHeader)
+                                .session(mockHttpSession))
+                .andExpect(status().isOk());
+    }
 
     @Test
     @Order(5)
     public void updateUser() throws Exception {
-        // update User information from /user/{userId}
-        // Update user gender to female
         UserDto userDto = new UserDto();
         userDto.setEmail("admin@example.com");
         userDto.setName("admin");
