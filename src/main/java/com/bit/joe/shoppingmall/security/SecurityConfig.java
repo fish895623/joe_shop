@@ -2,7 +2,6 @@ package com.bit.joe.shoppingmall.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -52,8 +51,7 @@ public class SecurityConfig {
                         session ->
                                 session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                                         .sessionAuthenticationStrategy(
-                                                sessionAuthenticationStrategy())
-                )
+                                                sessionAuthenticationStrategy()))
                 .logout(
                         logout ->
                                 logout.logoutUrl("/user/logout")
@@ -76,7 +74,8 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(12);
     }
 
-    // ======================================== undeveloped yet ========================================
+    // ======================================== undeveloped yet
+    // ========================================
     @Bean
     public SessionAuthenticationStrategy sessionAuthenticationStrategy() {
         return new SessionFixationProtectionStrategy();
@@ -87,6 +86,7 @@ public class SecurityConfig {
         SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
     }
 
-    // ======================================== undeveloped yet ========================================
+    // ======================================== undeveloped yet
+    // ========================================
 
 }
