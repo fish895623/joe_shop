@@ -19,8 +19,7 @@ public class CartController {
     private final CartService cartService;
 
     @GetMapping("/create/{userId}")
-    public ResponseEntity<Response> createCart(
-            @PathVariable Long userId) {
+    public ResponseEntity<Response> createCart(@PathVariable Long userId) {
 
         return ResponseEntity.ok(cartService.createCart(userId));
         // return success response with status code 200 (OK)
