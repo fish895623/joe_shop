@@ -28,8 +28,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public Response createUser(UserDto userRequest) {
         User user = UserMapper.toEntity(userRequest);
+        // Convert UserDto to User
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        // Encode password
+
         userRepository.save(user);
+        // Save user
         return Response.builder().status(200).message("User created successfully").build();
     }
 
@@ -38,14 +42,20 @@ public class UserServiceImpl implements UserService {
 
         userRepository
                 .findById(userId)
-                .orElseThrow(() -> new NotFoundException("User data not found"));
-        // Check if user exists
+                .orElseThrow(
+                        () -> new NotFoundException("User data going to update does not found"));
+        // Check if user exists and throw exception if not
+
         User user = UserMapper.toEntity(userRequest);
         // Convert UserDto to User
         user.setId(userId);
         // Set target user's id
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        // Encode password
+
         userRepository.save(user);
         // Save user
+
         return Response.builder().status(200).message("User updated successfully").build();
         // return success response
     }
@@ -140,6 +150,16 @@ public class UserServiceImpl implements UserService {
 
         session.invalidate();
         // Invalidate session -> logout user
+
+        // Clear the SecurityContextHolderStrategy
+
+        // Clear teh SecurityContextRepository
+
+        // Clean up any RememberMe authentication
+
+        // Clear out any saved CSRF token
+
+        // Fire a LogoutSuccessEvent
 
         return Response.builder().status(200).message("Logout successfully").build();
     }
