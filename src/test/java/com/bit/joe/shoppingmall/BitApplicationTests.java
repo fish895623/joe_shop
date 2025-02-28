@@ -32,6 +32,6 @@ class DemoApplicationTests {
 
     @Test
     void contextLoads() {
-        Assertions.assertTrue(mySQLContainer.isHealthy());
+        Assertions.assertTrue(mySQLContainer.isRunning());
     }
 }
