@@ -36,7 +36,7 @@ public class User {
     @Column(name = "birth", nullable = false)
     private String birth;
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(name = "password", nullable = false)

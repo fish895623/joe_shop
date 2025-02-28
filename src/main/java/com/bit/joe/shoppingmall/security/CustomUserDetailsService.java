@@ -11,8 +11,10 @@ import com.bit.joe.shoppingmall.entity.User;
 import com.bit.joe.shoppingmall.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
@@ -22,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
         Optional<User> user = userRepository.findByName(name);
         if (user.isEmpty()) { // Use isEmpty() to check if the user was found
-            System.out.println("User Not Found");
+            log.warn("User Not Found");
             throw new UsernameNotFoundException("user not found");
         }
 

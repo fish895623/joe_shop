@@ -11,5 +11,5 @@ public class ProductRequest {
     private String image;
     private String name;
     private int quantity;
-    private int price;
+    private int price; // TODO: Need to change info float?
 }
