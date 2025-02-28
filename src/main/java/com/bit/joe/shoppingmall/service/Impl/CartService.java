@@ -1,7 +1,6 @@
 package com.bit.joe.shoppingmall.service.Impl;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -51,7 +50,10 @@ public class CartService {
                         .orElseThrow(() -> new NotFoundException("User not found"));
 
         // find cart by user
-        Cart cart = cartRepository.findCartByUser(user).orElseThrow(() -> new NotFoundException("Cart not found"));
+        Cart cart =
+                cartRepository
+                        .findCartByUser(user)
+                        .orElseThrow(() -> new NotFoundException("Cart not found"));
 
         // Find product by id
         Product product =
@@ -60,8 +62,12 @@ public class CartService {
                         .orElseThrow(() -> new NotFoundException("Product not found"));
 
         CartItem cartItem =
-                CartItem.builder().cart(cart).product(product).quantity(quantity).price(
-                    BigDecimal.valueOf((long) quantity * product.getPrice())).build();
+                CartItem.builder()
+                        .cart(cart)
+                        .product(product)
+                        .quantity(quantity)
+                        .price(BigDecimal.valueOf((long) quantity * product.getPrice()))
+                        .build();
         // Create a new cart item with the found product, quantity and price
 
         cart.getCartItems().add(cartItem);
