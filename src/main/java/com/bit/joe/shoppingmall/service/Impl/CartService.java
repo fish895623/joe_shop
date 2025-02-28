@@ -2,6 +2,7 @@ package com.bit.joe.shoppingmall.service.Impl;
 
 import java.util.List;
 
+import com.bit.joe.shoppingmall.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.bit.joe.shoppingmall.dto.response.Response;
@@ -24,12 +25,17 @@ public class CartService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
 
-    public Response createCart(Long userId, Long cartId) {
+    // Create a cart initially (when user registers)
+    public Response createCart(Long userId) {
         User user =
                 userRepository
                         .findById(userId)
-                        .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        Cart cart = Cart.builder().id(cartId).user(user).build();
+                        .orElseThrow(() -> new NotFoundException("User not found"));
+        Cart cart = new Cart();
+        // Create a new cart (empty)
+        cart.setUser(user);
+        // Set the user of the cart
+
         cartRepository.save(cart);
 
         return Response.builder().status(200).message("Cart created successfully").build();
