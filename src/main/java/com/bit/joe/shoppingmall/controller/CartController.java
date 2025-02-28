@@ -28,9 +28,9 @@ public class CartController {
     @GetMapping("/add/{userId}/{productId}/{quantity}")
     public ResponseEntity<Response> appendProductToCart(
             @PathVariable Long userId, @PathVariable Long productId, @PathVariable int quantity) {
-        log.info("cartId: {}, productId: {}, quantity: {}", userId, productId, quantity);
 
         return ResponseEntity.ok(cartService.appendProductToCart(userId, productId, quantity));
+        // return success response with status code 200 (OK)
     }
 
     @PostMapping("/remove/{cartId}/{productId}")

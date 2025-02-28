@@ -1,5 +1,6 @@
 package com.bit.joe.shoppingmall.service.Impl;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -47,26 +48,27 @@ public class CartService {
         User user =
                 userRepository
                         .findById(userId)
-                        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                        .orElseThrow(() -> new NotFoundException("User not found"));
 
         // find cart by user
-        Cart cart = cartRepository.findCartByUser(user).get();
+        Cart cart = cartRepository.findCartByUser(user).orElseThrow(() -> new NotFoundException("Cart not found"));
 
         // Find product by id
         Product product =
                 productRepository
                         .findById(productId)
-                        .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+                        .orElseThrow(() -> new NotFoundException("Product not found"));
 
         CartItem cartItem =
-                CartItem.builder().cart(cart).product(product).quantity(quantity).build();
+                CartItem.builder().cart(cart).product(product).quantity(quantity).price(
+                    BigDecimal.valueOf((long) quantity * product.getPrice())).build();
+        // Create a new cart item with the found product, quantity and price
 
-        List<CartItem> cartItems = cart.getCartItems();
-        cartItems.add(cartItem);
-
-        cart.setCartItems(cartItems);
+        cart.getCartItems().add(cartItem);
+        // Add the cart item to the cart
 
         cartRepository.save(cart);
+        // Save the cart
 
         return Response.builder()
                 .status(200)
