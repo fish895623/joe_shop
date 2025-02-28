@@ -98,4 +98,31 @@ class UserControllerTests {
                                 .content(userDtoJson))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    @Order(4)
+    public void loginUser() throws Exception {}
+
+    @Test
+    @Order(5)
+    public void updateUser() throws Exception {
+        // update User information from /user/{userId}
+        // Update user gender to female
+        UserDto userDto = new UserDto();
+        userDto.setEmail("admin@example.com");
+        userDto.setName("admin");
+        userDto.setPassword("admin");
+        userDto.setRole(UserRole.ADMIN);
+        userDto.setGender(UserGender.FEMALE);
+        userDto.setBirth("2021-01-01");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userDtoJson = objectMapper.writeValueAsString(userDto);
+
+        mockMvc.perform(
+                        put("/user/update/1")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(userDtoJson))
+                .andExpect(status().isOk());
+    }
 }
