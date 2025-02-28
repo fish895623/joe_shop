@@ -4,6 +4,7 @@ plugins {
     id 'org.springframework.boot' version '3.4.3'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'com.diffplug.spotless' version '7.0.2'
+    id 'jacoco'
 }
 
 group = 'com.bit.joe'
@@ -51,10 +52,44 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     developmentOnly("org.springframework.boot:spring-boot-devtools")
+    
+    // testcontainer
+    testImplementation group: "org.testcontainers", name: 'junit-jupiter', version: '1.+'
+    testImplementation group: 'org.testcontainers', name: 'mysql', version: '1.+'
+    testImplementation group: 'org.testcontainers', name: 'mariadb', version: '1.+'
 }
 
 tasks.named('test') {
-    useJUnitPlatform()
+	useJUnitPlatform()
+	
+	finalizedBy jacocoTestCoverageVerification
+}
+
+jacocoTestReport {
+	reports {
+		xml.required = true
+		html.required = true
+	}
+	classDirectories.setFrom(files(classDirectories.files.collect {
+		fileTree(dir: it, exclude: [
+			'com/bit/joe/shopping/BitApplication.class',
+			'com/bit/joe/shopping/ServletInitializer.class',
+		])
+	}))
+}
+
+jacocoTestCoverageVerification {
+    dependsOn jacocoTestReport
+    violationRules {
+        rule {
+            element = 'CLASS'
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.0
+            }
+        }
+    }
 }
 
 tasks.withType(JavaExec).configureEach {
