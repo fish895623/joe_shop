@@ -92,6 +92,10 @@ jacocoTestCoverageVerification {
     }
 }
 
+tasks.withType(JavaExec).configureEach {
+    jvmArgs = ['-Djava.security.egd=file:/dev/./urandom']
+}
+
 spotless {
     java {
         googleJavaFormat().aosp() 
