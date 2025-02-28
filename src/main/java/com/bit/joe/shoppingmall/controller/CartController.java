@@ -36,12 +36,11 @@ public class CartController {
     @PostMapping("/remove/{cartId}/{productId}")
     public ResponseEntity<Response> removeProductFromCart(
             @PathVariable Long cartId, @PathVariable Long productId) {
-        cartService.removeProductFromCart(cartId, productId);
 
-        return ResponseEntity.ok(
-                Response.builder()
-                        .status(200)
-                        .message("Product removed from cart successfully")
-                        .build());
+        Response resp = cartService.removeProductFromCart(cartId, productId);
+        // Remove product from cart and get response
+
+        return ResponseEntity.ok(resp);
+        // return success response with status code 200 (OK)
     }
 }
