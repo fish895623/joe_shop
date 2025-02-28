@@ -55,6 +55,21 @@ public class CartService {
                         .findCartByUser(user)
                         .orElseThrow(() -> new NotFoundException("Cart not found"));
 
+        // if same product already exists in the cart, update only quantity
+        for (CartItem cartItem : cart.getCartItems()) {
+            if (cartItem.getProduct().getId().equals(productId)) {
+                cartItem.setQuantity(cartItem.getQuantity() + quantity);
+                cartItem.setPrice(
+                        BigDecimal.valueOf(
+                                (long) cartItem.getQuantity() * cartItem.getProduct().getPrice()));
+                cartItemRepository.save(cartItem);
+                return Response.builder()
+                        .status(200)
+                        .message("Product quantity updated successfully")
+                        .build();
+            }
+        }
+
         // Find product by id
         Product product =
                 productRepository
