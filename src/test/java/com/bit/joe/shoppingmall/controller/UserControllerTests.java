@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpSession;
 
-class UserControllerTests {
+public class UserControllerTests {
 
     static final MySQLContainer<?> mysql = MySQLContainerConfig.getInstance();
 
