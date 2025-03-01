@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ["self-hosted", "ubuntu-latest"]
+    runs-on: ["self-hosted", "ubuntu-latest", "self-linux"]
     permissions:
       contents: read
 
