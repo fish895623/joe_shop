@@ -1,3 +1,7 @@
+# 테스트 실행방법
+
+Docker 설치 후 `./gradlew test --info` 작업 실행
+
 # 1. 브랜치 만들기
 
 `git checkout -b __브랜치 이름__`
