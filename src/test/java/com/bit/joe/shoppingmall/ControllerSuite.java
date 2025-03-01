@@ -9,6 +9,7 @@ import com.bit.joe.shoppingmall.controller.UserControllerTests;
 
 @Suite
 @SelectClasses({
+    ContainerTests.class,
     UserControllerTests.class,
     CategoryControllerTests.class,
     ProductControllerTests.class,

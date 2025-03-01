@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpSession;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class UserControllerTests {
+public class UserControllerTests {
 
     static final MySQLContainer<?> mysql = MySQLContainerConfig.getInstance();
     UserDto userDto =
