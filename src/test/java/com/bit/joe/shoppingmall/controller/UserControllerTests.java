@@ -106,12 +106,17 @@ class UserControllerTests {
     public void loginUser() throws Exception {
         MockHttpSession mockHttpSession = new MockHttpSession();
 
-        String basicAuthHeader =
-                "Basic " + Base64.getEncoder().encodeToString("admin:admin".getBytes());
+        UserDto userDto = new UserDto();
+        userDto.setEmail("admin@example.com");
+        userDto.setPassword("admin");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String dataJson = objectMapper.writeValueAsString(userDto);
 
         mockMvc.perform(
                         post("/user/login")
-                                .header("Authorization", basicAuthHeader)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(dataJson)
                                 .session(mockHttpSession))
                 .andExpect(status().isOk());
     }
