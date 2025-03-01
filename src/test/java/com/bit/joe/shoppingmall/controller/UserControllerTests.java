@@ -34,13 +34,23 @@ import jakarta.servlet.http.HttpSession;
 class UserControllerTests {
 
     static final MySQLContainer<?> mysql = MySQLContainerConfig.getInstance();
-
+    UserDto userDto =
+            UserDto.builder()
+                    .name("admin")
+                    .password("admin")
+                    .email("admin@example.com")
+                    .role(UserRole.ADMIN)
+                    .gender(UserGender.MALE)
+                    .birth("2021-01-01")
+                    .build();
+    String basicAuthHeader =
+            "Basic "
+                    + Base64.getEncoder()
+                            .encodeToString(
+                                    (userDto.getEmail() + userDto.getPassword()).getBytes());
     private MockMvc mockMvc;
-
     @Mock private UserService userService;
-
     @Mock private HttpSession session;
-
     @InjectMocks private UserController userController;
 
     @BeforeEach
@@ -52,13 +62,6 @@ class UserControllerTests {
     @Test
     @Order(1)
     public void registerAdminUser() throws Exception {
-        UserDto userDto = new UserDto();
-        userDto.setEmail("admin@example.com");
-        userDto.setName("admin");
-        userDto.setPassword("admin");
-        userDto.setRole(UserRole.ADMIN);
-        userDto.setGender(UserGender.MALE);
-        userDto.setBirth("2021-01-01");
 
         ObjectMapper objectMapper = new ObjectMapper();
         String userDtoJson = objectMapper.writeValueAsString(userDto);
@@ -75,9 +78,6 @@ class UserControllerTests {
     public void getAllUsers() throws Exception {
 
         MockHttpSession mockHttpSession = new MockHttpSession();
-
-        String basicAuthHeader =
-                "Basic " + Base64.getEncoder().encodeToString("admin:admin".getBytes());
 
         mockMvc.perform(
                         get("/user/get-all")
@@ -105,18 +105,17 @@ class UserControllerTests {
     @Order(4)
     public void loginUser() throws Exception {
         MockHttpSession mockHttpSession = new MockHttpSession();
-
-        UserDto userDto = new UserDto();
-        userDto.setEmail("admin@example.com");
-        userDto.setPassword("admin");
+        String basicAuthHeader =
+                "Basic " + Base64.getEncoder().encodeToString("admin@example.com:admin".getBytes());
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String dataJson = objectMapper.writeValueAsString(userDto);
+        String userDtoJson = objectMapper.writeValueAsString(userDto);
 
         mockMvc.perform(
                         post("/user/login")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(dataJson)
+                                .header("Authorization", basicAuthHeader)
+                                .content(userDtoJson)
                                 .session(mockHttpSession))
                 .andExpect(status().isOk());
     }
@@ -138,7 +137,8 @@ class UserControllerTests {
         mockMvc.perform(
                         put("/user/update/1")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(userDtoJson))
+                                .content(userDtoJson)
+                                .header("Authorization", basicAuthHeader))
                 .andExpect(status().isOk());
     }
 }
