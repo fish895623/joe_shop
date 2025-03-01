@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.bit.joe.shoppingmall.dto.CartDto;
+import com.bit.joe.shoppingmall.dto.CartItemDto;
 import com.bit.joe.shoppingmall.dto.CategoryDto;
 import com.bit.joe.shoppingmall.dto.OrderDto;
 import com.bit.joe.shoppingmall.dto.OrderItemDto;
@@ -41,4 +42,7 @@ public class Response {
 
     private CartDto cart;
     private List<CartDto> cartList;
+
+    private CartItemDto cartItem;
+    private List<CartItemDto> cartItemList;
 }
