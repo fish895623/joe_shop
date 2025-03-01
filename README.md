@@ -34,11 +34,11 @@ ex) `bsh-authorization-button`
 
 `git push` 작업후 페이지에서 `Pull Request` 작업 진행
 
-(https://github.blog/news-insights/product-news/introducing-draft-pull-requests/)[Pull Request Draft] 를 만들어 놓는다.
+[Pull Request Draft](https://github.blog/news-insights/product-news/introducing-draft-pull-requests/) 를 만들어 놓는다.
 
 개발 작업 도중에 수시로 커밋을 푸시하도록 한다.
 
-개발완료 후 (https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-stage-of-a-pull-request)[Ready For Review] 버튼을 눌러준다.
+개발완료 후 [Ready For Review](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-stage-of-a-pull-request) 버튼을 눌러준다.
 
 ### 방법 2.
 
