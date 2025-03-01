@@ -2,7 +2,9 @@
 
 Docker 설치 후 `./gradlew test --info` 작업 실행
 
-# 1. 브랜치 만들기
+# 코드 기여방법
+
+## 1. 브랜치 만들기
 
 `git checkout -b __브랜치 이름__`
 
@@ -10,7 +12,7 @@ Docker 설치 후 `./gradlew test --info` 작업 실행
 
 ex) `bsh-authorization-button`
 
-# 2. 코드 내용 적용
+## 2. 코드 내용 적용
 
 코드를 올리기 전 `./gradlew spotlessApply` 를 실행하여 코드 컨벤션 적용
 
@@ -18,7 +20,7 @@ ex) `bsh-authorization-button`
 
 [상세 설명](https://hihiha2.tistory.com/4)
 
-# 3. 코드 올리기
+## 3. 코드 올리기
 
 `git push`를 사용하여 코드 올리기.
 
@@ -26,13 +28,19 @@ ex) `bsh-authorization-button`
 
 `git push -u origin` 적용
 
-# 4. Pull Request 요청 ( 택 1 )
+## 4. Pull Request 요청 ( 택 1 )
 
-## 방법 1.
+### 방법 1.
 
 `git push` 작업후 페이지에서 `Pull Request` 작업 진행
 
-## 방법 2.
+(https://github.blog/news-insights/product-news/introducing-draft-pull-requests/)[Pull Request Draft] 를 만들어 놓는다.
+
+개발 작업 도중에 수시로 커밋을 푸시하도록 한다.
+
+개발완료 후 (https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-stage-of-a-pull-request)[Ready For Review] 버튼을 눌러준다.
+
+### 방법 2.
 
 https://cli.github.com/
 
@@ -44,7 +52,7 @@ gh pr create --web
 
 위 명령어를 통해서 코드 합치기 요청.
 
-# 5. 완료 작업
+## 5. 완료 작업
 
 `git checkout master` 를 이용하여 원래 브랜치로 이동
 
