@@ -1,0 +1,25 @@
+name: Java CI with Gradle
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  build:
+    runs-on: X64
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        java: [ '17', '21', '23' ]
+
+    steps:
+      - uses: actions/checkout@main
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: "temurin"
+      - name: Build with Gradle Wrapper
+        run: ./gradlew build
+
