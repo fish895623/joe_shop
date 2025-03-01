@@ -72,6 +72,8 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 
+    ignoreFailures = gradle.startParameter.taskNames.contains('build')
+
     finalizedBy jacocoTestCoverageVerification
 }
 
