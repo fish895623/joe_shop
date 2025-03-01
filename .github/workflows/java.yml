@@ -23,6 +23,8 @@ jobs:
         with:
           java-version: "17"
           distribution: "temurin"
+      - name: test output
+        run: echo 1234
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
