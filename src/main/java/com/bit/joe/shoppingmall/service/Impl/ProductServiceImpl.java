@@ -89,7 +89,7 @@ public class ProductServiceImpl implements ProductService {
                 productRepository
                         .findById(productId)
                         .orElseThrow(() -> new NotFoundException("Product not found"));
-        ProductDto productDto = ProductMapper.productToDto(product);
+        ProductDto productDto = ProductMapper.toDto(product);
 
         return Response.builder()
                 .status(200)
@@ -102,7 +102,7 @@ public class ProductServiceImpl implements ProductService {
     public Response getAllProducts() {
         List<ProductDto> productList =
                 productRepository.findAll(Sort.by(Sort.Direction.DESC, "id")).stream()
-                        .map(ProductMapper::productToDto)
+                        .map(ProductMapper::toDto)
                         .collect(Collectors.toList());
 
         return Response.builder()
@@ -119,7 +119,7 @@ public class ProductServiceImpl implements ProductService {
             throw new NotFoundException("No Products found for this category");
         }
         List<ProductDto> productDtoList =
-                products.stream().map(ProductMapper::productToDto).collect(Collectors.toList());
+                products.stream().map(ProductMapper::toDto).collect(Collectors.toList());
 
         return Response.builder()
                 .status(200)
