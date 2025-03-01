@@ -40,9 +40,9 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
                 userRepository
                         .findByEmail(username)
                         .orElseThrow(() -> new NotFoundException("User data not found"));
-        // db에서 username(->email) 문자열을 가진 Customer있다면 customer로 반환
+        // db에서 username(->email) 문자열을 가진 User가 있으면 user로 반환
 
-        // customer가 존재한다면
+        // user가 존재한다면
         if (user != null) {
             // 비밀번호가 일치하다면
             if (bCryptPasswordEncoder.matches(pwd, user.getPassword())) {
@@ -50,16 +50,16 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
                 List<GrantedAuthority> authorities = new ArrayList<>();
                 // 엔드 유저의 authorities 세부 사항을 덧붙임
                 authorities.add(new SimpleGrantedAuthority(user.getRole().name()));
-                // customer 테이블 내의 role 컬럼에 존재, Role 문자열 값을 SimpleGrantedAuthority 클래스로 변환
+                // users 테이블 내의 role 컬럼에 존재, Role 문자열 값을 SimpleGrantedAuthority 클래스로 변환
                 return new UsernamePasswordAuthenticationToken(username, pwd, authorities);
-                // UsernamePasswordAuthenticationToken 대상을 새롭게 생성
+                // UsernamePasswordAuthenticationToken 대상을 새롭게 생성 후 반환
             }
             // 비밀번호가 일치하지 않다면
             else {
                 throw new BadCredentialsException("Invalid password!");
             }
         }
-        // customer가 존재하지 않다면
+        // user가 존재하지 않다면
         else {
             throw new BadCredentialsException("No user registered with this details!");
         }

@@ -9,10 +9,15 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy;
 
 import com.bit.joe.shoppingmall.enums.UserRole;
+
+import jakarta.annotation.PostConstruct;
 
 @Configuration
 @EnableWebSecurity
@@ -33,10 +38,7 @@ public class SecurityConfig {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         request ->
-                                request
-                                        // add more requestMatchers here to restrict access to
-                                        // certain endpoints
-                                        .requestMatchers("/user/get-all")
+                                request.requestMatchers("/user/get-all")
                                         .hasAuthority(UserRole.ADMIN.name())
                                         .requestMatchers("/category/create")
                                         .hasAuthority(UserRole.ADMIN.name())
@@ -46,8 +48,15 @@ public class SecurityConfig {
                                         .permitAll())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(
-                        session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-                .logout(logout -> logout.logoutSuccessUrl("/login"))
+                        session ->
+                                session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                                        .sessionAuthenticationStrategy(
+                                                sessionAuthenticationStrategy()))
+                .logout(
+                        logout ->
+                                logout.logoutUrl("/user/logout")
+                                        .logoutSuccessUrl("/login")
+                                        .invalidateHttpSession(true))
                 .build();
     }
 
@@ -64,4 +73,20 @@ public class SecurityConfig {
     public static BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder(12);
     }
+
+    // ======================================== undeveloped yet
+    // ========================================
+    @Bean
+    public SessionAuthenticationStrategy sessionAuthenticationStrategy() {
+        return new SessionFixationProtectionStrategy();
+    }
+
+    @PostConstruct
+    public void init() {
+        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+    }
+
+    // ======================================== undeveloped yet
+    // ========================================
+
 }
