@@ -75,7 +75,7 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform {
         filter {
-            includeTestsMatching 'com.bit.joe.shoppingmall.ControllerSuite'
+            includeTestsMatching 'com.bit.joe.shoppingmall.TestRunner'
         }
     }
 
