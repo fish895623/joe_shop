@@ -11,25 +11,20 @@ public class OrderMapper {
 
         return OrderDto.builder()
                 .id(data.getId())
-                .user(UserMapper.toDto(data.getUser()))
+                .user(data.getUser())
                 .orderDate(data.getOrderDate())
                 .status(data.getStatus())
-                .orderItems(data.getOrderItems().stream().map(OrderItemMapper::toDto).toList())
+                .orderItems(data.getOrderItems())
                 .build();
     }
 
     public static Order toEntity(OrderDto data) {
         return Order.builder()
                 .id(data.getId())
-                .user(UserMapper.toEntity(data.getUser()))
+                .user(data.getUser())
                 .orderDate(data.getOrderDate())
                 .status(data.getStatus())
-                .orderItems(
-                        data.getOrderItems() == null
-                                ? null
-                                : data.getOrderItems().stream()
-                                        .map(OrderItemMapper::toEntity)
-                                        .toList())
+                .orderItems(data.getOrderItems())
                 .build();
     }
 }
