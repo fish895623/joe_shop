@@ -1,7 +1,6 @@
 package com.bit.joe.shoppingmall.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -133,7 +132,7 @@ public class ProductControllerTests {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header("Authorization", basicAuthHeader)
                                 .content(contentJson))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -148,29 +147,43 @@ public class ProductControllerTests {
     @Order(6)
     void testAdminUpdateProduct() throws Exception {
         ProductRequest productRequest = new ProductRequest();
-        productRequest.setName("product");
+        productRequest.setName("product2");
         productRequest.setPrice(1000);
         productRequest.setQuantity(10);
-        productRequest.setImage("image2");
+        productRequest.setImage("image");
         productRequest.setCategoryId(1L);
 
         ObjectMapper objectMapper = new ObjectMapper();
         String contentJson = objectMapper.writeValueAsString(productRequest);
 
         mockMvc.perform(
-                        post("/product/update/1")
+                        put("/product/update/1")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header("Authorization", basicAuthHeader)
                                 .content(contentJson))
                 .andExpect(status().isOk());
 
+        productRequest.setQuantity(-1);
+
+        // Return bad request because quantity is negative
+        mockMvc.perform(
+                        put("/product/update/1")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", basicAuthHeader)
+                                .content(contentJson))
+                .andExpect(status().isBadRequest());
+
         mockMvc.perform(get("/product/get-by-product-id/1"))
-                .andExpect(jsonPath("$.pro[?(@.id == 1)].categoryName").value(""));
+                .andExpect(jsonPath("$.product[?(@.id == 1)].categoryName").value("product2"));
     }
 
     @Test
     @Order(99)
     void testDeleteProduct() throws Exception {
-        mockMvc.perform(post("/product/delete/1")).andExpect(status().isOk());
+        mockMvc.perform(
+                        delete("/product/delete/1")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", basicAuthHeader))
+                .andExpect(status().isOk());
     }
 }
