@@ -2,6 +2,7 @@ package com.bit.joe.shoppingmall.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Base64;
@@ -141,5 +142,35 @@ public class ProductControllerTests {
         mockMvc.perform(get("/product/get-all")).andExpect(status().isOk());
         mockMvc.perform(get("/product/get-by-product-id/1")).andExpect(status().isOk());
         mockMvc.perform(get("/product/get-by-category-id/1")).andExpect(status().isOk());
+    }
+
+    @Test
+    @Order(6)
+    void testAdminUpdateProduct() throws Exception {
+        ProductRequest productRequest = new ProductRequest();
+        productRequest.setName("product");
+        productRequest.setPrice(1000);
+        productRequest.setQuantity(10);
+        productRequest.setImage("image2");
+        productRequest.setCategoryId(1L);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String contentJson = objectMapper.writeValueAsString(productRequest);
+
+        mockMvc.perform(
+                        post("/product/update/1")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", basicAuthHeader)
+                                .content(contentJson))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/product/get-by-product-id/1"))
+                .andExpect(jsonPath("$.pro[?(@.id == 1)].categoryName").value(""));
+    }
+
+    @Test
+    @Order(99)
+    void testDeleteProduct() throws Exception {
+        mockMvc.perform(post("/product/delete/1")).andExpect(status().isOk());
     }
 }
