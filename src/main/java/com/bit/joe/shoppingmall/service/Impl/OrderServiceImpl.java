@@ -7,7 +7,6 @@ import com.bit.joe.shoppingmall.entity.OrderItem;
 import com.bit.joe.shoppingmall.entity.Product;
 import com.bit.joe.shoppingmall.enums.OrderStatus;
 import com.bit.joe.shoppingmall.exception.NotFoundException;
-import com.bit.joe.shoppingmall.mapper.OrderItemMapper;
 import com.bit.joe.shoppingmall.mapper.OrderMapper;
 import com.bit.joe.shoppingmall.repository.OrderRepository;
 import com.bit.joe.shoppingmall.repository.ProductRepository;
@@ -47,7 +46,8 @@ public class OrderServiceImpl implements OrderService {
         return savedOrder;
     }
 
-    private Order createOrder(Cart cart) {
+    @Override
+    public Order createOrder(Cart cart) {
         Order order = new Order();
         order.setUser(cart.getUser());
         order.setStatus(OrderStatus.PENDING);
