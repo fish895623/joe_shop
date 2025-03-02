@@ -69,6 +69,8 @@ public class CartItemController {
         log.info("get all cart items by user id");
 
         return ResponseEntity.status(200)
-                .body(cartItemService.getCartItems(CartItemRequest.builder().userId(userId).build()));
+                .body(
+                        cartItemService.getCartItems(
+                                CartItemRequest.builder().userId(userId).build()));
     }
 }
