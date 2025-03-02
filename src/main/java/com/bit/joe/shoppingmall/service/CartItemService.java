@@ -8,7 +8,7 @@ import com.bit.joe.shoppingmall.dto.response.Response;
 public interface CartItemService {
     Response addCartItem(CartItemRequest cartItemRequest);
 
-    Response removeCartItem(long userId, long productId);
+    Response removeCartItem(CartItemRequest cartItemRequest);
 
     Response updateCartItem(long userId, long productId, int quantity, BigDecimal price);
 
