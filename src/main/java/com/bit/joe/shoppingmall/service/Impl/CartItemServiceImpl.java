@@ -54,18 +54,15 @@ public class CartItemServiceImpl implements CartItemService {
         // Check if product exists in cart
         if (isProductExists) {
 
-            CartItem cartItem =
-                    cartItemRepository
-                            .findByCartAndProduct(cart, product)
-                            .orElseThrow(() -> new NotFoundException("Cart " + "item not found"));
+            cartItemRequest.setQuantity(
+                    cartItemRequest.getQuantity()
+                            + cartItemRepository
+                                    .findByCartAndProduct(cart, product)
+                                    .orElseThrow(() -> new NotFoundException("Cart item not found"))
+                                    .getQuantity());
+            // update quantity
 
-            int quantity = cartItem.getQuantity() + cartItemRequest.getQuantity();
-            BigDecimal price =
-                    BigDecimal.valueOf((long) quantity * cartItem.getProduct().getPrice());
-            // calculate quantity and price
-
-            return updateCartItem(
-                    cart.getUser().getId(), cartItemRequest.getProductId(), quantity, price);
+            return updateCartItem(cartItemRequest);
             // update cart item and return response
         }
 
@@ -110,30 +107,28 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public Response updateCartItem(long userId, long productId, int quantity, BigDecimal price) {
+    public Response updateCartItem(CartItemRequest cartItemRequest) {
 
         Cart cart =
                 cartRepository
-                        .findCartByUser(
-                                userRepository
-                                        .findById(userId)
-                                        .orElseThrow(() -> new NotFoundException("Cart not found")))
+                        .findById(cartItemRequest.getCartId())
                         .orElseThrow(() -> new NotFoundException("Cart not found"));
         // Get cart by user: with checking user exists and cart exists
 
+        Product product =
+                productRepository
+                        .findById(cartItemRequest.getProductId())
+                        .orElseThrow(() -> new NotFoundException("Product not found"));
+
         CartItem cartItem =
                 cartItemRepository
-                        .findByCartAndProduct(
-                                cart,
-                                productRepository
-                                        .findById(productId)
-                                        .orElseThrow(
-                                                () -> new NotFoundException("Product not found")))
+                        .findByCartAndProduct(cart, product)
                         .orElseThrow(() -> new NotFoundException("Cart item not found"));
         // Get cart item by cart and product: with checking cart exists and product exists
 
-        cartItem.setQuantity(quantity);
-        cartItem.setPrice(price);
+        cartItem.setQuantity(cartItemRequest.getQuantity());
+        cartItem.setPrice(
+                BigDecimal.valueOf((long) cartItemRequest.getQuantity() * product.getPrice()));
         // set quantity and price
 
         cartItemRepository.save(cartItem);

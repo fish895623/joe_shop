@@ -39,6 +39,12 @@ public class CartItemController {
     }
 
     // update cart item
+    @PostMapping("/update")
+    public ResponseEntity<Response> updateCartItem(@RequestBody CartItemRequest cartItemRequest) {
+        log.info("update cart item");
+
+        return ResponseEntity.status(200).body(cartItemService.updateCartItem(cartItemRequest));
+    }
 
     // get cart item
 }

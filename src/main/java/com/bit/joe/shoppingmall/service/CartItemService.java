@@ -1,7 +1,5 @@
 package com.bit.joe.shoppingmall.service;
 
-import java.math.BigDecimal;
-
 import com.bit.joe.shoppingmall.dto.request.CartItemRequest;
 import com.bit.joe.shoppingmall.dto.response.Response;
 
@@ -10,7 +8,7 @@ public interface CartItemService {
 
     Response removeCartItem(CartItemRequest cartItemRequest);
 
-    Response updateCartItem(long userId, long productId, int quantity, BigDecimal price);
+    Response updateCartItem(CartItemRequest cartItemRequest);
 
     Response getCartItems(long userId);
 
