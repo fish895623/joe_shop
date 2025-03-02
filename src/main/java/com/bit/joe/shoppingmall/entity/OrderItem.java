@@ -32,5 +32,13 @@ public class OrderItem {
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
+    public OrderItem(Order order, Product product, int quantity, BigDecimal price) {
+        this.order = order;
+        this.product = product;
+        this.quantity = quantity;
+        this.price = price;
+
+    }
+
     // Getters and Setters
 }

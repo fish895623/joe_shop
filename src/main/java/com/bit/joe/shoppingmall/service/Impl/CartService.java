@@ -128,4 +128,23 @@ public class CartService {
         return Response.builder().status(404).message("Product not found in cart").build();
         // return not found response with status code 404 -> product not found in cart
     }
+
+    public Cart getCart(Long id) {
+        Cart cart = cartRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Cart not found"));
+        BigDecimal totalAmount = cart.getTotalAmount();
+        cart.setTotalAmount(totalAmount);
+        return cartRepository.save(cart);
+    }
+
+//    public void clearCart(Long id) {
+//        Cart cart = getCart(id);
+//        cartItemRepository.deleteAllByCartId(id);
+//        cart.getItems().clear();
+//        cartRepository.deleteById(id);
+//    }
+
+    public Cart getCartByUserId(Long userId) {
+        return cartRepository.findByUserId(userId);
+    }
 }

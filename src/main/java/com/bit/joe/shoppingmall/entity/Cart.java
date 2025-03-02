@@ -1,5 +1,6 @@
 package com.bit.joe.shoppingmall.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -32,6 +33,8 @@ public class Cart {
     private LocalDateTime createdAt;
 
     private Boolean isOrdered;
+
+    private BigDecimal totalAmount;
 
     @PrePersist
     public void prePersist() {

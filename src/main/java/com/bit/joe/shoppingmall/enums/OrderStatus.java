@@ -9,4 +9,5 @@ public enum OrderStatus {
     RETURN_REQUESTED,
     RETURN_IN_PROGRESS,
     RETURNED,
+    PENDING
 }

@@ -9,4 +9,5 @@ import com.bit.joe.shoppingmall.entity.User;
 
 public interface CartRepository extends JpaRepository<Cart, Long> {
     Optional<Cart> findCartByUser(User user);
+    Cart findByUserId(Long userId);
 }

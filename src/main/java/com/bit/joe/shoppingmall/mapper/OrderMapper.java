@@ -7,7 +7,7 @@ import com.bit.joe.shoppingmall.entity.Order;
 
 @Component
 public class OrderMapper {
-    public static OrderDto toDto(Order data) {
+    public OrderDto toDto(Order data) {
 
         return OrderDto.builder()
                 .id(data.getId())
