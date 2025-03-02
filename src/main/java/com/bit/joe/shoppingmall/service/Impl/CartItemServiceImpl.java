@@ -195,6 +195,20 @@ public class CartItemServiceImpl implements CartItemService {
         // return success response
     }
 
+    @Override
+    public Response getAllCartItems() {
+
+        List<CartItem> cartItems = cartItemRepository.findAll();
+        // Get all cart items
+
+        return Response.builder()
+                .status(200)
+                .cartItemList(cartItems.stream().map(CartItemMapper::toDto).toList())
+                .message("All cart items successfully")
+                .build();
+        // return success response
+    }
+
     // TODO consider to put this method in CartService
     @Override
     public Response clearCart(long userId) {

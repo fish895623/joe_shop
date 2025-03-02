@@ -53,4 +53,12 @@ public class CartItemController {
 
         return ResponseEntity.status(200).body(cartItemService.getCartItem(cartItemRequest));
     }
+
+    // get all cart items
+    @GetMapping("/get-all")
+    public ResponseEntity<Response> getAllCartItems() {
+        log.info("get all cart items");
+
+        return ResponseEntity.status(200).body(cartItemService.getAllCartItems());
+    }
 }

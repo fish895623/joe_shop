@@ -14,6 +14,8 @@ public interface CartItemService {
 
     Response getCartItem(CartItemRequest cartItemRequest);
 
+    Response getAllCartItems();
+
     // TODO consider to put this method in CartService
     Response clearCart(long userId);
 }
