@@ -18,26 +18,6 @@ public class ProductController {
 
     private final ProductService productService;
 
-    //    @PostMapping("/create")
-    //    @PreAuthorize("hasAuthority('ADMIN')")
-    //    public ResponseEntity<Response> createProduct(
-    //            @RequestParam Long categoryId,
-    //            @RequestParam String image,
-    //            @RequestParam String name,
-    //            @RequestParam int quantity,
-    //            @RequestParam int price
-    //    ){
-    //        if (categoryId == null
-    //                || image.isEmpty()
-    //                || name.isEmpty()
-    //                || quantity <= 0
-    //                || price <= 0) {
-    //            throw new InvalidCredentialsException("All Fields are Required");
-    //        }
-    //        return ResponseEntity.ok(
-    //                productService.createProduct(categoryId, image, name, quantity, price));
-    //    }
-
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Response> createProduct(@RequestBody ProductRequest productRequest) {
@@ -58,20 +38,6 @@ public class ProductController {
                         productRequest.getQuantity(),
                         productRequest.getPrice()));
     }
-
-    //    @PutMapping("/update")
-    //    @PreAuthorize("hasAuthority('ADMIN')")
-    //    public ResponseEntity<Response> updateProduct(
-    //            @RequestParam Long productId,
-    //            @RequestParam(required = false) Long categoryId,
-    //            @RequestParam(required = false) String image,
-    //            @RequestParam(required = false) String name,
-    //            @RequestParam(required = false) int quantity,
-    //            @RequestParam(required = false) int price) {
-    //        return ResponseEntity.ok(
-    //                productService.updateProduct(productId, categoryId, image, name, quantity,
-    // price));
-    //    }
 
     @PutMapping("/update/{productId}")
     @PreAuthorize("hasAuthority('ADMIN')")
