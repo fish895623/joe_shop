@@ -211,11 +211,11 @@ public class CartItemServiceImpl implements CartItemService {
 
     // TODO consider to put this method in CartService
     @Override
-    public Response clearCart(long userId) {
+    public Response clearCart(CartItemRequest cartItemRequest) {
 
         User user =
                 userRepository
-                        .findById(userId)
+                        .findById(cartItemRequest.getUserId())
                         .orElseThrow(() -> new NotFoundException("User not found"));
         // Get user
 
