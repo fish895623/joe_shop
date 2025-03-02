@@ -47,4 +47,10 @@ public class CartItemController {
     }
 
     // get cart item
+    @GetMapping("/get")
+    public ResponseEntity<Response> getCartItem(@RequestBody CartItemRequest cartItemRequest) {
+        log.info("get cart item");
+
+        return ResponseEntity.status(200).body(cartItemService.getCartItem(cartItemRequest));
+    }
 }

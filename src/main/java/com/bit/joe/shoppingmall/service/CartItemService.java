@@ -12,7 +12,7 @@ public interface CartItemService {
 
     Response getCartItems(long userId);
 
-    Response getCartItem(long userId, long productId);
+    Response getCartItem(CartItemRequest cartItemRequest);
 
     // TODO consider to put this method in CartService
     Response clearCart(long userId);

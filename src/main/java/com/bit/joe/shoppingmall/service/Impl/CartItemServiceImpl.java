@@ -161,11 +161,11 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public Response getCartItem(long userId, long productId) {
+    public Response getCartItem(CartItemRequest cartItemRequest) {
 
         User user =
                 userRepository
-                        .findById(userId)
+                        .findById(cartItemRequest.getUserId())
                         .orElseThrow(() -> new NotFoundException("User not found"));
         // Get user
 
@@ -177,7 +177,7 @@ public class CartItemServiceImpl implements CartItemService {
 
         Product product =
                 productRepository
-                        .findById(productId)
+                        .findById(cartItemRequest.getProductId())
                         .orElseThrow(() -> new NotFoundException("Product not found"));
         // Get product
 

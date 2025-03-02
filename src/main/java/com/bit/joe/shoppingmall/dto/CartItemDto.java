@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CartItemDto {
     private Long id;
-    private CartDto cart;
+    private Long cartId;
     private ProductDto product;
     private BigDecimal price;
 }
