@@ -1,11 +1,11 @@
 package com.bit.joe.shoppingmall.service;
 
-import com.bit.joe.shoppingmall.repository.UserRepository;
-import com.bit.joe.shoppingmall.service.Impl.UserServiceImpl;
-
 import org.junit.jupiter.api.*;
 import org.mockito.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import com.bit.joe.shoppingmall.repository.UserRepository;
+import com.bit.joe.shoppingmall.service.Impl.UserServiceImpl;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class UserServiceTests {
