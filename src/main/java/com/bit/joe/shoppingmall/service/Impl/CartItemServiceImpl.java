@@ -138,19 +138,19 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public Response getCartItems(long userId) {
+    public Response getCartItems(CartItemRequest cartItemRequest) {
 
-        List<CartItem> cartItems =
-                cartItemRepository.findByCart(
-                        cartRepository
-                                .findCartByUser(
-                                        userRepository
-                                                .findById(userId)
-                                                .orElseThrow(
-                                                        () ->
-                                                                new NotFoundException(
-                                                                        "Cart not found")))
-                                .orElseThrow(() -> new NotFoundException("Cart not found")));
+        User user =
+                userRepository
+                        .findById(cartItemRequest.getUserId())
+                        .orElseThrow(() -> new NotFoundException("User not found"));
+
+        Cart cart =
+                cartRepository
+                        .findCartByUser(user)
+                        .orElseThrow(() -> new NotFoundException("Cart not found"));
+
+        List<CartItem> cartItems = cartItemRepository.findByCart(cart);
         // Get cart items by cart
 
         return Response.builder()

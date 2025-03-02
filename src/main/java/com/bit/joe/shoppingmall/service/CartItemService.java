@@ -10,7 +10,7 @@ public interface CartItemService {
 
     Response updateCartItem(CartItemRequest cartItemRequest);
 
-    Response getCartItems(long userId);
+    Response getCartItems(CartItemRequest cartItemRequest);
 
     Response getCartItem(CartItemRequest cartItemRequest);
 

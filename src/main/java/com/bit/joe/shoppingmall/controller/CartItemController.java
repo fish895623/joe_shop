@@ -3,6 +3,7 @@ package com.bit.joe.shoppingmall.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,5 +61,14 @@ public class CartItemController {
         log.info("get all cart items");
 
         return ResponseEntity.status(200).body(cartItemService.getAllCartItems());
+    }
+
+    // get all cart items by user id
+    @GetMapping("/get-all/{userId}")
+    public ResponseEntity<Response> getAllCartItemsByUserId(@PathVariable Long userId) {
+        log.info("get all cart items by user id");
+
+        return ResponseEntity.status(200)
+                .body(cartItemService.getCartItems(CartItemRequest.builder().userId(userId).build()));
     }
 }
