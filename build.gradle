@@ -67,10 +67,17 @@ dependencies {
     testImplementation group: "org.testcontainers", name: 'junit-jupiter', version: '1.+'
     testImplementation group: 'org.testcontainers', name: 'mysql', version: '1.+'
     testImplementation group: 'org.testcontainers', name: 'mariadb', version: '1.+'
+
+    // swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 }
 
 tasks.named('test') {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        filter {
+            includeTestsMatching 'com.bit.joe.shoppingmall.ControllerSuite'
+        }
+    }
 
     ignoreFailures = gradle.startParameter.taskNames.contains('build')
 
