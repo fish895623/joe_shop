@@ -5,6 +5,11 @@ import org.junit.platform.suite.api.Suite;
 
 @Suite
 @SelectClasses({
-    UserServiceTest.class,
+    CategoryServiceTests.class,
+    CartServiceTests.class,
+    CategoryServiceTests.class,
+    OrderServiceTests.class,
+    ProductServiceTests.class,
+    UserServiceTests.class,
 })
 public class ServiceSuite {}
