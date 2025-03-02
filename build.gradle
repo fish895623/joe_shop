@@ -118,6 +118,10 @@ tasks.withType(JavaExec).configureEach {
     jvmArgs = ['-Djava.security.egd=file:/dev/./urandom']
 }
 
+tasks.named('spotlessCheck') {
+    dependsOn 'spotlessApply'
+}
+
 spotless {
     java {
         googleJavaFormat().aosp()
