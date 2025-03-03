@@ -67,6 +67,7 @@ dependencies {
     testImplementation group: "org.testcontainers", name: 'junit-jupiter', version: '1.+'
     testImplementation group: 'org.testcontainers', name: 'mysql', version: '1.+'
     testImplementation group: 'org.testcontainers', name: 'mariadb', version: '1.+'
+    implementation('com.microsoft.playwright:playwright:1.49.0')
 
     // swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
@@ -75,7 +76,7 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform {
         filter {
-            includeTestsMatching 'com.bit.joe.shoppingmall.ControllerSuite'
+            includeTestsMatching 'com.bit.joe.shoppingmall.TestRunner'
         }
     }
 
@@ -134,4 +135,10 @@ spotless {
         trimTrailingWhitespace()
         endWithNewline()
     }
+}
+
+tasks.register('installPlaywright', JavaExec) {
+    mainClass = 'com.microsoft.playwright.CLI'
+    classpath = sourceSets.main.runtimeClasspath
+    args = ['install', '--with-deps']
 }

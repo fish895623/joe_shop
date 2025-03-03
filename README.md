@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/fish895623/joe_shop/branch/master/graph/badge.svg?token=KlvQQwQnPl)](https://codecov.io/gh/fish895623/joe_shop)
+
 # 테스트 실행방법
 
 Docker 설치 후 `./gradlew test --info` 작업 실행
@@ -38,7 +40,9 @@ ex) `bsh-authorization-button`
 
 개발 작업 도중에 수시로 커밋을 푸시하도록 한다.
 
-개발완료 후 [Ready For Review](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-stage-of-a-pull-request) 버튼을 눌러준다.
+개발완료
+후 [Ready For Review](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-stage-of-a-pull-request)
+버튼을 눌러준다.
 
 ### 방법 2.
 
