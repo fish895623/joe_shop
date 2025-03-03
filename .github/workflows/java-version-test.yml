@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: X64
+    runs-on: "self-hosted"
     permissions:
       contents: read
     strategy:
