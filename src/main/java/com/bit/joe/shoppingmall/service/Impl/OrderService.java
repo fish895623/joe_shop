@@ -2,7 +2,6 @@ package com.bit.joe.shoppingmall.service.Impl;
 
 import java.util.List;
 
-import com.bit.joe.shoppingmall.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.bit.joe.shoppingmall.dto.request.OrderRequest;
@@ -11,6 +10,7 @@ import com.bit.joe.shoppingmall.entity.CartItem;
 import com.bit.joe.shoppingmall.entity.Order;
 import com.bit.joe.shoppingmall.entity.OrderItem;
 import com.bit.joe.shoppingmall.enums.OrderStatus;
+import com.bit.joe.shoppingmall.exception.NotFoundException;
 import com.bit.joe.shoppingmall.mapper.OrderItemMapper;
 import com.bit.joe.shoppingmall.repository.CartItemRepository;
 import com.bit.joe.shoppingmall.repository.OrderItemRepository;
@@ -92,8 +92,10 @@ public class OrderService {
 
     public Response changeOrderStatus(OrderRequest orderRequest) {
 
-        Order order = orderRepository.findById(orderRequest.getOrderId())
-                .orElseThrow(() -> new NotFoundException("Order not found"));
+        Order order =
+                orderRepository
+                        .findById(orderRequest.getOrderId())
+                        .orElseThrow(() -> new NotFoundException("Order not found"));
         // get order object
 
         order.setStatus(orderRequest.getStatus());
