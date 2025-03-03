@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: X64
+    runs-on: ["X64", "ubuntu-latest"]
     permissions:
       contents: read
 
