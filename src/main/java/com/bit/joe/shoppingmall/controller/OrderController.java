@@ -1,6 +1,7 @@
 package com.bit.joe.shoppingmall.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,5 +25,10 @@ public class OrderController {
     @PostMapping("/create")
     public ResponseEntity<Response> createOrder(@RequestBody OrderRequest orderRequest) {
         return ResponseEntity.ok(orderService.createOrder(orderRequest));
+    }
+
+    @GetMapping("/change-status")
+    public ResponseEntity<Response> changeStatus(@RequestBody OrderRequest orderRequest) {
+        return ResponseEntity.ok(orderService.changeOrderStatus(orderRequest));
     }
 }

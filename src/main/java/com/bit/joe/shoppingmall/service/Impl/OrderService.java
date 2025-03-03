@@ -2,6 +2,7 @@ package com.bit.joe.shoppingmall.service.Impl;
 
 import java.util.List;
 
+import com.bit.joe.shoppingmall.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.bit.joe.shoppingmall.dto.request.OrderRequest;
@@ -86,6 +87,22 @@ public class OrderService {
         // save order items
 
         return Response.builder().message("Order created successfully").build();
+        // return success message
+    }
+
+    public Response changeOrderStatus(OrderRequest orderRequest) {
+
+        Order order = orderRepository.findById(orderRequest.getOrderId())
+                .orElseThrow(() -> new NotFoundException("Order not found"));
+        // get order object
+
+        order.setStatus(orderRequest.getStatus());
+        // change order status
+
+        orderRepository.save(order);
+        // save order object
+
+        return Response.builder().status(200).message("Order status changed").build();
         // return success message
     }
 }
