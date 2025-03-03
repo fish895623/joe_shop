@@ -150,4 +150,76 @@ public class OrderService {
         return Response.builder().status(200).message("Order cancelled").build();
         // return success message
     }
+
+    public Response requestReturn(OrderRequest orderRequest) {
+        Order order =
+                orderRepository
+                        .findById(orderRequest.getOrderId())
+                        .orElseThrow(() -> new NotFoundException("Order not " + "found"));
+        // get order object
+
+        // if order status is not DELIVERED, return error message
+        if (order.getStatus() != OrderStatus.DELIVERED) {
+            return Response.builder()
+                    .status(400)
+                    .message("Order cannot be returned without delivery.")
+                    .build();
+        }
+
+        orderRequest.setStatus(OrderStatus.RETURN_REQUESTED);
+        changeOrderStatus(orderRequest);
+        // change order status
+
+        return Response.builder().status(200).message("Order return requested").build();
+        // return success message
+    }
+
+    public Response progressReturn(OrderRequest orderRequest) {
+        Order order =
+                orderRepository
+                        .findById(orderRequest.getOrderId())
+                        .orElseThrow(() -> new NotFoundException("Order not " + "found"));
+        // get order object
+
+        // if order status is not RETURN_REQUESTED, return error message
+        if (order.getStatus() != OrderStatus.RETURN_REQUESTED) {
+            return Response.builder()
+                    .status(400)
+                    .message("Order cannot be returned without return request.")
+                    .build();
+        }
+
+        orderRequest.setStatus(OrderStatus.RETURN_IN_PROGRESS);
+        changeOrderStatus(orderRequest);
+        // change order status
+
+        return Response.builder()
+                .status(200)
+                .message("Order return request now progressing")
+                .build();
+        // return success message
+    }
+
+    public Response completeReturn(OrderRequest orderRequest) {
+        Order order =
+                orderRepository
+                        .findById(orderRequest.getOrderId())
+                        .orElseThrow(() -> new NotFoundException("Order not " + "found"));
+        // get order object
+
+        // if order status is not RETURN_IN_PROGRESS, return error message
+        if (order.getStatus() != OrderStatus.RETURN_IN_PROGRESS) {
+            return Response.builder()
+                    .status(400)
+                    .message("Order cannot be returned without return request.")
+                    .build();
+        }
+
+        orderRequest.setStatus(OrderStatus.RETURNED);
+        changeOrderStatus(orderRequest);
+        // change order status
+
+        return Response.builder().status(200).message("Order returned").build();
+        // return success message
+    }
 }

@@ -41,4 +41,19 @@ public class OrderController {
     public ResponseEntity<Response> confirmCancel(@RequestBody OrderRequest orderRequest) {
         return ResponseEntity.ok(orderService.confirmCancel(orderRequest));
     }
+
+    @GetMapping("/request-return")
+    public ResponseEntity<Response> requestReturn(@RequestBody OrderRequest orderRequest) {
+        return ResponseEntity.ok(orderService.requestReturn(orderRequest));
+    }
+
+    @GetMapping("/progress-return")
+    public ResponseEntity<Response> progressReturn(@RequestBody OrderRequest orderRequest) {
+        return ResponseEntity.ok(orderService.progressReturn(orderRequest));
+    }
+
+    @GetMapping("/complete-return")
+    public ResponseEntity<Response> completeReturn(@RequestBody OrderRequest orderRequest) {
+        return ResponseEntity.ok(orderService.completeReturn(orderRequest));
+    }
 }
