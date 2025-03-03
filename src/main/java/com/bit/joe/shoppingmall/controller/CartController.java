@@ -1,7 +1,6 @@
 package com.bit.joe.shoppingmall.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import com.bit.joe.shoppingmall.dto.response.Response;
@@ -11,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Controller
+@RestController
 @RequestMapping("/api/cart")
 @RequiredArgsConstructor
 public class CartController {
