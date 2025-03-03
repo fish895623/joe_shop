@@ -31,4 +31,14 @@ public class OrderController {
     public ResponseEntity<Response> changeStatus(@RequestBody OrderRequest orderRequest) {
         return ResponseEntity.ok(orderService.changeOrderStatus(orderRequest));
     }
+
+    @GetMapping("/request-cancel")
+    public ResponseEntity<Response> requestCancel(@RequestBody OrderRequest orderRequest) {
+        return ResponseEntity.ok(orderService.requestCancel(orderRequest));
+    }
+
+    @GetMapping("/confirm-cancel")
+    public ResponseEntity<Response> confirmCancel(@RequestBody OrderRequest orderRequest) {
+        return ResponseEntity.ok(orderService.confirmCancel(orderRequest));
+    }
 }

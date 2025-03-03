@@ -107,4 +107,47 @@ public class OrderService {
         return Response.builder().status(200).message("Order status changed").build();
         // return success message
     }
+
+    public Response requestCancel(OrderRequest orderRequest) {
+        Order order =
+                orderRepository
+                        .findById(orderRequest.getOrderId())
+                        .orElseThrow(() -> new NotFoundException("Order not " + "found"));
+        // get order object
+
+        // if order status is over PREPARE status, return error message
+        if (order.getStatus().ordinal() > OrderStatus.PREPARE.ordinal()) {
+            return Response.builder().status(400).message("Order cannot be cancelled").build();
+        }
+
+        orderRequest.setStatus(OrderStatus.CANCEL_REQUESTED);
+        changeOrderStatus(orderRequest);
+        // change order status
+
+        return Response.builder().status(200).message("Order cancel requested").build();
+        // return success message
+    }
+
+    public Response confirmCancel(OrderRequest orderRequest) {
+        Order order =
+                orderRepository
+                        .findById(orderRequest.getOrderId())
+                        .orElseThrow(() -> new NotFoundException("Order not " + "found"));
+        // get order object
+
+        // if order status is not CANCEL_REQUESTED, return error message
+        if (order.getStatus() != OrderStatus.CANCEL_REQUESTED) {
+            return Response.builder()
+                    .status(400)
+                    .message("Order cannot be cancelled without cancel request.")
+                    .build();
+        }
+
+        orderRequest.setStatus(OrderStatus.CANCELLED);
+        changeOrderStatus(orderRequest);
+        // change order status
+
+        return Response.builder().status(200).message("Order cancelled").build();
+        // return success message
+    }
 }
