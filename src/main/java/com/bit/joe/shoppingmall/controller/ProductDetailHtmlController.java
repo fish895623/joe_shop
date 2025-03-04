@@ -28,10 +28,6 @@ public class ProductDetailHtmlController {
         Response response = productService.getProductById(productId);
         ProductDto product = response.getProduct();
 
-        System.out.println("상품 이름: " + product.getName());
-        System.out.println("상품 이미지 URL: " + product.getImageUrl());
-        System.out.println("상품 가격: " + product.getPrice());
-
         // 상품 정보를 모델에 추가하여 템플릿에서 사용 가능하게 함
         model.addAttribute("product", response.getProduct());
 
