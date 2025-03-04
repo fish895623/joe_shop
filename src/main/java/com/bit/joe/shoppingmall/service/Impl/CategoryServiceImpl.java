@@ -13,6 +13,7 @@ import com.bit.joe.shoppingmall.mapper.CategoryMapper;
 import com.bit.joe.shoppingmall.repository.CategoryRepository;
 import com.bit.joe.shoppingmall.service.CategoryService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,6 +25,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Override
+    @Transactional
     public Response createCategory(CategoryDto categoryRequest) {
         Category category = new Category();
         category.setCategoryName(categoryRequest.getCategoryName());
