@@ -38,7 +38,7 @@ public class CartService {
         cart.setUser(user);
         // Set the user of the cart
 
-        cartRepository.save(cart);
+        cartRepository.save(cart); // db로 저장
 
         return Response.builder().status(200).message("Cart created successfully").build();
     }

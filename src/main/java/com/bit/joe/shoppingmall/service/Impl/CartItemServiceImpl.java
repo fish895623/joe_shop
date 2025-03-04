@@ -84,29 +84,6 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public Response removeCartItem(CartItemRequest cartItemRequest) {
-
-        Cart cart =
-                cartRepository
-                        .findById(cartItemRequest.getCartId())
-                        .orElseThrow(() -> new NotFoundException("Cart not found"));
-        // Get cart
-
-        Product product =
-                productRepository
-                        .findById(cartItemRequest.getProductId())
-                        .orElseThrow(() -> new NotFoundException("Product not found"));
-        // Get product
-
-        cartItemRepository
-                .findByCartAndProduct(cart, product)
-                .ifPresent(cartItemRepository::delete);
-        // Remove cart item if exists
-
-        return Response.builder().status(200).message("Remove cart item successfully").build();
-    }
-
-    @Override
     public Response updateCartItem(CartItemRequest cartItemRequest) {
 
         Cart cart =
@@ -135,6 +112,29 @@ public class CartItemServiceImpl implements CartItemService {
         // save cart item
 
         return Response.builder().status(200).message("Update cart item successfully").build();
+    }
+
+    @Override
+    public Response removeCartItem(CartItemRequest cartItemRequest) {
+
+        Cart cart =
+                cartRepository
+                        .findById(cartItemRequest.getCartId())
+                        .orElseThrow(() -> new NotFoundException("Cart not found"));
+        // Get cart
+
+        Product product =
+                productRepository
+                        .findById(cartItemRequest.getProductId())
+                        .orElseThrow(() -> new NotFoundException("Product not found"));
+        // Get product
+
+        cartItemRepository
+                .findByCartAndProduct(cart, product)
+                .ifPresent(cartItemRepository::delete);
+        // Remove cart item if exists
+
+        return Response.builder().status(200).message("Remove cart item successfully").build();
     }
 
     @Override
