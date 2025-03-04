@@ -44,6 +44,10 @@ public class User {
 
     private boolean active;
 
+    private String phone;
+
+    private String address;
+
     @OneToMany(mappedBy = "user")
     private List<Order> orders;
 
