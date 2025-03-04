@@ -13,6 +13,7 @@ concurrency:
 jobs:
   build:
     runs-on: "self-hosted"
+    timeout-minutes: 10
     permissions:
       contents: read
 
@@ -27,8 +28,8 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Playwright setup
-        run: ./gradlew installPlaywright
+      - name: spotless Check
+        run: ./gradlew spotlessCheck
 
       - name: Gradle Test
         id: test
@@ -36,7 +37,7 @@ jobs:
         run: ./gradlew test
 
       - name: Build with Gradle Wrapper
-        run: ./gradlew build
+        run: ./gradlew build -x test -x spotlessCheck
 
       - uses: codecov/codecov-action@v5
         with:
