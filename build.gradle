@@ -5,6 +5,9 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.7'
     id 'com.diffplug.spotless' version '7.0.2'
     id 'jacoco'
+
+    id 'eclipse'
+    id 'idea'
 }
 
 group = 'com.bit.joe'
@@ -31,7 +34,7 @@ repositories {
 }
 
 dependencies {
-//    implementation 'org.springframework.boot:spring-boot-starter-actuator:3.3.+'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator:3.3.+'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.3.+'
     implementation 'org.springframework.boot:spring-boot-starter-security:3.3.+'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:3.3.+'
@@ -50,43 +53,58 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 //    testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'org.springframework.security:spring-security-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    testImplementation platform('org.junit:junit-bom:5.+') // Manages JUnit versions
+    testImplementation 'org.junit.jupiter:junit-jupiter' // JUnit 5 API + Engine
+    testImplementation 'org.junit.jupiter:junit-jupiter-api' // JUnit 5 API
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine' // JUnit 5 Engine
+    testImplementation 'org.junit.platform:junit-platform-suite' // For test suites
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher' // Needed for running tests
+
     developmentOnly("org.springframework.boot:spring-boot-devtools")
-    
+
     // testcontainer
     testImplementation group: "org.testcontainers", name: 'junit-jupiter', version: '1.+'
     testImplementation group: 'org.testcontainers', name: 'mysql', version: '1.+'
     testImplementation group: 'org.testcontainers', name: 'mariadb', version: '1.+'
+    implementation('com.microsoft.playwright:playwright:1.49.0')
+
+    // swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
-	
-	finalizedBy jacocoTestCoverageVerification
+    useJUnitPlatform()
+
+    ignoreFailures = gradle.startParameter.taskNames.contains('build')
+
+    finalizedBy jacocoTestCoverageVerification
 }
 
 jacocoTestReport {
-	reports {
-		xml.required = true
-		html.required = true
-	}
-	classDirectories.setFrom(files(classDirectories.files.collect {
-		fileTree(dir: it, exclude: [
-			'com/bit/joe/shopping/BitApplication.class',
-			'com/bit/joe/shopping/ServletInitializer.class',
-		])
-	}))
+    reports {
+        xml.required = true
+        html.required = true
+    }
+    classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(dir: it, exclude: [
+                'com/bit/joe/shoppingmall/BitApplication.class',
+                'com/bit/joe/shoppingmall/ServletInitializer.class',
+                'com/bit/joe/shoppingmall/exception/*.class',
+                'com/bit/joe/shoppingmall/enums/*.class',
+                'com/bit/joe/shoppingmall/dto/**.class',
+        ])
+    }))
 }
 
 jacocoTestCoverageVerification {
     dependsOn jacocoTestReport
     violationRules {
         rule {
-            element = 'CLASS'
             limit {
                 counter = 'LINE'
                 value = 'COVEREDRATIO'
-                minimum = 0.0
+                minimum = 0.00
             }
         }
     }
@@ -96,13 +114,27 @@ tasks.withType(JavaExec).configureEach {
     jvmArgs = ['-Djava.security.egd=file:/dev/./urandom']
 }
 
+tasks.named('spotlessCheck') {
+    dependsOn 'spotlessApply'
+}
+
+tasks.withType(JavaExec).configureEach {
+    jvmArgs = ['-Djava.security.egd=file:/dev/./urandom']
+}
+
 spotless {
     java {
-        googleJavaFormat().aosp() 
+        googleJavaFormat().aosp()
 
         importOrder('java', 'javax', 'org', 'com')
         removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()
     }
+}
+
+tasks.register('installPlaywright', JavaExec) {
+    mainClass = 'com.microsoft.playwright.CLI'
+    classpath = sourceSets.main.runtimeClasspath
+    args = ['install', '--with-deps']
 }

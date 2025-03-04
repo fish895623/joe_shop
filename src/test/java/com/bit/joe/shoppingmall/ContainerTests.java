@@ -12,7 +12,7 @@ import com.bit.joe.shoppingmall.config.MySQLContainerConfig;
 
 @SpringBootTest
 @Testcontainers
-class ContainerTests {
+public class ContainerTests {
     static final MySQLContainer<?> mySQLContainer = MySQLContainerConfig.getInstance();
 
     @DynamicPropertySource

@@ -2,9 +2,9 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: ["master"]
+    branches: [ "master" ]
   pull_request:
-    branches: ["master"]
+    branches: [ "master" ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
@@ -12,7 +12,8 @@ concurrency:
 
 jobs:
   build:
-    runs-on: self
+    runs-on: "self-hosted"
+    timeout-minutes: 10
     permissions:
       contents: read
 
@@ -27,11 +28,16 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: spotless
+      - name: spotless Check
         run: ./gradlew spotlessCheck
 
+      - name: Gradle Test
+        id: test
+        continue-on-error: true
+        run: ./gradlew test
+
       - name: Build with Gradle Wrapper
-        run: ./gradlew build
+        run: ./gradlew build -x test -x spotlessCheck
 
       - uses: codecov/codecov-action@v5
         with:

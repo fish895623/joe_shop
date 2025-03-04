@@ -6,32 +6,32 @@ import java.util.List;
 import com.bit.joe.shoppingmall.enums.OrderStatus;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "orders")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_id")
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "order_date", nullable = false)
-    private String orderDate;
+    private LocalDateTime orderDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
     private OrderStatus status;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @OneToMany(mappedBy = "order")
-    private List<OrderItem> orderItems; // 수정: orderLists -> orderItems
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> orderItems;
 }
