@@ -20,13 +20,14 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.bit.joe.shoppingmall.dto.UserDto;
+import com.bit.joe.shoppingmall.dto.*;
 import com.bit.joe.shoppingmall.dto.request.ProductRequest;
 import com.bit.joe.shoppingmall.enums.UserGender;
 import com.bit.joe.shoppingmall.enums.UserRole;
 import com.bit.joe.shoppingmall.repository.CategoryRepository;
 import com.bit.joe.shoppingmall.repository.UserRepository;
 import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
+import com.bit.joe.shoppingmall.service.Impl.ProductServiceImpl;
 import com.bit.joe.shoppingmall.service.Impl.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -65,6 +66,8 @@ public class ProductControllerTests {
     @Autowired private CategoryServiceImpl categoryService;
     @Autowired private HttpSession session;
     @Autowired private CategoryController categoryController;
+    @Autowired private ProductController productController;
+    @Autowired private ProductServiceImpl productService;
     @PersistenceContext private EntityManager entityManager;
 
     @BeforeAll
