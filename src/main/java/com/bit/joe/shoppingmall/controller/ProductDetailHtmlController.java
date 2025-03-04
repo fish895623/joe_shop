@@ -1,13 +1,14 @@
 package com.bit.joe.shoppingmall.controller;
 
-import com.bit.joe.shoppingmall.dto.response.Response;
-import com.bit.joe.shoppingmall.dto.ProductDto;
-import com.bit.joe.shoppingmall.service.ProductService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.bit.joe.shoppingmall.dto.ProductDto;
+import com.bit.joe.shoppingmall.dto.response.Response;
+import com.bit.joe.shoppingmall.service.ProductService;
 
 @Controller
 @RequestMapping("product")
