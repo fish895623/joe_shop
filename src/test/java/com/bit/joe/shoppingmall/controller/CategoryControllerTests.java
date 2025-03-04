@@ -125,6 +125,7 @@ public class CategoryControllerTests {
         var categoryDto = CategoryDto.builder().categoryName("Update Category").build();
 
         Category category = new Category();
+        category.setId(1L);
         category.setCategoryName("Update Category 1");
         categoryRepository.save(category);
 
