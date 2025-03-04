@@ -31,13 +31,16 @@ jobs:
       - name: Playwright setup
         run: ./gradlew installPlaywright
 
+      - name: spotless Check
+        run: ./gradlew spotlessCheck
+
       - name: Gradle Test
         id: test
         continue-on-error: true
         run: ./gradlew test
 
       - name: Build with Gradle Wrapper
-        run: ./gradlew build
+        run: ./gradlew build -x test -x spotlessCheck
 
       - uses: codecov/codecov-action@v5
         with:
