@@ -25,7 +25,7 @@ public class ContainerTests {
     }
 
     @Test
-    void contextLoads() {
+    void containerRunning() {
         Assertions.assertTrue(mySQLContainer.isRunning());
     }
 }
