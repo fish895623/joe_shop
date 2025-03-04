@@ -22,7 +22,6 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.bit.joe.shoppingmall.dto.CategoryDto;
 import com.bit.joe.shoppingmall.dto.UserDto;
 import com.bit.joe.shoppingmall.dto.request.ProductRequest;
 import com.bit.joe.shoppingmall.enums.UserGender;
@@ -30,7 +29,6 @@ import com.bit.joe.shoppingmall.enums.UserRole;
 import com.bit.joe.shoppingmall.repository.CategoryRepository;
 import com.bit.joe.shoppingmall.repository.UserRepository;
 import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
-import com.bit.joe.shoppingmall.service.Impl.ProductServiceImpl;
 import com.bit.joe.shoppingmall.service.Impl.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -69,20 +67,7 @@ public class ProductControllerTests {
     @Autowired private CategoryServiceImpl categoryService;
     @Autowired private HttpSession session;
     @Autowired private CategoryController categoryController;
-    @Autowired private ProductController productController;
     @PersistenceContext private EntityManager entityManager;
-    @Autowired private ProductServiceImpl productService;
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", mySQLContainer::getJdbcUrl);
-        registry.add("spring.datasource.username", mySQLContainer::getUsername);
-        registry.add("spring.datasource.password", mySQLContainer::getPassword);
-        registry.add("spring.datasource.driver-class-name", () -> "com.mysql.cj.jdbc.Driver");
-        registry.add("spring.jpa.database-platform", () -> "org.hibernate.dialect.MySQLDialect");
-        registry.add("spring.jpa.hibernate.ddl-auto", () -> "update");
-        registry.add("spring.jpa.show-sql", () -> "true");
-    }
 
     @BeforeAll
     static void setUpContainer() {

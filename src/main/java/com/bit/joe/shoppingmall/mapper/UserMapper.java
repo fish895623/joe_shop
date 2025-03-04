@@ -21,6 +21,8 @@ public class UserMapper {
         userDto.setBirth(user.getBirth());
         userDto.setEmail(user.getEmail());
         userDto.setPassword(user.getPassword());
+        userDto.setPhone(user.getPhone());
+        userDto.setAddress(user.getAddress());
         userDto.setActive(user.isActive());
         return userDto;
     }
@@ -38,6 +40,8 @@ public class UserMapper {
         user.setBirth(userDto.getBirth());
         user.setEmail(userDto.getEmail());
         user.setPassword(userDto.getPassword());
+        user.setPhone(userDto.getPhone());
+        user.setAddress(userDto.getAddress());
         user.setActive(userDto.isActive());
         return user;
     }
