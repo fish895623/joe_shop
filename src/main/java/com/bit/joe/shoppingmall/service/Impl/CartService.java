@@ -1,6 +1,7 @@
 package com.bit.joe.shoppingmall.service.Impl;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
 
@@ -37,7 +38,7 @@ public class CartService {
         cart.setUser(user);
         // Set the user of the cart
 
-        cartRepository.save(cart);
+        cartRepository.save(cart); // db로 저장
 
         return Response.builder().status(200).message("Cart created successfully").build();
     }
@@ -52,15 +53,29 @@ public class CartService {
                         .orElseThrow(() -> new NotFoundException("User not found"));
 
         // find cart by user
+//        Cart cart =
+//                cartRepository
+//                        .findCartByUser(user)
+//                        .orElseThrow(() -> new NotFoundException("Cart not found"));
+
         Cart cart =
                 cartRepository
                         .findCartByUser(user)
-                        .orElseThrow(() -> new NotFoundException("Cart not found"));
+                        .orElseGet(() -> {
+                            // If no cart is found, create a new one
+                            Cart newCart = new Cart();
+                            newCart.setUser(user);
+                            newCart.setCreatedAt(LocalDateTime.now());
+                            newCart.setIsOrdered(false);
+                            cartRepository.save(newCart);  // Save the new cart to the repository
+                            return newCart;
+                        });
 
         // if same product already exists in the cart, update only quantity
         for (CartItem cartItem : cart.getCartItems()) {
+            // productId in cart items -> equals to productId passed as a parameter?
             if (cartItem.getProduct().getId().equals(productId)) {
-                cartItem.setQuantity(cartItem.getQuantity() + quantity);
+                cartItem.setQuantity(cartItem.getQuantity() + quantity); // add one more
                 cartItem.setPrice(
                         BigDecimal.valueOf(
                                 (long) cartItem.getQuantity() * cartItem.getProduct().getPrice()));

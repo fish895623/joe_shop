@@ -2,6 +2,7 @@ package com.bit.joe.shoppingmall.service.Impl;
 
 import java.util.List;
 
+import com.bit.joe.shoppingmall.entity.User;
 import org.springframework.stereotype.Service;
 
 import com.bit.joe.shoppingmall.dto.request.OrderRequest;
@@ -44,6 +45,7 @@ public class OrderService {
         }
         // return error message if order already exists
 
+        // 1. 주문 생성
         Order order =
                 Order.builder()
                         .user(
@@ -53,22 +55,20 @@ public class OrderService {
                         .status(OrderStatus.ORDER)
                         .orderDate(orderRequest.getOrderDate())
                         .build();
-        // create order object
-
         orderRepository.save(order);
-        // save order object
 
         Order orderSaved =
                 orderRepository
                         .findByOrderDateAndUserId(
                                 orderRequest.getOrderDate(), orderRequest.getUserId())
                         .orElseThrow(() -> new RuntimeException("Order not found"));
-        // get saved order object
 
+        // 2. 주문 목록 생성
         List<OrderItem> orderItems =
                 orderRequest.getCartItemIds().stream()
                         .map(
                                 cartItemId -> {
+                                    // DB에서 해당하는 각 cartItemId 조회
                                     CartItem cartItem =
                                             cartItemRepository
                                                     .findById(cartItemId)
@@ -76,7 +76,9 @@ public class OrderService {
                                                             () ->
                                                                     new RuntimeException(
                                                                             "Cart item not found"));
+                                    // 해당 cart에서 cartItems 삭제
                                     cartItemRepository.delete(cartItem);
+                                    // 2. order items 생성
                                     return OrderItemMapper.cartItemToOrderItem(
                                             cartItem, orderSaved);
                                 })

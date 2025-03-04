@@ -1,5 +1,8 @@
 package com.bit.joe.shoppingmall.controller;
 
+import com.bit.joe.shoppingmall.exception.NotFoundException;
+import com.bit.joe.shoppingmall.service.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -17,18 +20,11 @@ import lombok.RequiredArgsConstructor;
 public class ProductController {
 
     private final ProductService productService;
+    private final CategoryService categoryService;
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Response> createProduct(@RequestBody ProductRequest productRequest) {
-        // Validate the fields in the productRequest
-        if (productRequest.getCategoryId() == null
-                || productRequest.getImage().isEmpty()
-                || productRequest.getName().isEmpty()
-                || productRequest.getQuantity() <= 0
-                || productRequest.getPrice() <= 0) {
-            throw new InvalidCredentialsException("All Fields are Required");
-        }
+    public ResponseEntity<Response> createProduct(@Valid @RequestBody ProductRequest productRequest) {
 
         return ResponseEntity.ok(
                 productService.createProduct(
@@ -42,10 +38,7 @@ public class ProductController {
     @PutMapping("/update/{productId}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Response> updateProduct(
-            @PathVariable Long productId, @RequestBody ProductRequest productRequest) {
-        if (productRequest.getQuantity() <= 0 && productRequest.getPrice() <= 0) {
-            throw new InvalidCredentialsException("Quantity and price must be greater than 0.");
-        }
+            @PathVariable Long productId, @Valid @RequestBody ProductRequest productRequest) {
         return ResponseEntity.ok(
                 productService.updateProduct(
                         productId,
@@ -55,6 +48,7 @@ public class ProductController {
                         productRequest.getQuantity(),
                         productRequest.getPrice()));
     }
+
 
     @DeleteMapping("/delete/{productId}")
     @PreAuthorize("hasAuthority('ADMIN')")
