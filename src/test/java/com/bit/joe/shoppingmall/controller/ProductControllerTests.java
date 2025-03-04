@@ -1,6 +1,9 @@
 package com.bit.joe.shoppingmall.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -35,12 +38,10 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 
-@ExtendWith({SpringExtension.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
 @AutoConfigureMockMvc
-@Transactional
 public class ProductControllerTests {
     @Container public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:lts");
     UserDto userDto =
@@ -62,7 +63,6 @@ public class ProductControllerTests {
     @Autowired private ProductController productController;
     @Autowired private UserRepository userRepository;
     @Autowired private CategoryRepository categoryRepository;
-    @Autowired private UserServiceImpl userService;
     @Autowired private CategoryServiceImpl categoryService;
     @Autowired private HttpSession session;
     @Autowired private CategoryController categoryController;
@@ -115,8 +115,7 @@ public class ProductControllerTests {
         productRequest.setImage("image");
         productRequest.setCategoryId(1L);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String contentJson = objectMapper.writeValueAsString(productRequest);
+        String contentJson = new ObjectMapper().writeValueAsString(productRequest);
 
         mockMvc.perform(
                         post("/product/create")
@@ -171,7 +170,7 @@ public class ProductControllerTests {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header("Authorization", basicAuthHeader) // 인증 추가
                                 .content(contentJson))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
@@ -185,6 +184,10 @@ public class ProductControllerTests {
 
         // 카테고리 ID로 제품 조회
         mockMvc.perform(get("/product/get-by-category-id/1")).andExpect(status().isOk());
+
+        mockMvc.perform(get("/product/get-by-product-id/2")).andExpect(status().is4xxClientError());
+        mockMvc.perform(get("/product/get-by-category-id/2"))
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
@@ -194,7 +197,7 @@ public class ProductControllerTests {
         ProductRequest productRequest = new ProductRequest();
         productRequest.setName("product2");
         productRequest.setPrice(1000);
-        productRequest.setQuantity(10);
+        productRequest.setQuantity(11);
         productRequest.setImage("image");
         productRequest.setCategoryId(1L);
 

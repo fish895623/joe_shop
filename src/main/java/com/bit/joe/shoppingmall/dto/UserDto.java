@@ -29,5 +29,8 @@ public class UserDto {
     private String password;
     private boolean active;
 
+    private String phone;
+    private String address;
+
     private List<OrderDto> orders;
 }
