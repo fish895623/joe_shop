@@ -87,6 +87,7 @@ public class CategoryControllerTests {
     @Transactional
     void createCategory() throws Exception {
         CategoryDto categoryDto = new CategoryDto();
+        categoryDto.setId(1L);
         categoryDto.setCategoryName("Test Category");
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -105,13 +106,22 @@ public class CategoryControllerTests {
 
     @Test
     @Transactional
-    void testGetAllCategories() throws Exception {
+    void getCategories() throws Exception {
+        // Get All Categories
         mockMvc.perform(get("/category/get-all")).andExpect(status().isOk());
+
+        // Get Single Category
+        Category category = new Category();
+        category.setId(1L);
+        category.setCategoryName("Test Category");
+        categoryRepository.save(category);
+
+        mockMvc.perform(get("/category/get-category-by-id/1")).andExpect(status().isOk());
     }
 
     @Test
     @Transactional
-    void testUpdateCategory() throws Exception {
+    void updateCategory() throws Exception {
         var categoryDto = CategoryDto.builder().categoryName("Update Category").build();
 
         Category category = new Category();
@@ -128,17 +138,6 @@ public class CategoryControllerTests {
                                 .content(contentJson)
                                 .session(mockHttpSession))
                 .andExpect(status().isOk());
-
-        mockMvc.perform(get("/category/get-category-by-id/1")).andExpect(status().isOk());
-    }
-
-    @Test
-    @Transactional
-    void testGetCategoryById() throws Exception {
-        Category category = new Category();
-        category.setId(1L);
-        category.setCategoryName("Test Category");
-        categoryRepository.save(category);
 
         mockMvc.perform(get("/category/get-category-by-id/1")).andExpect(status().isOk());
     }
