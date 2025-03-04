@@ -4,6 +4,21 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Base64;
+
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+
 import com.bit.joe.shoppingmall.dto.UserDto;
 import com.bit.joe.shoppingmall.dto.request.ProductRequest;
 import com.bit.joe.shoppingmall.enums.UserGender;
@@ -19,21 +34,6 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpSession;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-
-import java.util.Base64;
-
 @ExtendWith({SpringExtension.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -41,22 +41,21 @@ import java.util.Base64;
 @AutoConfigureMockMvc
 @Transactional
 public class ProductControllerTests {
-    @Container
-    public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:lts");
+    @Container public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:lts");
     UserDto userDto =
-        UserDto.builder()
-            .name("admin")
-            .password("admin")
-            .email("admin@example.com")
-            .role(UserRole.ADMIN)
-            .gender(UserGender.MALE)
-            .birth("2021-01-01")
-            .build();
+            UserDto.builder()
+                    .name("admin")
+                    .password("admin")
+                    .email("admin@example.com")
+                    .role(UserRole.ADMIN)
+                    .gender(UserGender.MALE)
+                    .birth("2021-01-01")
+                    .build();
     String basicAuthHeader =
-        "Basic "
-            + Base64.getEncoder()
-            .encodeToString(
-                (userDto.getEmail() + userDto.getPassword()).getBytes());
+            "Basic "
+                    + Base64.getEncoder()
+                            .encodeToString(
+                                    (userDto.getEmail() + userDto.getPassword()).getBytes());
     MockHttpSession mockHttpSession = new MockHttpSession();
     private MockMvc mockMvc;
     @Autowired private UserRepository userRepository;
@@ -64,10 +63,8 @@ public class ProductControllerTests {
     @Autowired private UserServiceImpl userService;
     @Autowired private CategoryServiceImpl categoryService;
     @Autowired private HttpSession session;
-    @Autowired
-    private CategoryController categoryController;
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Autowired private CategoryController categoryController;
+    @PersistenceContext private EntityManager entityManager;
 
     @BeforeAll
     static void setUpContainer() {
