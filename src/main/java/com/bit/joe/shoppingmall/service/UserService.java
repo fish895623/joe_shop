@@ -21,4 +21,6 @@ public interface UserService {
     Response login(String email, String password);
 
     Response logout(HttpSession session);
+
+    Response withdraw(HttpSession session, UserDto userDto);
 }

@@ -21,6 +21,7 @@ public class UserMapper {
         userDto.setBirth(user.getBirth());
         userDto.setEmail(user.getEmail());
         userDto.setPassword(user.getPassword());
+        userDto.setActive(user.isActive());
         return userDto;
     }
 
@@ -37,6 +38,7 @@ public class UserMapper {
         user.setBirth(userDto.getBirth());
         user.setEmail(userDto.getEmail());
         user.setPassword(userDto.getPassword());
+        user.setActive(userDto.isActive());
         return user;
     }
 }
