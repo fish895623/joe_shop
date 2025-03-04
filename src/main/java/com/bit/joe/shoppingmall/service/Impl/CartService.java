@@ -1,7 +1,6 @@
 package com.bit.joe.shoppingmall.service.Impl;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -52,7 +51,6 @@ public class CartService {
                 userRepository
                         .findById(userId)
                         .orElseThrow(() -> new NotFoundException("User not found"));
-
 
         // find cart by user, if cart not found, create a new cart
         Cart cart = cartRepository.findCartByUser(user).orElseGet(Cart::new);
