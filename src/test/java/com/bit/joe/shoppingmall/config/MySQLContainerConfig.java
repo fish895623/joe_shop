@@ -4,6 +4,7 @@ import org.testcontainers.containers.MySQLContainer;
 
 public class MySQLContainerConfig {
 
+    @SuppressWarnings("resource")
     private static final MySQLContainer<?> mysql =
             new MySQLContainer<>("mysql:lts")
                     .withDatabaseName("testdb")
