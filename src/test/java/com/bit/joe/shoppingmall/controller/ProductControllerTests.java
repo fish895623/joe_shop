@@ -1,46 +1,46 @@
-//package com.bit.joe.shoppingmall.controller;
+// package com.bit.joe.shoppingmall.controller;
 //
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 //
-//import java.util.Base64;
+// import java.util.Base64;
 //
-//import org.junit.jupiter.api.*;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.http.MediaType;
-//import org.springframework.mock.web.MockHttpSession;
-//import org.springframework.test.context.junit.jupiter.SpringExtension;
-//import org.springframework.test.web.servlet.MockMvc;
-//import org.testcontainers.containers.MySQLContainer;
-//import org.testcontainers.junit.jupiter.Container;
-//import org.testcontainers.junit.jupiter.Testcontainers;
+// import org.junit.jupiter.api.*;
+// import org.junit.jupiter.api.extension.ExtendWith;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+// import org.springframework.boot.test.context.SpringBootTest;
+// import org.springframework.http.MediaType;
+// import org.springframework.mock.web.MockHttpSession;
+// import org.springframework.test.context.junit.jupiter.SpringExtension;
+// import org.springframework.test.web.servlet.MockMvc;
+// import org.testcontainers.containers.MySQLContainer;
+// import org.testcontainers.junit.jupiter.Container;
+// import org.testcontainers.junit.jupiter.Testcontainers;
 //
-//import com.bit.joe.shoppingmall.dto.UserDto;
-//import com.bit.joe.shoppingmall.dto.request.ProductRequest;
-//import com.bit.joe.shoppingmall.enums.UserGender;
-//import com.bit.joe.shoppingmall.enums.UserRole;
-//import com.bit.joe.shoppingmall.repository.CategoryRepository;
-//import com.bit.joe.shoppingmall.repository.UserRepository;
-//import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
-//import com.bit.joe.shoppingmall.service.Impl.UserServiceImpl;
-//import com.fasterxml.jackson.databind.ObjectMapper;
+// import com.bit.joe.shoppingmall.dto.UserDto;
+// import com.bit.joe.shoppingmall.dto.request.ProductRequest;
+// import com.bit.joe.shoppingmall.enums.UserGender;
+// import com.bit.joe.shoppingmall.enums.UserRole;
+// import com.bit.joe.shoppingmall.repository.CategoryRepository;
+// import com.bit.joe.shoppingmall.repository.UserRepository;
+// import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
+// import com.bit.joe.shoppingmall.service.Impl.UserServiceImpl;
+// import com.fasterxml.jackson.databind.ObjectMapper;
 //
-//import jakarta.persistence.EntityManager;
-//import jakarta.persistence.PersistenceContext;
-//import jakarta.servlet.http.HttpSession;
-//import jakarta.transaction.Transactional;
+// import jakarta.persistence.EntityManager;
+// import jakarta.persistence.PersistenceContext;
+// import jakarta.servlet.http.HttpSession;
+// import jakarta.transaction.Transactional;
 //
-//@ExtendWith({SpringExtension.class})
-//@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@Testcontainers
-//@AutoConfigureMockMvc
-//@Transactional
-//public class ProductControllerTests {
+// @ExtendWith({SpringExtension.class})
+// @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+// @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+// @Testcontainers
+// @AutoConfigureMockMvc
+// @Transactional
+// public class ProductControllerTests {
 //    @Container public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:lts");
 //    UserDto userDto =
 //            UserDto.builder()
@@ -198,4 +198,4 @@
 //                                .header("Authorization", basicAuthHeader))
 //                .andExpect(status().isOk());
 //    }
-//}
+// }
