@@ -6,28 +6,40 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.Base64;
 
 import org.junit.jupiter.api.*;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.bit.joe.shoppingmall.config.MySQLContainerConfig;
 import com.bit.joe.shoppingmall.dto.CategoryDto;
 import com.bit.joe.shoppingmall.dto.UserDto;
+import com.bit.joe.shoppingmall.entity.Category;
 import com.bit.joe.shoppingmall.enums.UserGender;
 import com.bit.joe.shoppingmall.enums.UserRole;
-import com.bit.joe.shoppingmall.service.CategoryService;
+import com.bit.joe.shoppingmall.repository.CategoryRepository;
+import com.bit.joe.shoppingmall.repository.UserRepository;
+import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
+import com.bit.joe.shoppingmall.service.Impl.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 
+@ExtendWith({SpringExtension.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@SpringBootTest
+@Testcontainers
 public class CategoryControllerTests {
-    static final MySQLContainer<?> mysql = MySQLContainerConfig.getInstance();
+    @Container public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:lts");
     UserDto userDto =
             UserDto.builder()
                     .name("admin")
@@ -44,20 +56,36 @@ public class CategoryControllerTests {
                                     (userDto.getEmail() + userDto.getPassword()).getBytes());
     MockHttpSession mockHttpSession = new MockHttpSession();
     private MockMvc mockMvc;
-    @Mock private CategoryService categoryService;
-    @Mock private HttpSession session;
-    @InjectMocks private CategoryController categoryController;
+    @Autowired private UserRepository userRepository;
+    @Autowired private CategoryRepository categoryRepository;
+    @Autowired private UserServiceImpl userService;
+    @Autowired private CategoryServiceImpl categoryService;
+    @Autowired private HttpSession session;
+    @Autowired private CategoryController categoryController;
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", mySQLContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", mySQLContainer::getUsername);
+        registry.add("spring.datasource.password", mySQLContainer::getPassword);
+        registry.add("spring.datasource.driver-class-name", () -> "com.mysql.cj.jdbc.Driver");
+        registry.add("spring.jpa.database-platform", () -> "org.hibernate.dialect.MySQLDialect");
+        registry.add("spring.jpa.hibernate.ddl-auto", () -> "update");
+        registry.add("spring.jpa.show-sql", () -> "true");
+    }
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
+        userRepository.deleteAll();
+        categoryRepository.deleteAll();
+
+        userService.createUser(userDto);
         mockMvc = MockMvcBuilders.standaloneSetup(categoryController).build();
     }
 
     @Test
-    @Order(1)
-    void testCreateCategory() throws Exception {
-
+    @Transactional
+    void createCategory() throws Exception {
         CategoryDto categoryDto = new CategoryDto();
         categoryDto.setCategoryName("Test Category");
 
@@ -71,18 +99,24 @@ public class CategoryControllerTests {
                                 .content(contentJson)
                                 .session(mockHttpSession))
                 .andExpect(status().isOk());
+        var repo = categoryRepository.findAll();
+        Assertions.assertEquals(1, repo.size());
     }
 
     @Test
-    @Order(2)
+    @Transactional
     void testGetAllCategories() throws Exception {
         mockMvc.perform(get("/category/get-all")).andExpect(status().isOk());
     }
 
     @Test
-    @Order(3)
+    @Transactional
     void testUpdateCategory() throws Exception {
         var categoryDto = CategoryDto.builder().categoryName("Update Category").build();
+
+        Category category = new Category();
+        category.setCategoryName("Update Category 1");
+        categoryRepository.save(category);
 
         ObjectMapper objectMapper = new ObjectMapper();
         String contentJson = objectMapper.writeValueAsString(categoryDto);
@@ -99,20 +133,31 @@ public class CategoryControllerTests {
     }
 
     @Test
-    @Order(4)
+    @Transactional
     void testGetCategoryById() throws Exception {
+        Category category = new Category();
+        category.setId(1L);
+        category.setCategoryName("Test Category");
+        categoryRepository.save(category);
+
         mockMvc.perform(get("/category/get-category-by-id/1")).andExpect(status().isOk());
     }
 
     @Test
-    @Order(5)
-    void testDeleteCategory() throws Exception {
+    @Transactional
+    void deleteCategory() throws Exception {
+        Category category = new Category();
+        category.setId(1L);
+        category.setCategoryName("Test Category");
+        categoryRepository.save(category);
+
         mockMvc.perform(
                         delete("/category/delete/1")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header("Authorization", basicAuthHeader)
                                 .session(mockHttpSession))
                 .andExpect(status().isOk());
-        mockMvc.perform(get("/category/get-category-by-id/1")).andExpect(status().isOk());
+        mockMvc.perform(get("/category/get-category-by-id/1"))
+                .andExpect(status().is4xxClientError());
     }
 }
