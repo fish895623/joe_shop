@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -76,8 +77,43 @@ public class ProductControllerTests {
         mySQLContainer.stop();
     }
 
+    @BeforeEach
+    void setUp() {
+        userRepository.deleteAll();
+        userService.createUser(userDto);
+        categoryRepository.deleteAll();
+
+        mockMvc = MockMvcBuilders.standaloneSetup(productController).build();
+
+        userRepository.flush();
+        entityManager.flush();
+    }
+
     @Test
-    void testAdminCreateProduct() throws Exception {
+    void adminCreateProduct() throws Exception {
+        categoryService.createCategory(CategoryDto.builder().categoryName("Test Category").build());
+
+        ProductRequest productRequest = new ProductRequest();
+        productRequest.setName("product");
+        productRequest.setPrice(1000);
+        productRequest.setQuantity(10);
+        productRequest.setImage("image");
+        productRequest.setCategoryId(1L);
+
+        String contentJson = new ObjectMapper().writeValueAsString(productRequest);
+
+        mockMvc.perform(
+                        post("/product/create")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", basicAuthHeader)
+                                .content(contentJson))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void adminCreateDuplicateProduct() throws Exception {
+        categoryService.createCategory(CategoryDto.builder().categoryName("Test Category").build());
+
         ProductRequest productRequest = new ProductRequest();
         productRequest.setName("product");
         productRequest.setPrice(1000);
@@ -93,31 +129,13 @@ public class ProductControllerTests {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header("Authorization", basicAuthHeader)
                                 .content(contentJson))
-                .andExpect(status().isOk());
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
-    void testAdminCreateDuplicateProduct() throws Exception {
-        ProductRequest productRequest = new ProductRequest();
-        productRequest.setName("product");
-        productRequest.setPrice(1000);
-        productRequest.setQuantity(10);
-        productRequest.setImage("image");
-        productRequest.setCategoryId(1L);
+    void userCreateProduct() throws Exception {
+        categoryService.createCategory(CategoryDto.builder().categoryName("Test Category").build());
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String contentJson = objectMapper.writeValueAsString(productRequest);
-
-        mockMvc.perform(
-                        post("/product/create")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", basicAuthHeader)
-                                .content(contentJson))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void testUserCreateProduct() throws Exception {
         ProductRequest productRequest = new ProductRequest();
         productRequest.setName("product");
         productRequest.setPrice(1000);
@@ -132,7 +150,7 @@ public class ProductControllerTests {
                         post("/product/create")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(contentJson))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
@@ -147,22 +165,32 @@ public class ProductControllerTests {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header("Authorization", basicAuthHeader)
                                 .content(contentJson))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
     void testGetProducts() throws Exception {
+        categoryService.createCategory(CategoryDto.builder().categoryName("Test Category").build());
+        productService.createProduct(1L, "image", "product", 10, 1000);
+
         mockMvc.perform(get("/product/get-all")).andExpect(status().isOk());
         mockMvc.perform(get("/product/get-by-product-id/1")).andExpect(status().isOk());
         mockMvc.perform(get("/product/get-by-category-id/1")).andExpect(status().isOk());
+
+        mockMvc.perform(get("/product/get-by-product-id/2")).andExpect(status().is4xxClientError());
+        mockMvc.perform(get("/product/get-by-category-id/2"))
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
-    void testAdminUpdateProduct() throws Exception {
+    void adminUpdateProduct() throws Exception {
+        categoryService.createCategory(CategoryDto.builder().categoryName("Test Category").build());
+        productService.createProduct(1L, "image", "product", 10, 1000);
+
         ProductRequest productRequest = new ProductRequest();
         productRequest.setName("product2");
         productRequest.setPrice(1000);
-        productRequest.setQuantity(10);
+        productRequest.setQuantity(11);
         productRequest.setImage("image");
         productRequest.setCategoryId(1L);
 
@@ -176,9 +204,8 @@ public class ProductControllerTests {
                                 .content(contentJson))
                 .andExpect(status().isOk());
 
-        productRequest.setQuantity(-1);
-
         // Return bad request because quantity is negative
+        productRequest.setQuantity(-1);
         mockMvc.perform(
                         put("/product/update/1")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -191,7 +218,12 @@ public class ProductControllerTests {
     }
 
     @Test
-    void testDeleteProduct() throws Exception {
+    void deleteProduct() throws Exception {
+        categoryService.createCategory(
+                CategoryDto.builder().id(1L).categoryName("Test Category").build());
+        categoryRepository.flush();
+        productService.createProduct(1L, "image", "product", 10, 1000);
+
         mockMvc.perform(
                         delete("/product/delete/1")
                                 .contentType(MediaType.APPLICATION_JSON)

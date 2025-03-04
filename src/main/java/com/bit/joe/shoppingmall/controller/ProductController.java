@@ -1,5 +1,6 @@
 package com.bit.joe.shoppingmall.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,20 @@ public class ProductController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Response> createProduct(
             @Valid @RequestBody ProductRequest productRequest) {
+
+        boolean productExistsInCategory =
+                productService.existsByCategoryIdAndName(
+                        productRequest.getCategoryId(), productRequest.getName());
+
+        if (productExistsInCategory) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(
+                            Response.builder()
+                                    .status(400)
+                                    .message(
+                                            "Product name must be unique within the same category.")
+                                    .build());
+        }
         // If everything is fine, proceed with product creation
         return ResponseEntity.ok(
                 productService.createProduct(
@@ -36,6 +51,21 @@ public class ProductController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Response> updateProduct(
             @PathVariable Long productId, @Valid @RequestBody ProductRequest productRequest) {
+        // Check if the product name is unique within the same category, excluding the current
+        // product
+        boolean productExistsInCategory =
+                productService.existsByCategoryIdAndName(
+                        productRequest.getCategoryId(), productRequest.getName());
+
+        if (productExistsInCategory && !productRequest.getName().equals(productRequest.getName())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(
+                            Response.builder()
+                                    .status(400)
+                                    .message(
+                                            "Product name must be unique within the same category.")
+                                    .build());
+        }
         return ResponseEntity.ok(
                 productService.updateProduct(
                         productId,
