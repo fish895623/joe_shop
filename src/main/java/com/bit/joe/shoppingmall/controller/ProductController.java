@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.bit.joe.shoppingmall.dto.request.ProductRequest;
 import com.bit.joe.shoppingmall.dto.response.Response;
-import com.bit.joe.shoppingmall.service.CategoryService;
 import com.bit.joe.shoppingmall.service.ProductService;
 
 import jakarta.validation.Valid;
@@ -18,13 +17,12 @@ import lombok.RequiredArgsConstructor;
 public class ProductController {
 
     private final ProductService productService;
-    private final CategoryService categoryService;
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Response> createProduct(
             @Valid @RequestBody ProductRequest productRequest) {
-
+        // If everything is fine, proceed with product creation
         return ResponseEntity.ok(
                 productService.createProduct(
                         productRequest.getCategoryId(),

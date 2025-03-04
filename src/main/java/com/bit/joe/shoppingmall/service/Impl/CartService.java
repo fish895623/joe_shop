@@ -52,12 +52,6 @@ public class CartService {
                         .findById(userId)
                         .orElseThrow(() -> new NotFoundException("User not found"));
 
-        // find cart by user
-        //        Cart cart =
-        //                cartRepository
-        //                        .findCartByUser(user)
-        //                        .orElseThrow(() -> new NotFoundException("Cart not found"));
-
         Cart cart =
                 cartRepository
                         .findCartByUser(user)
