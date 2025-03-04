@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
 
-import org.junit.Before;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +30,7 @@ import jakarta.transaction.Transactional;
 @Testcontainers
 class CategoryServiceTests {
 
-    @Container
-    public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:lts");
+    @Container public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:lts");
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
@@ -45,11 +43,10 @@ class CategoryServiceTests {
         registry.add("spring.jpa.show-sql", () -> "true");
     }
 
-    @Autowired
-    private CategoryServiceImpl categoryService;
+    @Autowired private CategoryServiceImpl categoryService;
 
-    @Autowired
-    private CategoryRepository categoryRepository;
+    @Autowired private CategoryRepository categoryRepository;
+
     @BeforeEach
     public void setUp() {
         categoryRepository.deleteAll();
@@ -68,8 +65,8 @@ class CategoryServiceTests {
 
         var category = categoryRepository.findAll();
         System.out.println(category);
-
     }
+
     @Test
     @Transactional
     public void updateCategory() {
@@ -91,6 +88,7 @@ class CategoryServiceTests {
         assertTrue(updatedCategory.isPresent());
         assertEquals("Home Appliances", updatedCategory.get().getCategoryName());
     }
+
     @Test
     @Transactional
     public void getAllCategory() {
@@ -142,6 +140,7 @@ class CategoryServiceTests {
         assertEquals(200, response.getStatus());
         assertEquals("Category was deleted successfully", response.getMessage());
     }
+
     @Test
     @Transactional
     public void failedFindById() {
@@ -156,6 +155,7 @@ class CategoryServiceTests {
         // Then
         assertTrue(response.getStatus() >= 400 || response.getStatus() < 500);
     }
+
     @Test
     @Transactional
     public void updateNonExistCategory() {
@@ -173,6 +173,7 @@ class CategoryServiceTests {
         // Then
         assertTrue(response.getStatus() >= 400 || response.getStatus() < 500);
     }
+
     @Test
     @Transactional
     public void deleteNonExistCategory() {
@@ -187,6 +188,7 @@ class CategoryServiceTests {
         // Then
         assertTrue(response.getStatus() >= 400 || response.getStatus() < 500);
     }
+
     @Test
     @Transactional
     public void createCategoryWithNullNameAndDuplicate() {
