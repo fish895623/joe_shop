@@ -53,23 +53,25 @@ public class CartService {
                         .orElseThrow(() -> new NotFoundException("User not found"));
 
         // find cart by user
-//        Cart cart =
-//                cartRepository
-//                        .findCartByUser(user)
-//                        .orElseThrow(() -> new NotFoundException("Cart not found"));
+        //        Cart cart =
+        //                cartRepository
+        //                        .findCartByUser(user)
+        //                        .orElseThrow(() -> new NotFoundException("Cart not found"));
 
         Cart cart =
                 cartRepository
                         .findCartByUser(user)
-                        .orElseGet(() -> {
-                            // If no cart is found, create a new one
-                            Cart newCart = new Cart();
-                            newCart.setUser(user);
-                            newCart.setCreatedAt(LocalDateTime.now());
-                            newCart.setIsOrdered(false);
-                            cartRepository.save(newCart);  // Save the new cart to the repository
-                            return newCart;
-                        });
+                        .orElseGet(
+                                () -> {
+                                    // If no cart is found, create a new one
+                                    Cart newCart = new Cart();
+                                    newCart.setUser(user);
+                                    newCart.setCreatedAt(LocalDateTime.now());
+                                    newCart.setIsOrdered(false);
+                                    cartRepository.save(
+                                            newCart); // Save the new cart to the repository
+                                    return newCart;
+                                });
 
         // if same product already exists in the cart, update only quantity
         for (CartItem cartItem : cart.getCartItems()) {

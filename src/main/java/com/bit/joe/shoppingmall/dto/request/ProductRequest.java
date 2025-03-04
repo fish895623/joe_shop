@@ -1,8 +1,8 @@
 package com.bit.joe.shoppingmall.dto.request;
 
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
-import jakarta.validation.constraints.*;
 
 @Getter
 @Setter
@@ -21,6 +21,6 @@ public class ProductRequest {
     private int quantity;
 
     @Min(value = 1, message = "Price must be greater than 0")
-    private int price; // TODO: Need to change to float? -> fine for Korean Won, also can be fixed later
+    private int
+            price; // TODO: Need to change to float? -> fine for Korean Won, also can be fixed later
 }
-

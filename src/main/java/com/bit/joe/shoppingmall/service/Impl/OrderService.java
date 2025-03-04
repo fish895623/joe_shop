@@ -2,7 +2,6 @@ package com.bit.joe.shoppingmall.service.Impl;
 
 import java.util.List;
 
-import com.bit.joe.shoppingmall.entity.User;
 import org.springframework.stereotype.Service;
 
 import com.bit.joe.shoppingmall.dto.request.OrderRequest;
