@@ -2,6 +2,10 @@ package com.bit.joe.shoppingmall.e2e;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.bit.joe.shoppingmall.config.MySQLContainerConfig;
+import com.bit.joe.shoppingmall.utils.TestUtils;
+import com.microsoft.playwright.*;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,10 +14,6 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
-import com.bit.joe.shoppingmall.config.MySQLContainerConfig;
-import com.bit.joe.shoppingmall.utils.TestUtils;
-import com.microsoft.playwright.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers

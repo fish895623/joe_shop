@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.*;
 
 import com.bit.joe.shoppingmall.dto.request.ProductRequest;
 import com.bit.joe.shoppingmall.dto.response.Response;
-import com.bit.joe.shoppingmall.exception.InvalidCredentialsException;
 import com.bit.joe.shoppingmall.service.ProductService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -20,16 +20,9 @@ public class ProductController {
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Response> createProduct(@RequestBody ProductRequest productRequest) {
-        // Validate the fields in the productRequest
-        if (productRequest.getCategoryId() == null
-                || productRequest.getImage().isEmpty()
-                || productRequest.getName().isEmpty()
-                || productRequest.getQuantity() <= 0
-                || productRequest.getPrice() <= 0) {
-            throw new InvalidCredentialsException("All Fields are Required");
-        }
-
+    public ResponseEntity<Response> createProduct(
+            @Valid @RequestBody ProductRequest productRequest) {
+        // If everything is fine, proceed with product creation
         return ResponseEntity.ok(
                 productService.createProduct(
                         productRequest.getCategoryId(),
@@ -42,10 +35,7 @@ public class ProductController {
     @PutMapping("/update/{productId}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Response> updateProduct(
-            @PathVariable Long productId, @RequestBody ProductRequest productRequest) {
-        if (productRequest.getQuantity() <= 0 && productRequest.getPrice() <= 0) {
-            throw new InvalidCredentialsException("Quantity and price must be greater than 0.");
-        }
+            @PathVariable Long productId, @Valid @RequestBody ProductRequest productRequest) {
         return ResponseEntity.ok(
                 productService.updateProduct(
                         productId,

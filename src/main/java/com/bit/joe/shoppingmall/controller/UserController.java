@@ -149,4 +149,27 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.OK).body(resp);
     }
+
+    @GetMapping("/withdraw")
+    public ResponseEntity<Response> withdraw(HttpSession session, @RequestBody UserDto userDto) {
+        UserDto user = (UserDto) session.getAttribute("user");
+        // Get user from session
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Response.builder().status(401).message("Unauthorized").build());
+            // return unauthorized response with status code 401 -> user is not logged in
+        }
+
+        // check if session user is him/her self
+        if (!user.getId().equals(userDto.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Response.builder().status(403).message("Forbidden").build());
+            // return forbidden response with status code 403 -> user is not allowed to delete other
+            // user's account
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(userService.withdraw(session, userDto));
+        // return success response with status code 200 (OK)
+    }
 }

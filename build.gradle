@@ -60,7 +60,7 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine' // JUnit 5 Engine
     testImplementation 'org.junit.platform:junit-platform-suite' // For test suites
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher' // Needed for running tests
-
+    implementation 'org.springframework.boot:spring-boot-starter-validation' // Jakarta Bean Validation
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
     // testcontainer
