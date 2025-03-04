@@ -38,6 +38,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<Response> handleNotFoundException(NotFoundException ex) {
+        // NotFoundException 처리
+        Response errorResponse = Response.builder().status(404).message(ex.getMessage()).build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Response> handleAllExceptions(Exception ex) {
         // Generic exception handler

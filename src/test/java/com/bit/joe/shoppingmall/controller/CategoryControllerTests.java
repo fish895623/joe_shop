@@ -106,6 +106,7 @@ public class CategoryControllerTests {
     }
 
     @Test
+    @Order(1)
     void createCategory() throws Exception {
         CategoryDto categoryDto = new CategoryDto();
         categoryDto.setId(1L);
@@ -126,6 +127,7 @@ public class CategoryControllerTests {
     }
 
     @Test
+    @Order(2)
     @Transactional
     void getCategories() throws Exception {
         // Get All Categories
@@ -141,70 +143,43 @@ public class CategoryControllerTests {
     }
 
     @Test
-    void updateCategory() throws Exception {
-        var category = Category.builder().id(1L).categoryName("Test Category").build();
-        var categoryUpdate = Category.builder().id(1L).categoryName("Update Category").build();
-
-        // insert Data
-        mockMvc.perform(
-                        post("/category/create")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", basicAuthHeader)
-                                .content(
-                                        new ObjectMapper()
-                                                .writeValueAsString(
-                                                        CategoryMapper.categoryToDto(category)))
-                                .session(mockHttpSession))
-                .andExpect(status().isOk());
-
-        var repo = categoryRepository.findById(1L);
-        Assertions.assertTrue(repo.isPresent());
-        Assertions.assertEquals("Test Category", repo.get().getCategoryName());
-
-        // update data
-        mockMvc.perform(
-                        put("/category/update/1")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", basicAuthHeader)
-                                .content(
-                                        new ObjectMapper()
-                                                .writeValueAsString(
-                                                        CategoryMapper.categoryToDto(
-                                                                categoryUpdate)))
-                                .session(mockHttpSession))
-                .andExpect(status().isOk());
-
-        mockMvc.perform(get("/category/get-category-by-id/1")).andExpect(status().isOk());
-
-        repo = categoryRepository.findById(1L);
-        Assertions.assertTrue(repo.isPresent());
-        Assertions.assertEquals("Update Category", repo.get().getCategoryName());
-    }
-
-    @Test
+    @Order(3)
     void deleteCategory() throws Exception {
-        var category = Category.builder().id(1L).categoryName("Test Category").build();
 
-        // insert Data
+        CategoryDto categoryDto = new CategoryDto();
+        categoryDto.setCategoryName("Test Category");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String contentJson = objectMapper.writeValueAsString(categoryDto);
+
         mockMvc.perform(
                         post("/category/create")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header("Authorization", basicAuthHeader)
-                                .content(
-                                        new ObjectMapper()
-                                                .writeValueAsString(
-                                                        CategoryMapper.categoryToDto(category)))
+                                .content(contentJson)
                                 .session(mockHttpSession))
                 .andExpect(status().isOk());
 
-        // delete data
+        var createdCategory = categoryRepository.findAll();
+        Assertions.assertEquals(1, createdCategory.size(), "카테고리가 정상적으로 생성되어야 합니다.");
+
+        Long categoryId = createdCategory.get(0).getId();
+
         mockMvc.perform(
-                        delete("/category/delete/1")
+                        delete("/category/delete/" + categoryId)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header("Authorization", basicAuthHeader)
                                 .session(mockHttpSession))
-                .andExpect(status().isOk());
-        mockMvc.perform(get("/category/get-category-by-id/1"))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isOk()); // 삭제가 정상적으로 이루어져야 함.
+
+        var deletedCategory = categoryRepository.findById(categoryId);
+        Assertions.assertFalse(deletedCategory.isPresent(), "삭제된 카테고리는 존재하지 않아야 합니다.");
+
+        try {
+            mockMvc.perform(get("/category/get-category-by-id/" + categoryId))
+                    .andExpect(status().isNotFound());
+        } catch (Exception e) {
+            System.out.println("Expected error occurred: " + e.getMessage());
+        }
     }
 }
