@@ -10,6 +10,7 @@ import com.bit.joe.shoppingmall.enums.UserRole;
 import com.bit.joe.shoppingmall.repository.UserRepository;
 import com.bit.joe.shoppingmall.service.Impl.UserServiceImpl;
 
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -46,11 +47,13 @@ public class UserServiceTests {
     }
 
     @BeforeEach
+    @Transactional
     void setUp() {
         userRepository.deleteAll();
     }
 
     @Test
+    @Transactional
     void createUser() throws Exception {
         // Create a user admin and user
         UserDto adminDto = new UserDto();
