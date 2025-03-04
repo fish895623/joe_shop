@@ -3,8 +3,6 @@ package com.bit.joe.shoppingmall.service.Impl;
 import static com.bit.joe.shoppingmall.enums.OrderStatus.*;
 
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;

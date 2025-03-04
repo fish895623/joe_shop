@@ -169,8 +169,7 @@ public class UserController {
             // user's account
         }
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(userService.withdraw(session, userDto));
+        return ResponseEntity.status(HttpStatus.OK).body(userService.withdraw(session, userDto));
         // return success response with status code 200 (OK)
     }
 }
