@@ -5,25 +5,55 @@
       .container {
         display: flex;
       }
+
+      #nav1 {
+        text-align: center;
+      }
+
+      #nav1 > ul {
+        display: inline-block;
+      }
+      #nav1 > ul li {
+        float: left;
+        padding: 0 30px;
+        line-height: 80px;
+      }
+
+      * {
+        padding: 0;
+        margin: 0;
+      }
+
+      nav {
+        width: 80%;
+        overflow: hidden;
+      }
+      ul {
+        list-style: none;
+      }
     </style>
     <head>
       <body>
-        <div id="navbar">
-          <a href="/basic/login">로그인</a>
-          <span><a href="/basic/signUp">회원가입</a></span>
-          <span><a href="/basic/myPage">마이페이지</a></span>
-          <span><a href="/basic/updateProfile"> 정보 수정</a></span>
-          <span><a href="">구매내역</a></span>
-          <span><a href="">장바구니</a></span>
-        </div>
-        <hr />
-        <form>
-          <div id="mainDisplay">
-            <span><button>알림 받기</button></span>
-            <span>방문자 수 : </span>
-            <span><h1>JOE SHOP</h1></span>
+        <div>
+          <div>
+            <h1>JOE SHOP</h1>
           </div>
-        </form>
+          <div>
+            <input type="button" value="알림받기" />
+          </div>
+          <div>
+            <nav id="nav1">
+              <ul>
+                <li><a href="/basic/login">로그인</a></li>
+                <li><a href="/basic/signUp">회원가입</a></li>
+                <li><a href="/basic/myPage">마이페이지</a></li>
+                <li><a href="/basic/updateProfile"> 정보 수정</a></li>
+                <li><a href="">구매내역</a></li>
+                <li><a href="">장바구니</a></li>
+              </ul>
+            </nav>
+          </div>
+        </div>
         <hr />
         <div>
           <input type="text" />
