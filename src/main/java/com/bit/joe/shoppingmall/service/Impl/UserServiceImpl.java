@@ -1,6 +1,10 @@
 package com.bit.joe.shoppingmall.service.Impl;
 
+import static com.bit.joe.shoppingmall.enums.OrderStatus.*;
+
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,6 +35,8 @@ public class UserServiceImpl implements UserService {
         // Convert UserDto to User
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         // Encode password
+        user.setActive(true);
+        // Set user to active
 
         userRepository.save(user);
         // Save user
@@ -162,5 +168,42 @@ public class UserServiceImpl implements UserService {
         // Fire a LogoutSuccessEvent
 
         return Response.builder().status(200).message("Logout successfully").build();
+    }
+
+    // Withdraw user account
+    /*
+    leave the data in the database, but mark the account as inactive
+    if the user logs in again, the account will be reactivated
+    if the user does not log in for a certain period of time, the account will be deleted
+    */
+    @Override
+    public Response withdraw(HttpSession session, UserDto userDto) {
+
+        User user =
+                userRepository
+                        .findById(userDto.getId())
+                        .orElseThrow(() -> new NotFoundException("User not found"));
+        // get user from database by userId
+
+        // check if the user has any order that is not completed
+        // if there is, return a response with status code 400 (BAD_REQUEST)
+        // if there is not, continue to the next step
+        if (user.getOrders().stream().anyMatch(order -> !order.getStatus().equals(COMPLETE))) {
+            return Response.builder()
+                    .status(400)
+                    .message("Cannot withdraw account, order progressing")
+                    .build();
+        }
+
+        user.setActive(false);
+        // set user to inactive
+
+        userRepository.save(user);
+        // save user
+
+        session.invalidate();
+        // Invalidate session -> logout user
+
+        return Response.builder().status(200).message("Withdraw successfully").build();
     }
 }
