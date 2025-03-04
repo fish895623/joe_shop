@@ -21,6 +21,5 @@ public class ProductRequest {
     private int quantity;
 
     @Min(value = 1, message = "Price must be greater than 0")
-    private int
-            price; // TODO: Need to change to float? -> fine for Korean Won, also can be fixed later
+    private int price; // TODO: Need to change to float? -> fine for Korean Won, also can be fixed later
 }
