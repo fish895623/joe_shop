@@ -8,5 +8,6 @@ import com.bit.joe.shoppingmall.entity.Product;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategoryId(Long categoryId);
+
     boolean existsByCategoryIdAndName(Long categoryId, String name);
 }
