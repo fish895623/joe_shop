@@ -1,19 +1,28 @@
 package com.bit.joe.shoppingmall.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Base64;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.testcontainers.containers.MySQLContainer;
@@ -22,9 +31,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.bit.joe.shoppingmall.dto.*;
 import com.bit.joe.shoppingmall.dto.request.ProductRequest;
+import com.bit.joe.shoppingmall.entity.User;
 import com.bit.joe.shoppingmall.enums.UserGender;
 import com.bit.joe.shoppingmall.enums.UserRole;
 import com.bit.joe.shoppingmall.repository.CategoryRepository;
+import com.bit.joe.shoppingmall.repository.ProductRepository;
 import com.bit.joe.shoppingmall.repository.UserRepository;
 import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
 import com.bit.joe.shoppingmall.service.Impl.ProductServiceImpl;
@@ -34,41 +45,51 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.http.HttpSession;
-import jakarta.transaction.Transactional;
 
-@ExtendWith({SpringExtension.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
 @AutoConfigureMockMvc
-@Transactional
 public class ProductControllerTests {
     @Container public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:lts");
-    UserDto userDto =
-            UserDto.builder()
+    User user =
+            User.builder()
                     .name("admin")
                     .password("admin")
                     .email("admin@example.com")
                     .role(UserRole.ADMIN)
                     .gender(UserGender.MALE)
                     .birth("2021-01-01")
+                    .active(true)
                     .build();
     String basicAuthHeader =
             "Basic "
                     + Base64.getEncoder()
-                            .encodeToString(
-                                    (userDto.getEmail() + userDto.getPassword()).getBytes());
+                            .encodeToString((user.getEmail() + user.getPassword()).getBytes());
     MockHttpSession mockHttpSession = new MockHttpSession();
     private MockMvc mockMvc;
-    @Autowired private UserRepository userRepository;
+    @Autowired private CategoryController categoryController;
     @Autowired private CategoryRepository categoryRepository;
-    @Autowired private UserServiceImpl userService;
     @Autowired private CategoryServiceImpl categoryService;
     @Autowired private HttpSession session;
-    @Autowired private CategoryController categoryController;
     @Autowired private ProductController productController;
+    @Autowired private ProductRepository productRepository;
     @Autowired private ProductServiceImpl productService;
+    @Autowired private UserRepository userRepository;
+    @Autowired private UserServiceImpl userService;
     @PersistenceContext private EntityManager entityManager;
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        mySQLContainer.start();
+        registry.add("spring.datasource.url", mySQLContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", mySQLContainer::getUsername);
+        registry.add("spring.datasource.password", mySQLContainer::getPassword);
+        registry.add("spring.datasource.driver-class-name", () -> "com.mysql.cj.jdbc.Driver");
+        registry.add("spring.jpa.database-platform", () -> "org.hibernate.dialect.MySQLDialect");
+        registry.add("spring.jpa.hibernate.ddl-auto", () -> "update");
+        registry.add("spring.jpa.show-sql", () -> "true");
+    }
 
     @BeforeAll
     static void setUpContainer() {
@@ -83,18 +104,24 @@ public class ProductControllerTests {
     @BeforeEach
     void setUp() {
         userRepository.deleteAll();
-        userService.createUser(userDto);
+        productRepository.deleteAll();
         categoryRepository.deleteAll();
+
+        userRepository.save(user);
 
         mockMvc = MockMvcBuilders.standaloneSetup(productController).build();
 
         userRepository.flush();
-        entityManager.flush();
+        categoryRepository.flush();
+        productRepository.flush();
+
+        categoryService.createCategory(
+            CategoryDto.builder().id(1L).categoryName("Test Category").build());
     }
 
     @Test
+    @Order(1)
     void adminCreateProduct() throws Exception {
-        categoryService.createCategory(CategoryDto.builder().categoryName("Test Category").build());
 
         ProductRequest productRequest = new ProductRequest();
         productRequest.setName("product");
@@ -114,9 +141,8 @@ public class ProductControllerTests {
     }
 
     @Test
+    @Order(2)
     void adminCreateDuplicateProduct() throws Exception {
-        categoryService.createCategory(CategoryDto.builder().categoryName("Test Category").build());
-
         ProductRequest productRequest = new ProductRequest();
         productRequest.setName("product");
         productRequest.setPrice(1000);
@@ -124,8 +150,7 @@ public class ProductControllerTests {
         productRequest.setImage("image");
         productRequest.setCategoryId(1L);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String contentJson = objectMapper.writeValueAsString(productRequest);
+        String contentJson = new ObjectMapper().writeValueAsString(productRequest);
 
         mockMvc.perform(
                         post("/product/create")
@@ -136,9 +161,8 @@ public class ProductControllerTests {
     }
 
     @Test
+    @Order(3)
     void userCreateProduct() throws Exception {
-        categoryService.createCategory(CategoryDto.builder().categoryName("Test Category").build());
-
         ProductRequest productRequest = new ProductRequest();
         productRequest.setName("product");
         productRequest.setPrice(1000);
@@ -157,7 +181,8 @@ public class ProductControllerTests {
     }
 
     @Test
-    void testAdminCreateProductWithEmptyBody() throws Exception {
+    @Order(4)
+    void adminCreateProductWithEmptyBody() throws Exception {
         ProductRequest productRequest = new ProductRequest();
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -172,8 +197,8 @@ public class ProductControllerTests {
     }
 
     @Test
-    void testGetProducts() throws Exception {
-        categoryService.createCategory(CategoryDto.builder().categoryName("Test Category").build());
+    @Order(5)
+    void getProducts() throws Exception {
         productService.createProduct(1L, "image", "product", 10, 1000);
 
         mockMvc.perform(get("/product/get-all")).andExpect(status().isOk());
@@ -186,9 +211,10 @@ public class ProductControllerTests {
     }
 
     @Test
+    @Order(6)
     void adminUpdateProduct() throws Exception {
-        categoryService.createCategory(CategoryDto.builder().categoryName("Test Category").build());
         productService.createProduct(1L, "image", "product", 10, 1000);
+        productRepository.flush();
 
         ProductRequest productRequest = new ProductRequest();
         productRequest.setName("product2");
@@ -221,6 +247,7 @@ public class ProductControllerTests {
     }
 
     @Test
+    @Order(7)
     void deleteProduct() throws Exception {
         categoryService.createCategory(
                 CategoryDto.builder().id(1L).categoryName("Test Category").build());
