@@ -1,6 +1,8 @@
 package com.bit.joe.shoppingmall.service.Impl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -51,44 +53,53 @@ public class CartService {
                         .findById(userId)
                         .orElseThrow(() -> new NotFoundException("User not found"));
 
-        // find cart by user
-        Cart cart =
-                cartRepository
-                        .findCartByUser(user)
-                        .orElseThrow(() -> new NotFoundException("Cart not found"));
+        // find cart by user, if cart not found, create a new cart
+        Cart cart = cartRepository.findCartByUser(user).orElseGet(Cart::new);
 
-        // if same product already exists in the cart, update only quantity
-        for (CartItem cartItem : cart.getCartItems()) {
-            if (cartItem.getProduct().getId().equals(productId)) {
-                cartItem.setQuantity(cartItem.getQuantity() + quantity);
-                cartItem.setPrice(
-                        BigDecimal.valueOf(
-                                (long) cartItem.getQuantity() * cartItem.getProduct().getPrice()));
-                cartItemRepository.save(cartItem);
-                return Response.builder()
-                        .status(200)
-                        .message("Product quantity updated successfully")
-                        .build();
-            }
+        // if cart is created now, set user
+        if (cart.getUser() == null) {
+            cart.setUser(user);
+            // set user to the cart
         }
 
-        // Find product by id
-        Product product =
-                productRepository
-                        .findById(productId)
-                        .orElseThrow(() -> new NotFoundException("Product not found"));
+        // if cart is already created, check if the product already exists in the cart
+        if (cart.getCartItems() != null) {
 
-        CartItem cartItem =
-                CartItem.builder()
-                        .cart(cart)
-                        .product(product)
-                        .quantity(quantity)
-                        .price(BigDecimal.valueOf((long) quantity * product.getPrice()))
-                        .build();
-        // Create a new cart item with the found product, quantity and price
+            // if same product already exists in the cart, update only quantity
+            for (CartItem cartItem : cart.getCartItems()) {
+                if (cartItem.getProduct().getId().equals(productId)) {
+                    cartItem.setQuantity(cartItem.getQuantity() + quantity);
+                    cartItem.setPrice(
+                            BigDecimal.valueOf(
+                                    (long) cartItem.getQuantity()
+                                            * cartItem.getProduct().getPrice()));
+                    cartItemRepository.save(cartItem);
+                    return Response.builder()
+                            .status(200)
+                            .message("Product quantity updated successfully")
+                            .build();
+                }
+            }
+        } else {
 
-        cart.getCartItems().add(cartItem);
-        // Add the cart item to the cart
+            Product product =
+                    productRepository
+                            .findById(productId)
+                            .orElseThrow(() -> new NotFoundException("Product not found"));
+            // Find product by id
+
+            CartItem cartItem =
+                    CartItem.builder()
+                            .cart(cart)
+                            .product(product)
+                            .quantity(quantity)
+                            .price(BigDecimal.valueOf((long) quantity * product.getPrice()))
+                            .build();
+            // Create a new cart item with the found product, quantity and price
+
+            cart.setCartItems(List.of(cartItem));
+            // Add the cart item to the cart
+        }
 
         cartRepository.save(cart);
         // Save the cart
