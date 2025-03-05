@@ -1,12 +1,13 @@
 package com.bit.joe.shoppingmall.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Base64;
 
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.testcontainers.containers.MySQLContainer;
@@ -28,8 +28,10 @@ import com.bit.joe.shoppingmall.enums.UserGender;
 import com.bit.joe.shoppingmall.enums.UserRole;
 import com.bit.joe.shoppingmall.mapper.CategoryMapper;
 import com.bit.joe.shoppingmall.repository.CategoryRepository;
+import com.bit.joe.shoppingmall.repository.ProductRepository;
 import com.bit.joe.shoppingmall.repository.UserRepository;
 import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
+import com.bit.joe.shoppingmall.service.Impl.ProductServiceImpl;
 import com.bit.joe.shoppingmall.service.Impl.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -38,7 +40,6 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 
-@ExtendWith({SpringExtension.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
@@ -68,7 +69,10 @@ public class CategoryControllerTests {
     @Autowired private CategoryServiceImpl categoryService;
     @Autowired private HttpSession session;
     @Autowired private CategoryController categoryController;
+    @Autowired private ProductController productController;
     @PersistenceContext private EntityManager entityManager;
+    @Autowired private ProductServiceImpl productService;
+    @Autowired private ProductRepository productRepository;
 
     @BeforeAll
     static void setUpContainer() {
