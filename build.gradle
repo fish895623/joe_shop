@@ -88,14 +88,10 @@ jacocoTestReport {
         html.required = true
     }
     classDirectories.setFrom(files(classDirectories.files.collect {
-        fileTree(dir: it, exclude: [
-                'com/bit/joe/shoppingmall/BitApplication.class',
-                'com/bit/joe/shoppingmall/ServletInitializer.class',
-                'com/bit/joe/shoppingmall/exception/*.class',
-                'com/bit/joe/shoppingmall/enums/*.class',
-                'com/bit/joe/shoppingmall/dto/*.class',
-                'com/bit/joe/shoppingmall/entity/*.class',
+        fileTree(dir: it, includes: [
+                'com/bit/joe/shoppingmall/controller/*.class',
                 'com/bit/joe/shoppingmall/security/*.class',
+                'com/bit/joe/shoppingmall/service/*.class',
         ])
     }))
 }

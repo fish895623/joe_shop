@@ -24,7 +24,7 @@ jobs:
       - name: Gradle Test
         id: test
         continue-on-error: true
-        run: ./gradlew test -x spotlessCheck
+        run: ./gradlew test -x spotlessCheck --max-workers 2
 
       - uses: codecov/codecov-action@v5
         with:
