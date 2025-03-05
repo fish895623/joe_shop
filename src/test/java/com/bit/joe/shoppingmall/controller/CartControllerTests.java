@@ -5,20 +5,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Base64;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.bit.joe.shoppingmall.dto.UserDto;
-import com.bit.joe.shoppingmall.dto.request.CartItemRequest;
 import com.bit.joe.shoppingmall.entity.Category;
 import com.bit.joe.shoppingmall.entity.Product;
+import com.bit.joe.shoppingmall.entity.User;
 import com.bit.joe.shoppingmall.enums.UserGender;
 import com.bit.joe.shoppingmall.enums.UserRole;
 import com.bit.joe.shoppingmall.mapper.CategoryMapper;
@@ -28,27 +28,27 @@ import com.bit.joe.shoppingmall.repository.CartRepository;
 import com.bit.joe.shoppingmall.repository.CategoryRepository;
 import com.bit.joe.shoppingmall.repository.ProductRepository;
 import com.bit.joe.shoppingmall.repository.UserRepository;
-import com.bit.joe.shoppingmall.service.Impl.CartItemServiceImpl;
 import com.bit.joe.shoppingmall.service.Impl.CartService;
 import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
 import com.bit.joe.shoppingmall.service.Impl.ProductServiceImpl;
+import com.bit.joe.shoppingmall.service.UserService;
 
 @TestMethodOrder(MethodOrderer.Random.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource("classpath:application-test.properties")
 @AutoConfigureMockMvc
-public class CartItemControllerTests {
-    UserDto adminDto =
-            UserDto.builder()
+class CartControllerTests {
+    User adminEntity =
+            User.builder()
                     .name("admin")
-                    .password("admin")
-                    .email("admin@example.com")
-                    .role(UserRole.ADMIN)
                     .gender(UserGender.MALE)
+                    .role(UserRole.ADMIN)
                     .birth("2021-01-01")
+                    .email("admin@example.com")
+                    .password("admin")
                     .build();
-    UserDto userDto =
-            UserDto.builder()
+    User userEntity =
+            User.builder()
                     .name("user")
                     .password("user")
                     .email("user@example.com")
@@ -60,13 +60,14 @@ public class CartItemControllerTests {
             "Basic "
                     + Base64.getEncoder()
                             .encodeToString(
-                                    (adminDto.getEmail() + ":" + adminDto.getPassword())
+                                    (adminEntity.getEmail() + ":" + adminEntity.getPassword())
                                             .getBytes());
     String userBasicAuth =
             "Basic "
                     + Base64.getEncoder()
                             .encodeToString(
-                                    (userDto.getEmail() + ":" + userDto.getPassword()).getBytes());
+                                    (userEntity.getEmail() + ":" + userEntity.getPassword())
+                                            .getBytes());
     MockHttpSession mockHttpSession = new MockHttpSession();
     @Autowired private MockMvc mockMvc;
     @Autowired private UserRepository userRepository;
@@ -74,10 +75,10 @@ public class CartItemControllerTests {
     @Autowired private CategoryServiceImpl categoryService;
     @Autowired private ProductRepository productRepository;
     @Autowired private ProductServiceImpl productService;
-    @Autowired private CartItemController cartItemController;
-    @Autowired private CartItemServiceImpl cartItemService;
-    @Autowired private CartRepository cartRepository;
+    @Autowired private CartController cartController;
     @Autowired private CartService cartService;
+    @Autowired private CartRepository cartRepository;
+    @Autowired private UserService userService;
 
     @BeforeEach
     public void setUp() {
@@ -87,10 +88,8 @@ public class CartItemControllerTests {
         cartRepository.deleteAll();
 
         // Create user
-        userRepository.save(UserMapper.toEntity(adminDto));
-        userRepository.save(UserMapper.toEntity(userDto));
-
-        // Create Cart
+        userService.createUser(UserMapper.toDto(adminEntity));
+        userService.createUser(UserMapper.toDto(userEntity));
 
         // Prepare data
         Category category = Category.builder().id(1L).categoryName("Test Category").build();
@@ -116,19 +115,19 @@ public class CartItemControllerTests {
     }
 
     @Test
-    void createCartItem() throws Exception {
-        // prepare request data
-        CartItemRequest cartItemRequest =
-                CartItemRequest.builder().cartId(1L).productId(1L).quantity(1).build();
-
-        var insertData = new ObjectMapper().writeValueAsString(cartItemRequest);
-
+    void createCart() throws Exception {
+        // perform login
         mockMvc.perform(
-                        post("/api/cart-item/create")
-                                .contentType(MediaType.APPLICATION_JSON)
+                        post("/api/cart/create")
                                 .header("Authorization", adminBasicAuth)
-                                .content(insertData)
+                                .content("")
                                 .session(mockHttpSession))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    void appendProductToCart() {}
+
+    @Test
+    void removeProductFromCart() {}
 }

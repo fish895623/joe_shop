@@ -1,7 +1,6 @@
 package com.bit.joe.shoppingmall.entity;
 
 import jakarta.persistence.*;
-
 import lombok.*;
 
 @Entity
