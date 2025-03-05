@@ -16,4 +16,6 @@ public interface ProductService {
     Response getAllProducts();
 
     Response getProductsByCategory(Long categoryId);
+
+    boolean existsByCategoryIdAndName(Long categoryId, String name);
 }
