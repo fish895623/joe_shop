@@ -27,5 +27,4 @@ public class UserHtmlController {
     public String MyPage() {
         return "thymeleaf/user/myPage";
     }
-
 }
