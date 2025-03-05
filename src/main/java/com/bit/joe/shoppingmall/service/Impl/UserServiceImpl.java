@@ -4,6 +4,9 @@ import static com.bit.joe.shoppingmall.enums.OrderStatus.*;
 
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -203,5 +206,14 @@ public class UserServiceImpl implements UserService {
         // Invalidate session -> logout user
 
         return Response.builder().status(200).message("Withdraw successfully").build();
+    }
+
+    @Override
+    public User getLoginUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String  email = authentication.getName();
+//        log.info("User Email is: " + email);
+        return userRepository.findByEmail(email)
+                .orElseThrow(()-> new UsernameNotFoundException("User Not found"));
     }
 }

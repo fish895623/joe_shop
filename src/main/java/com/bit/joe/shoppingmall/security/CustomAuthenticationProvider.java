@@ -52,7 +52,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
                 authorities.add(new SimpleGrantedAuthority(user.getRole().name()));
                 // users 테이블 내의 role 컬럼에 존재, Role 문자열 값을 SimpleGrantedAuthority 클래스로 변환
                 return new UsernamePasswordAuthenticationToken(username, pwd, authorities);
-                // UsernamePasswordAuthenticationToken 대상을 새롭게 생성 후 반환
+                // UsernamePasswordAuthenticationToken 대상을 새롭게 생성 후 반환(세션의 SecurityContext에 저장된다.)
             }
             // 비밀번호가 일치하지 않다면
             else {
