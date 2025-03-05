@@ -1,11 +1,16 @@
 package com.bit.joe.shoppingmall.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+
+import lombok.*;
 
 @Entity
 @Table(name = "products")
-@Data
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Product {
 
     @Id
