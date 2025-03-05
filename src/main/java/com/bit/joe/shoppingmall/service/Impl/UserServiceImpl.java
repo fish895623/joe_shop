@@ -212,7 +212,7 @@ public class UserServiceImpl implements UserService {
     public User getLoginUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-        //        log.info("User Email is: " + email);
+        //                log.info("User Email is: " + email);
         return userRepository
                 .findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User Not found"));
