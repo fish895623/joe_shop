@@ -182,7 +182,5 @@ public class CategoryControllerTests {
     }
 
     @Test
-    void updateNonExistCategory () {
-        
-    }
+    void updateNonExistCategory() {}
 }
