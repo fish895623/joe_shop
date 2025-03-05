@@ -28,8 +28,4 @@ public class UserHtmlController {
         return "thymeleaf/user/myPage";
     }
 
-    @GetMapping("/updateProfile")
-    public String Update() {
-        return "thymeleaf/user/updateProfile";
-    }
 }
