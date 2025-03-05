@@ -95,6 +95,7 @@ jacocoTestReport {
                 'com/bit/joe/shoppingmall/enums/*.class',
                 'com/bit/joe/shoppingmall/dto/*.class',
                 'com/bit/joe/shoppingmall/entity/*.class',
+                'com/bit/joe/shoppingmall/security/*.class',
         ])
     }))
 }
