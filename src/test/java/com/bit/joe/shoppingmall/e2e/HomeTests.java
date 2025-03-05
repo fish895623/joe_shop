@@ -2,17 +2,14 @@ package com.bit.joe.shoppingmall.e2e;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.bit.joe.shoppingmall.utils.TestUtils;
-import com.microsoft.playwright.*;
-
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-//@ExtendWith(SpringExtension.class)
+import com.bit.joe.shoppingmall.utils.TestUtils;
+import com.microsoft.playwright.*;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource("classpath:application-test.properties")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
