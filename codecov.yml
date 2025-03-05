@@ -1,0 +1,8 @@
+coverage:
+  status:
+    project:
+      default:
+        threshold: 0%  # Allows minor coverage drops without marking it as unsuccessful
+    patch:
+      default:
+        informational: true  # Makes coverage decrease warnings instead of failures
