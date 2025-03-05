@@ -39,4 +39,14 @@ public class Cart {
         createdAt = LocalDateTime.now();
         isOrdered = false;
     }
+
+    /**
+     * Append a cart item to the cart
+     *
+     * @param cartItem
+     */
+    public void appendCartItemToCart(CartItem cartItem) {
+        cartItems.add(cartItem);
+        cartItem.setCart(this);
+    }
 }
