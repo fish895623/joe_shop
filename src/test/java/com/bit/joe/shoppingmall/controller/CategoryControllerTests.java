@@ -165,6 +165,23 @@ public class CategoryControllerTests {
 
         Long categoryId = createdCategory.get(0).getId();
 
+    @Test
+    void deleteCategory() throws Exception {
+        var category = Category.builder().id(1L).categoryName("Test Category").build();
+
+        // insert Data
+        mockMvc.perform(
+                        post("/category/create")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", basicAuthHeader)
+                                .content(
+                                        new ObjectMapper()
+                                                .writeValueAsString(
+                                                        CategoryMapper.categoryToDto(category)))
+                                .session(mockHttpSession))
+                .andExpect(status().isOk());
+
+        // delete data
         mockMvc.perform(
                         delete("/category/delete/" + categoryId)
                                 .contentType(MediaType.APPLICATION_JSON)
