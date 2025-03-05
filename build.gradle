@@ -93,7 +93,8 @@ jacocoTestReport {
                 'com/bit/joe/shoppingmall/ServletInitializer.class',
                 'com/bit/joe/shoppingmall/exception/*.class',
                 'com/bit/joe/shoppingmall/enums/*.class',
-                'com/bit/joe/shoppingmall/dto/**.class',
+                'com/bit/joe/shoppingmall/dto/*.class',
+                'com/bit/joe/shoppingmall/entity/*.class',
         ])
     }))
 }
