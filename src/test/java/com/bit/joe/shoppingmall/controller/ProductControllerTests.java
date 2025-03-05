@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Base64;
 
-import com.bit.joe.shoppingmall.service.Impl.ProductServiceImpl;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,6 +28,7 @@ import com.bit.joe.shoppingmall.repository.CategoryRepository;
 import com.bit.joe.shoppingmall.repository.ProductRepository;
 import com.bit.joe.shoppingmall.repository.UserRepository;
 import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
+import com.bit.joe.shoppingmall.service.Impl.ProductServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpSession;
