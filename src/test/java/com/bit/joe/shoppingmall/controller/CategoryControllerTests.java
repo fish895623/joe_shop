@@ -3,22 +3,7 @@ package com.bit.joe.shoppingmall.controller;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.bit.joe.shoppingmall.dto.CategoryDto;
-import com.bit.joe.shoppingmall.dto.UserDto;
-import com.bit.joe.shoppingmall.entity.Category;
-import com.bit.joe.shoppingmall.enums.UserGender;
-import com.bit.joe.shoppingmall.enums.UserRole;
-import com.bit.joe.shoppingmall.mapper.CategoryMapper;
-import com.bit.joe.shoppingmall.repository.CategoryRepository;
-import com.bit.joe.shoppingmall.repository.UserRepository;
-import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
-import com.bit.joe.shoppingmall.service.Impl.UserServiceImpl;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.servlet.http.HttpSession;
-import jakarta.transaction.Transactional;
+import java.util.Base64;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +21,22 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.Base64;
+import com.bit.joe.shoppingmall.dto.CategoryDto;
+import com.bit.joe.shoppingmall.dto.UserDto;
+import com.bit.joe.shoppingmall.entity.Category;
+import com.bit.joe.shoppingmall.enums.UserGender;
+import com.bit.joe.shoppingmall.enums.UserRole;
+import com.bit.joe.shoppingmall.mapper.CategoryMapper;
+import com.bit.joe.shoppingmall.repository.CategoryRepository;
+import com.bit.joe.shoppingmall.repository.UserRepository;
+import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
+import com.bit.joe.shoppingmall.service.Impl.UserServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 
 @ExtendWith({SpringExtension.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -187,15 +187,15 @@ public class CategoryControllerTests {
 
         // insert Data
         mockMvc.perform(
-                post("/category/create")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", basicAuthHeader)
-                    .content(
-                        new ObjectMapper()
-                            .writeValueAsString(
-                                CategoryMapper.categoryToDto(category)))
-                    .session(mockHttpSession))
-            .andExpect(status().isOk());
+                        post("/category/create")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", basicAuthHeader)
+                                .content(
+                                        new ObjectMapper()
+                                                .writeValueAsString(
+                                                        CategoryMapper.categoryToDto(category)))
+                                .session(mockHttpSession))
+                .andExpect(status().isOk());
 
         // delete data
         mockMvc.perform(
