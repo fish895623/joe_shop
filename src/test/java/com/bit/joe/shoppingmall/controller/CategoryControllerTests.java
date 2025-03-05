@@ -148,7 +148,7 @@ public class CategoryControllerTests {
 
     @Test
     @Order(3)
-    void deleteCategory() throws Exception {
+    void deleteCategory1() throws Exception {
 
         CategoryDto categoryDto = new CategoryDto();
         categoryDto.setCategoryName("Test Category");
