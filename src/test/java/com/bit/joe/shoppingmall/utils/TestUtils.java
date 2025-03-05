@@ -24,7 +24,7 @@ public class TestUtils {
         try {
             Files.createDirectories(Paths.get(SCREENSHOT_DIR)); // Ensure directory exists
 
-            page.locator("body")
+            page.locator("html")
                     .screenshot(new Locator.ScreenshotOptions().setPath(screenshotPath));
 
             cleanupOldScreenshots(fileName);
