@@ -91,7 +91,7 @@ jacocoTestReport {
         fileTree(dir: it, includes: [
                 'com/bit/joe/shoppingmall/controller/*.class',
                 'com/bit/joe/shoppingmall/security/*.class',
-                'com/bit/joe/shoppingmall/service/*.class',
+                'com/bit/joe/shoppingmall/service/**/*.class',
         ])
     }))
 }
