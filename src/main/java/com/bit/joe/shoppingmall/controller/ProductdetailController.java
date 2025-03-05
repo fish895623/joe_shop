@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/admin")
-public class AdminController {
+@RequestMapping("/product")
+public class ProductdetailController {
     @GetMapping
-    public String index() {
-        return "thymeleaf/admin/insight";
+    public String productdetail() {
+        return "thymeleaf/product/product-detail";
     }
 }
