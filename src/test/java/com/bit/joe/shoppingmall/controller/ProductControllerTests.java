@@ -11,36 +11,31 @@ import java.util.Base64;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.bit.joe.shoppingmall.dto.UserDto;
+import com.bit.joe.shoppingmall.dto.*;
 import com.bit.joe.shoppingmall.dto.request.ProductRequest;
 import com.bit.joe.shoppingmall.enums.UserGender;
 import com.bit.joe.shoppingmall.enums.UserRole;
+import com.bit.joe.shoppingmall.mapper.UserMapper;
 import com.bit.joe.shoppingmall.repository.CategoryRepository;
+import com.bit.joe.shoppingmall.repository.ProductRepository;
 import com.bit.joe.shoppingmall.repository.UserRepository;
 import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.http.HttpSession;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Testcontainers
-@AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@TestPropertySource("classpath:application-test.properties")
 public class ProductControllerTests {
-    @Container public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:lts");
-    UserDto userDto =
+    UserDto adminDto =
             UserDto.builder()
                     .name("admin")
                     .password("admin")
@@ -49,61 +44,55 @@ public class ProductControllerTests {
                     .gender(UserGender.MALE)
                     .birth("2021-01-01")
                     .build();
-    String basicAuthHeader =
+    UserDto userDto =
+            UserDto.builder()
+                    .name("user")
+                    .password("user")
+                    .email("user@example.com")
+                    .role(UserRole.USER)
+                    .gender(UserGender.MALE)
+                    .birth("2021-01-01")
+                    .build();
+    String adminBasicAuth =
             "Basic "
                     + Base64.getEncoder()
                             .encodeToString(
-                                    (userDto.getEmail() + userDto.getPassword()).getBytes());
+                                    (adminDto.getEmail() + ":" + adminDto.getPassword())
+                                            .getBytes());
+    String userBasicAuth =
+            "Basic "
+                    + Base64.getEncoder()
+                            .encodeToString(
+                                    (userDto.getEmail() + ":" + userDto.getPassword()).getBytes());
     MockHttpSession mockHttpSession = new MockHttpSession();
     private MockMvc mockMvc;
-    @Autowired private ProductController productController;
-    @Autowired private UserRepository userRepository;
+
+    @Autowired private HttpSession session;
+
+    @Autowired private CategoryController categoryController;
     @Autowired private CategoryRepository categoryRepository;
     @Autowired private CategoryServiceImpl categoryService;
-    @Autowired private HttpSession session;
-    @Autowired private CategoryController categoryController;
-    @PersistenceContext private EntityManager entityManager;
-
-    @BeforeAll
-    static void setUpContainer() {
-        mySQLContainer.start();
-    }
-
-    @AfterAll
-    static void stopContainer() {
-        mySQLContainer.stop();
-    }
+    @Autowired private ProductController productController;
+    @Autowired private ProductRepository productRepository;
+    @Autowired private ProductServiceImpl productService;
+    @Autowired private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
-        // MockMvc 객체를 수동으로 설정
-        mockMvc = MockMvcBuilders.standaloneSetup(productController).build();
+        userRepository.deleteAll();
+        productRepository.deleteAll();
+        categoryRepository.deleteAll();
+
+        var categoryDto = CategoryDto.builder().id(1L).categoryName("category").build();
+        categoryService.createCategory(categoryDto);
+        userRepository.save(UserMapper.toEntity(userDto));
+        userRepository.save(UserMapper.toEntity(adminDto));
+        mockMvc = MockMvcBuilders.standaloneSetup(new ProductController(productService)).build();
     }
 
     @Test
     @Order(1)
-    void testAdminCreateProduct() throws Exception {
-        ProductRequest productRequest = new ProductRequest();
-        productRequest.setName("product");
-        productRequest.setPrice(1000);
-        productRequest.setQuantity(10);
-        productRequest.setImage("image");
-        productRequest.setCategoryId(1L);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String contentJson = objectMapper.writeValueAsString(productRequest); // JSON으로 변환
-
-        mockMvc.perform(
-                        post("/product/create")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", basicAuthHeader) // 인증 헤더 추가
-                                .content(contentJson)) // JSON 본문 추가
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    @Order(2)
-    void testAdminCreateDuplicateProduct() throws Exception {
+    void adminCreateProduct() throws Exception {
         ProductRequest productRequest = new ProductRequest();
         productRequest.setName("product");
         productRequest.setPrice(1000);
@@ -116,7 +105,27 @@ public class ProductControllerTests {
         mockMvc.perform(
                         post("/product/create")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", basicAuthHeader)
+                                .header("Authorization", adminBasicAuth)
+                                .content(contentJson))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @Order(2)
+    void adminCreateDuplicateProduct() throws Exception {
+        ProductRequest productRequest = new ProductRequest();
+        productRequest.setName("product");
+        productRequest.setPrice(1000);
+        productRequest.setQuantity(10);
+        productRequest.setImage("image");
+        productRequest.setCategoryId(1L);
+
+        String contentJson = new ObjectMapper().writeValueAsString(productRequest);
+
+        mockMvc.perform(
+                        post("/product/create")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", adminBasicAuth)
                                 .content(contentJson))
                 .andExpect(status().isOk());
 
@@ -124,17 +133,18 @@ public class ProductControllerTests {
         mockMvc.perform(
                         post("/product/create")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", basicAuthHeader)
+                                .header("Authorization", adminBasicAuth)
                                 .content(contentJson))
-                .andExpect(status().isBadRequest()) // 중복 -> expect to 400 Bad Request
+                .andExpect(status().is4xxClientError()) // 중복 -> expect to 400 Bad Request
                 .andExpect(
                         jsonPath("$.message")
                                 .value("Product name must be unique within the same category."));
     }
 
+    /** User cannot create product */
     @Test
     @Order(3)
-    void testUserCreateProduct() throws Exception {
+    void userCreateProduct() throws Exception {
         ProductRequest productRequest = new ProductRequest();
         productRequest.setName("product");
         productRequest.setPrice(1000);
@@ -149,13 +159,13 @@ public class ProductControllerTests {
                         post("/product/create")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(contentJson)
-                                .header("Authorization", basicAuthHeader)) // 관리자 인증 헤더 추가
-                .andExpect(status().isOk());
+                                .header("Authorization", userBasicAuth))
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
     @Order(4)
-    void testAdminCreateProductWithEmptyBody() throws Exception {
+    void adminCreateProductWithEmptyBody() throws Exception {
         ProductRequest productRequest = new ProductRequest(); // 빈 요청 본문
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -164,14 +174,29 @@ public class ProductControllerTests {
         mockMvc.perform(
                         post("/product/create")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", basicAuthHeader) // 인증 추가
+                                .header("Authorization", adminBasicAuth) // 인증 추가
                                 .content(contentJson))
                 .andExpect(status().is4xxClientError());
     }
 
     @Test
     @Order(5)
-    void testGetProducts() throws Exception {
+    void getProducts() throws Exception {
+        ProductRequest productRequest = new ProductRequest();
+        productRequest.setName("product");
+        productRequest.setPrice(1000);
+        productRequest.setQuantity(10);
+        productRequest.setImage("image");
+        productRequest.setCategoryId(1L);
+
+        productService.createProduct(
+                productRequest.getCategoryId(),
+                productRequest.getImage(),
+                productRequest.getName(),
+                productRequest.getQuantity(),
+                productRequest.getPrice());
+
+        // Test
         // 제품 목록 조회
         mockMvc.perform(get("/product/get-all")).andExpect(status().isOk());
 
@@ -188,38 +213,57 @@ public class ProductControllerTests {
 
     @Test
     @Order(6)
-    void testAdminUpdateProduct() throws Exception {
-        // 제품 업데이트 요청 준비
+    void adminUpdateProduct() throws Exception {
         ProductRequest productRequest = new ProductRequest();
-        productRequest.setName("product2");
+        productRequest.setName("product");
         productRequest.setPrice(1000);
-        productRequest.setQuantity(11);
+        productRequest.setQuantity(10);
         productRequest.setImage("image");
         productRequest.setCategoryId(1L);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String contentJson = objectMapper.writeValueAsString(productRequest);
+        productService.createProduct(
+                productRequest.getCategoryId(),
+                productRequest.getImage(),
+                productRequest.getName(),
+                productRequest.getQuantity(),
+                productRequest.getPrice());
 
-        // 1번 제품을 업데이트
+        // Update product information
+        productRequest.setName("product2");
+
+        String contentJson = new ObjectMapper().writeValueAsString(productRequest);
         mockMvc.perform(
                         put("/product/update/1")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", basicAuthHeader) // 관리자 인증 헤더 추가
+                                .header("Authorization", adminBasicAuth)
                                 .content(contentJson))
                 .andExpect(status().isOk());
 
-        // 업데이트된 제품 확인 (name이 바뀌었는지 확인)
         mockMvc.perform(get("/product/get-by-product-id/1"))
                 .andExpect(jsonPath("$.product.name").value("product2"));
     }
 
     @Test
     @Order(7)
-    void testDeleteProduct() throws Exception {
+    void deleteProduct() throws Exception {
+        ProductRequest productRequest = new ProductRequest();
+        productRequest.setName("product");
+        productRequest.setPrice(1000);
+        productRequest.setQuantity(10);
+        productRequest.setImage("image");
+        productRequest.setCategoryId(1L);
+
+        productService.createProduct(
+                productRequest.getCategoryId(),
+                productRequest.getImage(),
+                productRequest.getName(),
+                productRequest.getQuantity(),
+                productRequest.getPrice());
+
         mockMvc.perform(
                         delete("/product/delete/1")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", basicAuthHeader))
+                                .header("Authorization", adminBasicAuth))
                 .andExpect(status().isOk());
     }
 }
