@@ -11,7 +11,6 @@ import java.util.Base64;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,7 +97,6 @@ public class ProductControllerTests {
     }
 
     @Test
-    @Order(1)
     void adminCreateProduct() throws Exception {
         ProductRequest productRequest = new ProductRequest();
         productRequest.setName("product");
@@ -118,7 +116,6 @@ public class ProductControllerTests {
     }
 
     @Test
-    @Order(2)
     void adminCreateDuplicateProduct() throws Exception {
         ProductRequest productRequest = new ProductRequest();
         productRequest.setName("product");
@@ -150,7 +147,6 @@ public class ProductControllerTests {
 
     /** User cannot create product */
     @Test
-    @Order(3)
     void userCreateProduct() throws Exception {
         ProductRequest productRequest = new ProductRequest();
         productRequest.setName("product");
@@ -171,7 +167,6 @@ public class ProductControllerTests {
     }
 
     @Test
-    @Order(4)
     void adminCreateProductWithEmptyBody() throws Exception {
         ProductRequest productRequest = new ProductRequest(); // 빈 요청 본문
 
@@ -187,7 +182,6 @@ public class ProductControllerTests {
     }
 
     @Test
-    @Order(5)
     void getProducts() throws Exception {
         ProductRequest productRequest = new ProductRequest();
         productRequest.setName("product");
@@ -219,7 +213,6 @@ public class ProductControllerTests {
     }
 
     @Test
-    @Order(6)
     void adminUpdateProduct() throws Exception {
         ProductRequest productRequest = new ProductRequest();
         productRequest.setName("product");
@@ -251,7 +244,6 @@ public class ProductControllerTests {
     }
 
     @Test
-    @Order(7)
     void deleteProduct() throws Exception {
         ProductRequest productRequest = new ProductRequest();
         productRequest.setName("product");
