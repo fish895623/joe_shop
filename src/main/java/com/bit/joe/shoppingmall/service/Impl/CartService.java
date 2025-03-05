@@ -12,6 +12,7 @@ import com.bit.joe.shoppingmall.entity.Product;
 import com.bit.joe.shoppingmall.entity.User;
 import com.bit.joe.shoppingmall.exception.NotFoundException;
 import com.bit.joe.shoppingmall.repository.*;
+import com.bit.joe.shoppingmall.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,14 +26,16 @@ public class CartService {
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
+    private final UserService userService;
 
     // --------------- createCart ---------------
     /** {@summary} Create a cart initially (when user registers) */
     public Response createCart(Long userId) {
-        User user =
-                userRepository
-                        .findById(userId)
-                        .orElseThrow(() -> new NotFoundException("User not found"));
+        //        User user =
+        //                userRepository
+        //                        .findById(userId)
+        //                        .orElseThrow(() -> new NotFoundException("User not found"));
+        User user = userService.getLoginUser();
         Cart cart = new Cart();
         // Create a new cart (empty)
         cart.setUser(user);
