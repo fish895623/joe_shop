@@ -23,7 +23,7 @@ public class CartController {
      *
      * @return ResponseEntity<Response>
      */
-    @GetMapping("/create")
+    @PostMapping("/create")
     public ResponseEntity<Response> createCart() {
 
         return ResponseEntity.ok(cartService.createCart());
@@ -36,7 +36,7 @@ public class CartController {
      * @param cartRequest CartRequest
      * @return ResponseEntity<Response>
      */
-    @GetMapping("/append")
+    @PostMapping("/append")
     public ResponseEntity<Response> appendProductToCart(@RequestBody CartRequest cartRequest) {
 
         return ResponseEntity.ok(cartService.appendProductToCart(cartRequest));
@@ -49,7 +49,7 @@ public class CartController {
      * @param cartRequest CartRequest
      * @return ResponseEntity<Response>
      */
-    @PostMapping("/remove}")
+    @PostMapping("/remove")
     public ResponseEntity<Response> removeProductFromCart(@RequestBody CartRequest cartRequest) {
 
         Response resp = cartService.removeProductFromCart(cartRequest);
