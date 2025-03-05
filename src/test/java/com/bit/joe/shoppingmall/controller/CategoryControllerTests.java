@@ -94,7 +94,6 @@ public class CategoryControllerTests {
     }
 
     @Test
-    @Order(1)
     void createCategory() throws Exception {
         CategoryDto categoryDto = new CategoryDto();
         categoryDto.setId(1L);
@@ -114,7 +113,6 @@ public class CategoryControllerTests {
     }
 
     @Test
-    @Order(2)
     @Transactional
     void getCategories() throws Exception {
         // Get All Categories
@@ -130,7 +128,6 @@ public class CategoryControllerTests {
     }
 
     @Test
-    @Order(3)
     void deleteCategory() throws Exception {
         CategoryDto categoryDto = new CategoryDto();
         categoryDto.setCategoryName("Test Category");
@@ -150,7 +147,6 @@ public class CategoryControllerTests {
     }
 
     @Test
-    @Order(4)
     void roleUserDeleteCategory() throws Exception {
         // insert Data
         String insertData;
@@ -184,4 +180,7 @@ public class CategoryControllerTests {
                             }
                         });
     }
+
+    @Test
+    void updateNonExistCategory() {}
 }
