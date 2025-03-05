@@ -146,7 +146,8 @@ public class CartService {
                     cartItemRepository.save(cartItem);
                     return Response.builder()
                             .status(200)
-                            .message("Product quantity updated successfully(remove product from cart)")
+                            .message(
+                                    "Product quantity updated successfully(remove product from cart)")
                             .build();
                 }
 
@@ -160,7 +161,10 @@ public class CartService {
             }
         }
 
-        return Response.builder().status(404).message("Product to be removed not found in cart").build();
+        return Response.builder()
+                .status(404)
+                .message("Product to be removed not found in cart")
+                .build();
         // return not found response with status code 404 -> product not found in cart
     }
 }
