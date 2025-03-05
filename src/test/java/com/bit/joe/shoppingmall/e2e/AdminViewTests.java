@@ -19,7 +19,7 @@ import com.microsoft.playwright.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @TestPropertySource("classpath:application-test.properties")
-public class HomeTests {
+public class AdminViewTests {
     static Playwright playwright;
     static Browser browser;
     Page page;
@@ -40,7 +40,8 @@ public class HomeTests {
     }
 
     @Test
-    void testHomePageLoads() throws InterruptedException {
+    void testHomePageLoads() {
+        page.navigate(LOCALHOST + "admin");
         TestUtils.screenShot(page, "root_page");
         assertTrue(page.title().contains("Home Page"));
     }
