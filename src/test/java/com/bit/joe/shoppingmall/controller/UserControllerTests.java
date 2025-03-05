@@ -45,6 +45,7 @@ import jakarta.transaction.Transactional;
 @ContextConfiguration(initializers = MySQLContainerConfig.class)
 public class UserControllerTests {
     @Container public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:lts");
+
     UserDto userDto =
             UserDto.builder()
                     .name("admin")
@@ -55,13 +56,17 @@ public class UserControllerTests {
                     .birth("2021-01-01")
                     .active(true)
                     .build();
+
     String basicAuthHeader =
             "Basic "
                     + Base64.getEncoder()
                             .encodeToString(
                                     (userDto.getEmail() + userDto.getPassword()).getBytes());
+
     MockHttpSession mockHttpSession = new MockHttpSession();
+
     private MockMvc mockMvc;
+
     @Autowired private UserRepository userRepository;
     @Autowired private CategoryRepository categoryRepository;
     @Autowired private UserServiceImpl userService;
@@ -86,6 +91,7 @@ public class UserControllerTests {
     }
 
     @Test
+    @DisplayName("Register admin user")
     @Order(1)
     public void registerAdminUser() throws Exception {
 
@@ -100,6 +106,7 @@ public class UserControllerTests {
     }
 
     @Test
+    @DisplayName("Get all users")
     @Order(2)
     public void getAllUsers() throws Exception {
 
@@ -113,6 +120,7 @@ public class UserControllerTests {
     }
 
     @Test
+    @DisplayName("Register user with empty body")
     @Order(3)
     public void registerUserWithEmptyBody() throws Exception {
         UserDto userDto = new UserDto();
@@ -128,6 +136,7 @@ public class UserControllerTests {
     }
 
     @Test
+    @DisplayName("Login user")
     @Order(4)
     public void loginUser() throws Exception {
         userRepository.save(UserMapper.toEntity(userDto));
@@ -149,6 +158,7 @@ public class UserControllerTests {
     }
 
     @Test
+    @DisplayName("Update user")
     @Order(5)
     public void updateUser() throws Exception {
         User user = userRepository.save(UserMapper.toEntity(userDto));
@@ -170,6 +180,28 @@ public class UserControllerTests {
 
         mockMvc.perform(
                         put("/user/update/3")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(userDtoJson)
+                                .header("Authorization", basicAuthHeader)
+                                .session(mockHttpSession))
+                .andExpect(status().isOk());
+    }
+
+    // 유저 탈퇴 테스트
+    @Test
+    @DisplayName("Withdraw user")
+    @Order(6)
+    public void withdrawUser() throws Exception {
+
+        User user = userRepository.save(UserMapper.toEntity(userDto));
+
+        MockHttpSession mockHttpSession = new MockHttpSession();
+        mockHttpSession.setAttribute("user", UserMapper.toDto(user));
+
+        String userDtoJson = new ObjectMapper().writeValueAsString(UserMapper.toDto(user));
+
+        mockMvc.perform(
+                        get("/user/withdraw")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(userDtoJson)
                                 .header("Authorization", basicAuthHeader)

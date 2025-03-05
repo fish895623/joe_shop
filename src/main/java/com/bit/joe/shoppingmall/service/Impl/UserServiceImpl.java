@@ -186,7 +186,9 @@ public class UserServiceImpl implements UserService {
         // check if the user has any order that is not completed
         // if there is, return a response with status code 400 (BAD_REQUEST)
         // if there is not, continue to the next step
-        if (user.getOrders().stream().anyMatch(order -> !order.getStatus().equals(COMPLETE))) {
+        if (user.getOrders() != null
+                && user.getOrders().stream()
+                        .anyMatch(order -> !order.getStatus().equals(COMPLETE))) {
             return Response.builder()
                     .status(400)
                     .message("Cannot withdraw account, order progressing")
