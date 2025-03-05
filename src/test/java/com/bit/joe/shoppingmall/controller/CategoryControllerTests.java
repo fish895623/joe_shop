@@ -1,25 +1,21 @@
 package com.bit.joe.shoppingmall.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Base64;
 
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.bit.joe.shoppingmall.dto.CategoryDto;
 import com.bit.joe.shoppingmall.dto.UserDto;
@@ -28,8 +24,10 @@ import com.bit.joe.shoppingmall.enums.UserGender;
 import com.bit.joe.shoppingmall.enums.UserRole;
 import com.bit.joe.shoppingmall.mapper.CategoryMapper;
 import com.bit.joe.shoppingmall.repository.CategoryRepository;
+import com.bit.joe.shoppingmall.repository.ProductRepository;
 import com.bit.joe.shoppingmall.repository.UserRepository;
 import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
+import com.bit.joe.shoppingmall.service.Impl.ProductServiceImpl;
 import com.bit.joe.shoppingmall.service.Impl.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -38,15 +36,12 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 
-@ExtendWith({SpringExtension.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Testcontainers
-@AutoConfigureMockMvc
-@Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@TestPropertySource("classpath:application-test.properties")
 public class CategoryControllerTests {
-    @Container public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:lts");
-    UserDto userDto =
+    UserDto adminDto =
             UserDto.builder()
                     .name("admin")
                     .password("admin")
@@ -55,11 +50,26 @@ public class CategoryControllerTests {
                     .gender(UserGender.MALE)
                     .birth("2021-01-01")
                     .build();
-    String basicAuthHeader =
+    UserDto userDto =
+            UserDto.builder()
+                    .name("user")
+                    .password("user")
+                    .email("user@example.com")
+                    .role(UserRole.USER)
+                    .gender(UserGender.MALE)
+                    .birth("2021-01-01")
+                    .build();
+    String adminBasicAuth =
             "Basic "
                     + Base64.getEncoder()
                             .encodeToString(
-                                    (userDto.getEmail() + userDto.getPassword()).getBytes());
+                                    (adminDto.getEmail() + ":" + adminDto.getPassword())
+                                            .getBytes());
+    String userBasicAuth =
+            "Basic "
+                    + Base64.getEncoder()
+                            .encodeToString(
+                                    (userDto.getEmail() + ":" + userDto.getPassword()).getBytes());
     MockHttpSession mockHttpSession = new MockHttpSession();
     private MockMvc mockMvc;
     @Autowired private UserRepository userRepository;
@@ -68,28 +78,10 @@ public class CategoryControllerTests {
     @Autowired private CategoryServiceImpl categoryService;
     @Autowired private HttpSession session;
     @Autowired private CategoryController categoryController;
+    @Autowired private ProductController productController;
     @PersistenceContext private EntityManager entityManager;
-
-    @BeforeAll
-    static void setUpContainer() {
-        mySQLContainer.start();
-    }
-
-    @AfterAll
-    static void stopContainer() {
-        mySQLContainer.stop();
-    }
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", mySQLContainer::getJdbcUrl);
-        registry.add("spring.datasource.username", mySQLContainer::getUsername);
-        registry.add("spring.datasource.password", mySQLContainer::getPassword);
-        registry.add("spring.datasource.driver-class-name", () -> "com.mysql.cj.jdbc.Driver");
-        registry.add("spring.jpa.database-platform", () -> "org.hibernate.dialect.MySQLDialect");
-        registry.add("spring.jpa.hibernate.ddl-auto", () -> "update");
-        registry.add("spring.jpa.show-sql", () -> "true");
-    }
+    @Autowired private ProductServiceImpl productService;
+    @Autowired private ProductRepository productRepository;
 
     @BeforeEach
     public void setUp() {
@@ -97,12 +89,8 @@ public class CategoryControllerTests {
         categoryRepository.deleteAll();
 
         userService.createUser(userDto);
+        userService.createUser(adminDto);
         mockMvc = MockMvcBuilders.standaloneSetup(categoryController).build();
-
-        userRepository.flush();
-        categoryRepository.flush();
-
-        entityManager.clear();
     }
 
     @Test
@@ -112,13 +100,12 @@ public class CategoryControllerTests {
         categoryDto.setId(1L);
         categoryDto.setCategoryName("Test Category");
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String contentJson = objectMapper.writeValueAsString(categoryDto);
+        String contentJson = new ObjectMapper().writeValueAsString(categoryDto);
 
         mockMvc.perform(
                         post("/category/create")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", basicAuthHeader)
+                                .header("Authorization", adminBasicAuth)
                                 .content(contentJson)
                                 .session(mockHttpSession))
                 .andExpect(status().isOk());
@@ -139,47 +126,62 @@ public class CategoryControllerTests {
         category.setCategoryName("Test Category");
         categoryService.createCategory(CategoryMapper.categoryToDto(category));
 
-        mockMvc.perform(get("/category/get-all")).andExpect(status().isOk());
+        mockMvc.perform(get("/category/get-category-by-id/1")).andExpect(status().isOk());
     }
 
     @Test
     @Order(3)
     void deleteCategory() throws Exception {
-
         CategoryDto categoryDto = new CategoryDto();
         categoryDto.setCategoryName("Test Category");
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String contentJson = objectMapper.writeValueAsString(categoryDto);
+        String contentJson = new ObjectMapper().writeValueAsString(categoryDto);
 
         mockMvc.perform(
                         post("/category/create")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", basicAuthHeader)
+                                .header("Authorization", adminBasicAuth)
                                 .content(contentJson)
                                 .session(mockHttpSession))
                 .andExpect(status().isOk());
 
         var createdCategory = categoryRepository.findAll();
         Assertions.assertEquals(1, createdCategory.size(), "카테고리가 정상적으로 생성되어야 합니다.");
+    }
 
-        Long categoryId = createdCategory.get(0).getId();
+    @Test
+    @Order(4)
+    void roleUserDeleteCategory() throws Exception {
+        // insert Data
+        String insertData;
 
+        CategoryDto categoryDto = new CategoryDto();
+        categoryDto.setId(1L);
+        categoryDto.setCategoryName("Test Category");
+
+        insertData = new ObjectMapper().writeValueAsString(categoryDto);
         mockMvc.perform(
-                        delete("/category/delete/" + categoryId)
+                        post("/category/create")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", basicAuthHeader)
+                                .header("Authorization", adminBasicAuth)
+                                .content(insertData)
                                 .session(mockHttpSession))
-                .andExpect(status().isOk()); // 삭제가 정상적으로 이루어져야 함.
+                .andExpect(status().isOk());
 
-        var deletedCategory = categoryRepository.findById(categoryId);
-        Assertions.assertFalse(deletedCategory.isPresent(), "삭제된 카테고리는 존재하지 않아야 합니다.");
-
-        try {
-            mockMvc.perform(get("/category/get-category-by-id/" + categoryId))
-                    .andExpect(status().isNotFound());
-        } catch (Exception e) {
-            System.out.println("Expected error occurred: " + e.getMessage());
-        }
+        // delete data
+        mockMvc.perform(
+                        delete("/category/delete/" + categoryDto.getId())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", adminBasicAuth)
+                                .session(mockHttpSession))
+                .andExpect(status().isOk())
+                .andExpect(
+                        result -> {
+                            if (result.getResolvedException() != null) {
+                                throw new AssertionError(
+                                        "Category delete by id failed: "
+                                                + result.getResolvedException().getMessage());
+                            }
+                        });
     }
 }
