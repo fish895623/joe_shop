@@ -9,6 +9,7 @@ import java.util.Base64;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
@@ -36,10 +37,10 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestMethodOrder(MethodOrderer.Random.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @TestPropertySource("classpath:application-test.properties")
+@AutoConfigureMockMvc
 public class CategoryControllerTests {
     UserDto adminDto =
             UserDto.builder()
@@ -71,7 +72,7 @@ public class CategoryControllerTests {
                             .encodeToString(
                                     (userDto.getEmail() + ":" + userDto.getPassword()).getBytes());
     MockHttpSession mockHttpSession = new MockHttpSession();
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
     @Autowired private UserRepository userRepository;
     @Autowired private CategoryRepository categoryRepository;
     @Autowired private UserServiceImpl userService;
@@ -90,7 +91,6 @@ public class CategoryControllerTests {
 
         userService.createUser(userDto);
         userService.createUser(adminDto);
-        mockMvc = MockMvcBuilders.standaloneSetup(categoryController).build();
     }
 
     @Test
