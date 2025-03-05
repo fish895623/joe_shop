@@ -187,6 +187,7 @@ public class UserControllerTests {
                 .andExpect(status().isOk());
     }
 
+    // 유저 탈퇴 테스트
     @Test
     @DisplayName("Withdraw user")
     @Order(6)
