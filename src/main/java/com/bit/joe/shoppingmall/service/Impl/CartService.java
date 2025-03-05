@@ -115,22 +115,42 @@ public class CartService {
         // return success response with status code 200 -> product appended to cart successfully
     }
 
-    // --------------- removeProductFromCart ---------------
-    /** {@summary} Remove a product from the cart */
-    public Response removeProductFromCart(Long userId, Long productId) {
+    /**
+     * Remove a product from the cart
+     *
+     * @param cartRequest CartRequest
+     * @return Response
+     */
+    public Response removeProductFromCart(CartRequest cartRequest) {
+
+        Long productIdToRemove = cartRequest.getProductId();
+        int quantityToRemove = cartRequest.getQuantity();
+
+        User user = userService.getLoginUser();
+        // get user from the context holder (logged-in user)
 
         Cart cart =
                 cartRepository
-                        .findCartByUser(
-                                userRepository
-                                        .findById(userId)
-                                        .orElseThrow(() -> new NotFoundException("User not found")))
+                        .findCartByUser(user)
                         .orElseThrow(() -> new NotFoundException("Cart not found"));
         // find cart by user (found by id)
 
         // remove product from cart if it exists
         for (CartItem cartItem : cart.getCartItems()) {
-            if (cartItem.getProduct().getId().equals(productId)) {
+            if (cartItem.getProduct().getId().equals(productIdToRemove)) {
+
+                // check if cart item quantity is greater than the quantity to remove
+                if (cartItem.getQuantity() > quantityToRemove) {
+                    cartItem.setQuantity(cartItem.getQuantity() - quantityToRemove);
+                    cartItem.setTotalPrice();
+                    cartItemRepository.save(cartItem);
+                    return Response.builder()
+                            .status(200)
+                            .message("Product quantity updated successfully(remove product from cart)")
+                            .build();
+                }
+
+                // remove the cart item from the cart
                 cart.getCartItems().remove(cartItem);
                 cartRepository.save(cart);
                 return Response.builder()
@@ -140,7 +160,7 @@ public class CartService {
             }
         }
 
-        return Response.builder().status(404).message("Product not found in cart").build();
+        return Response.builder().status(404).message("Product to be removed not found in cart").build();
         // return not found response with status code 404 -> product not found in cart
     }
 }

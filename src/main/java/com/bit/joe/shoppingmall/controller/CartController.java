@@ -18,6 +18,11 @@ public class CartController {
 
     private final CartService cartService;
 
+    /**
+     * Create a cart initially (when user registers)
+     *
+     * @return ResponseEntity<Response>
+     */
     @GetMapping("/create")
     public ResponseEntity<Response> createCart() {
 
@@ -25,6 +30,12 @@ public class CartController {
         // return success response with status code 200 (OK)
     }
 
+    /**
+     * Append a product to the cart
+     *
+     * @param cartRequest CartRequest
+     * @return ResponseEntity<Response>
+     */
     @GetMapping("/append")
     public ResponseEntity<Response> appendProductToCart(@RequestBody CartRequest cartRequest) {
 
@@ -32,11 +43,16 @@ public class CartController {
         // return success response with status code 200 (OK)
     }
 
-    @PostMapping("/remove/{cartId}/{productId}")
-    public ResponseEntity<Response> removeProductFromCart(
-            @PathVariable Long cartId, @PathVariable Long productId) {
+    /**
+     * Remove a product from the cart
+     *
+     * @param cartRequest CartRequest
+     * @return ResponseEntity<Response>
+     */
+    @PostMapping("/remove}")
+    public ResponseEntity<Response> removeProductFromCart(@RequestBody CartRequest cartRequest) {
 
-        Response resp = cartService.removeProductFromCart(cartId, productId);
+        Response resp = cartService.removeProductFromCart(cartRequest);
         // Remove product from cart and get response
 
         return ResponseEntity.ok(resp);
