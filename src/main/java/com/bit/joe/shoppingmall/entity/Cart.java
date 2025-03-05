@@ -33,6 +33,7 @@ public class Cart {
 
     private Boolean isOrdered;
 
+    // JPA 엔티티가 DB에 저장되기 전에 실행
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();

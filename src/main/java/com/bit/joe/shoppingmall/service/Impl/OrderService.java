@@ -1,6 +1,11 @@
 package com.bit.joe.shoppingmall.service.Impl;
 
+import static com.bit.joe.shoppingmall.enums.OrderStatus.*;
+import static com.bit.joe.shoppingmall.enums.RequestType.*;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -10,6 +15,7 @@ import com.bit.joe.shoppingmall.entity.CartItem;
 import com.bit.joe.shoppingmall.entity.Order;
 import com.bit.joe.shoppingmall.entity.OrderItem;
 import com.bit.joe.shoppingmall.enums.OrderStatus;
+import com.bit.joe.shoppingmall.enums.RequestType;
 import com.bit.joe.shoppingmall.exception.NotFoundException;
 import com.bit.joe.shoppingmall.mapper.OrderItemMapper;
 import com.bit.joe.shoppingmall.repository.CartItemRepository;
@@ -44,6 +50,7 @@ public class OrderService {
         }
         // return error message if order already exists
 
+        // 1. 주문 생성
         Order order =
                 Order.builder()
                         .user(
@@ -53,22 +60,20 @@ public class OrderService {
                         .status(OrderStatus.ORDER)
                         .orderDate(orderRequest.getOrderDate())
                         .build();
-        // create order object
-
         orderRepository.save(order);
-        // save order object
 
         Order orderSaved =
                 orderRepository
                         .findByOrderDateAndUserId(
                                 orderRequest.getOrderDate(), orderRequest.getUserId())
                         .orElseThrow(() -> new RuntimeException("Order not found"));
-        // get saved order object
 
+        // 2. 주문 목록 생성
         List<OrderItem> orderItems =
                 orderRequest.getCartItemIds().stream()
                         .map(
                                 cartItemId -> {
+                                    // DB에서 해당하는 각 cartItemId 조회
                                     CartItem cartItem =
                                             cartItemRepository
                                                     .findById(cartItemId)
@@ -76,7 +81,9 @@ public class OrderService {
                                                             () ->
                                                                     new RuntimeException(
                                                                             "Cart item not found"));
+                                    // 해당 cart에서 cartItems 삭제
                                     cartItemRepository.delete(cartItem);
+                                    // 2. order items 생성
                                     return OrderItemMapper.cartItemToOrderItem(
                                             cartItem, orderSaved);
                                 })
@@ -108,118 +115,58 @@ public class OrderService {
         // return success message
     }
 
-    public Response requestCancel(OrderRequest orderRequest) {
-        Order order =
-                orderRepository
-                        .findById(orderRequest.getOrderId())
-                        .orElseThrow(() -> new NotFoundException("Order not " + "found"));
-        // get order object
+    // --------------- isConditionOk ---------------
+    /** {@summary} Check if the condition for request is ok */
+    public Boolean isConditionOk(OrderStatus orderStatus, RequestType requestType) {
+        Map<OrderStatus, RequestType> mapping = new HashMap<>();
+        mapping.put(CONFIRM, REQUEST_CANCEL);
+        mapping.put(ORDER, REQUEST_CANCEL);
+        mapping.put(PREPARE, REQUEST_CANCEL);
+        mapping.put(CANCEL_REQUESTED, CONFIRM_CANCEL);
+        mapping.put(DELIVERED, REQUEST_RETURN);
+        mapping.put(RETURN_REQUESTED, PROGRESS_RETURN);
+        mapping.put(RETURN_IN_PROGRESS, COMPLETE_RETURN);
 
-        // if order status is over PREPARE status, return error message
-        if (order.getStatus().ordinal() > OrderStatus.PREPARE.ordinal()) {
-            return Response.builder().status(400).message("Order cannot be cancelled").build();
-        }
-
-        orderRequest.setStatus(OrderStatus.CANCEL_REQUESTED);
-        changeOrderStatus(orderRequest);
-        // change order status
-
-        return Response.builder().status(200).message("Order cancel requested").build();
-        // return success message
+        return requestType == mapping.get(orderStatus);
     }
 
-    public Response confirmCancel(OrderRequest orderRequest) {
+    // --------------- progressOrderRequest ---------------
+    /** {@summary} Progress an order requests */
+    public Response progressOrderRequest(OrderRequest orderRequest) {
+
         Order order =
                 orderRepository
                         .findById(orderRequest.getOrderId())
-                        .orElseThrow(() -> new NotFoundException("Order not " + "found"));
+                        .orElseThrow(() -> new NotFoundException("Order not found"));
         // get order object
 
-        // if order status is not CANCEL_REQUESTED, return error message
-        if (order.getStatus() != OrderStatus.CANCEL_REQUESTED) {
-            return Response.builder()
-                    .status(400)
-                    .message("Order cannot be cancelled without cancel request.")
-                    .build();
+        boolean isConditionOk = isConditionOk(order.getStatus(), orderRequest.getRequestType());
+        // check if condition is ok
+
+        if (!isConditionOk) {
+            return Response.builder().status(400).message("Request type is not valid").build();
         }
+        // return error message if condition is not ok
 
-        orderRequest.setStatus(OrderStatus.CANCELLED);
-        changeOrderStatus(orderRequest);
-        // change order status
+        Map<RequestType, OrderStatus> mapping = new HashMap<>();
 
-        return Response.builder().status(200).message("Order cancelled").build();
-        // return success message
-    }
+        mapping.put(REQUEST_CANCEL, CANCEL_REQUESTED);
+        mapping.put(CONFIRM_CANCEL, CANCELLED);
+        mapping.put(REQUEST_RETURN, RETURN_REQUESTED);
+        mapping.put(PROGRESS_RETURN, RETURN_IN_PROGRESS);
+        mapping.put(COMPLETE_RETURN, RETURNED);
 
-    public Response requestReturn(OrderRequest orderRequest) {
-        Order order =
-                orderRepository
-                        .findById(orderRequest.getOrderId())
-                        .orElseThrow(() -> new NotFoundException("Order not " + "found"));
-        // get order object
-
-        // if order status is not DELIVERED, return error message
-        if (order.getStatus() != OrderStatus.DELIVERED) {
-            return Response.builder()
-                    .status(400)
-                    .message("Order cannot be returned without delivery.")
-                    .build();
+        OrderStatus newStatus = mapping.get(orderRequest.getRequestType());
+        if (newStatus == null) {
+            return Response.builder().status(400).message("Invalid request type").build();
         }
+        // get new status from request type, return error message if request type is invalid
 
-        orderRequest.setStatus(OrderStatus.RETURN_REQUESTED);
+        orderRequest.setStatus(newStatus);
         changeOrderStatus(orderRequest);
-        // change order status
+        // switch case for request type
 
-        return Response.builder().status(200).message("Order return requested").build();
-        // return success message
-    }
-
-    public Response progressReturn(OrderRequest orderRequest) {
-        Order order =
-                orderRepository
-                        .findById(orderRequest.getOrderId())
-                        .orElseThrow(() -> new NotFoundException("Order not " + "found"));
-        // get order object
-
-        // if order status is not RETURN_REQUESTED, return error message
-        if (order.getStatus() != OrderStatus.RETURN_REQUESTED) {
-            return Response.builder()
-                    .status(400)
-                    .message("Order cannot be returned without return request.")
-                    .build();
-        }
-
-        orderRequest.setStatus(OrderStatus.RETURN_IN_PROGRESS);
-        changeOrderStatus(orderRequest);
-        // change order status
-
-        return Response.builder()
-                .status(200)
-                .message("Order return request now progressing")
-                .build();
-        // return success message
-    }
-
-    public Response completeReturn(OrderRequest orderRequest) {
-        Order order =
-                orderRepository
-                        .findById(orderRequest.getOrderId())
-                        .orElseThrow(() -> new NotFoundException("Order not " + "found"));
-        // get order object
-
-        // if order status is not RETURN_IN_PROGRESS, return error message
-        if (order.getStatus() != OrderStatus.RETURN_IN_PROGRESS) {
-            return Response.builder()
-                    .status(400)
-                    .message("Order cannot be returned without return request.")
-                    .build();
-        }
-
-        orderRequest.setStatus(OrderStatus.RETURNED);
-        changeOrderStatus(orderRequest);
-        // change order status
-
-        return Response.builder().status(200).message("Order returned").build();
+        return Response.builder().status(200).message("Order request progress").build();
         // return success message
     }
 }

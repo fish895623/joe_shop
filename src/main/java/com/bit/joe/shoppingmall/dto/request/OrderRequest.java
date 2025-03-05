@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.bit.joe.shoppingmall.enums.OrderStatus;
+import com.bit.joe.shoppingmall.enums.RequestType;
 
 import lombok.Builder;
 import lombok.Data;
@@ -17,4 +18,5 @@ public class OrderRequest {
     private List<Long> cartItemIds;
     private LocalDateTime orderDate;
     private OrderStatus status;
+    private RequestType requestType;
 }

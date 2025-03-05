@@ -1,14 +1,15 @@
 package com.bit.joe.shoppingmall.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.bit.joe.shoppingmall.dto.request.ProductRequest;
 import com.bit.joe.shoppingmall.dto.response.Response;
-import com.bit.joe.shoppingmall.exception.InvalidCredentialsException;
 import com.bit.joe.shoppingmall.service.ProductService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -20,16 +21,23 @@ public class ProductController {
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Response> createProduct(@RequestBody ProductRequest productRequest) {
-        // Validate the fields in the productRequest
-        if (productRequest.getCategoryId() == null
-                || productRequest.getImage().isEmpty()
-                || productRequest.getName().isEmpty()
-                || productRequest.getQuantity() <= 0
-                || productRequest.getPrice() <= 0) {
-            throw new InvalidCredentialsException("All Fields are Required");
-        }
+    public ResponseEntity<Response> createProduct(
+            @Valid @RequestBody ProductRequest productRequest) {
 
+        boolean productExistsInCategory =
+                productService.existsByCategoryIdAndName(
+                        productRequest.getCategoryId(), productRequest.getName());
+
+        if (productExistsInCategory) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(
+                            Response.builder()
+                                    .status(400)
+                                    .message(
+                                            "Product name must be unique within the same category.")
+                                    .build());
+        }
+        // If everything is fine, proceed with product creation
         return ResponseEntity.ok(
                 productService.createProduct(
                         productRequest.getCategoryId(),
@@ -42,9 +50,21 @@ public class ProductController {
     @PutMapping("/update/{productId}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Response> updateProduct(
-            @PathVariable Long productId, @RequestBody ProductRequest productRequest) {
-        if (productRequest.getQuantity() <= 0 && productRequest.getPrice() <= 0) {
-            throw new InvalidCredentialsException("Quantity and price must be greater than 0.");
+            @PathVariable Long productId, @Valid @RequestBody ProductRequest productRequest) {
+        // Check if the product name is unique within the same category, excluding the current
+        // product
+        boolean productExistsInCategory =
+                productService.existsByCategoryIdAndName(
+                        productRequest.getCategoryId(), productRequest.getName());
+
+        if (productExistsInCategory && !productRequest.getName().equals(productRequest.getName())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(
+                            Response.builder()
+                                    .status(400)
+                                    .message(
+                                            "Product name must be unique within the same category.")
+                                    .build());
         }
         return ResponseEntity.ok(
                 productService.updateProduct(

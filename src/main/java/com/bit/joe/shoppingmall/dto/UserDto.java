@@ -1,5 +1,7 @@
 package com.bit.joe.shoppingmall.dto;
 
+import java.util.List;
+
 import com.bit.joe.shoppingmall.enums.UserGender;
 import com.bit.joe.shoppingmall.enums.UserRole;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -25,7 +27,10 @@ public class UserDto {
     private String birth;
     private String email;
     private String password;
+    private boolean active;
 
-    // Order, Cart 파트는 아직 구현 전이라 주석 처리
-    // private List<OrderDto> orders;
+    private String phone;
+    private String address;
+
+    private List<OrderDto> orders;
 }

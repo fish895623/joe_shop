@@ -127,4 +127,9 @@ public class ProductServiceImpl implements ProductService {
                 .productList(productDtoList)
                 .build();
     }
+
+    @Override
+    public boolean existsByCategoryIdAndName(Long categoryId, String name) {
+        return productRepository.existsByCategoryIdAndName(categoryId, name);
+    }
 }

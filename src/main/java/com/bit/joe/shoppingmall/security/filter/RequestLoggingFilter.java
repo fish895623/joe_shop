@@ -1,4 +1,4 @@
-package com.bit.joe.shoppingmall.filter;
+package com.bit.joe.shoppingmall.security.filter;
 
 import java.io.IOException;
 
