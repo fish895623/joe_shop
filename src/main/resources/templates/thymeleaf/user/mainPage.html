@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<style>
+  .container {
+    display: flex;
+  }
+
+  #nav1 {
+    text-align: center;
+  }
+
+  #nav1 > ul {
+    display: flex;
+    justify-content:flex-end;
+    padding-left:0;
+    margin:0;
+  }
+  #nav1 > ul li {
+    padding: 0 20px;
+    line-height: 50px;
+  }
+
+  * {
+    padding: 0;
+    margin: 0;
+    box-sizing:border-box;
+  }
+
+  nav {
+    width: 100%;
+    overflow: hidden;
+  }
+  ul {
+    list-style: none;
+  }
+</style>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>MainPage</title>
+</head>
+<body>
+<div>
+  <div>
+    <h1>JOE SHOP</h1>
+  </div>
+  <div>
+    <input type="button" value="알림받기" />
+  </div>
+  <div>
+    <nav id="nav1">
+      <ul>
+        <li><a href="/user/login">로그인</a></li>
+        <li><a href="thymleaf/user/signUp">회원가입</a></li>
+        <li><a href="/user/myPage">마이페이지</a></li>
+        <li><a href="">구매내역</a></li>
+        <li><a href="">장바구니</a></li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<hr />
+<div>
+  <label>
+    <input type="text" />
+  </label>
+  <span><input type="submit" value="입력" /></span>
+</div>
+<div id="mainImage">
+  <h1>이미지(이벤트로 넘기기)</h1>
+</div>
+<br />
+<div class="container">
+  <div><img src="image1.jpg" alt="이미지1"></div>
+  <div><img src="image2.jpg" alt="이미지2"></div>
+  <div><img src="image3.jpg" alt="이미지3"></div>
+  <div><img src="image4.jpg" alt="이미지4"></div>
+  <div><img src="image5.jpg" alt="이미지5"></div>
+  <div><img src="image6.jpg" alt="이미지6"></div>
+</div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
