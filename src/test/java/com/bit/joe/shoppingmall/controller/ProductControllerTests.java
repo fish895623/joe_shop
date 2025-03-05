@@ -11,7 +11,6 @@ import java.util.Base64;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,17 +83,6 @@ public class ProductControllerTests {
     @Autowired private ProductServiceImpl productService;
     @Autowired private UserRepository userRepository;
 
-    //    @DynamicPropertySource
-    //    static void configureProperties(DynamicPropertyRegistry registry) {
-    //        registry.add("spring.datasource.url", () -> "jdbc:h2:mem:test");
-    //        registry.add("spring.datasource.username", () -> "sa");
-    //        registry.add("spring.datasource.password", () -> "");
-    //        registry.add("spring.datasource.driver-class-name", () -> "org.h2.Driver");
-    //        registry.add("spring.jpa.database-platform", () -> "org.hibernate.dialect.H2Dialect");
-    //        registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
-    //        registry.add("spring.jpa.show-sql", () -> "true");
-    //    }
-
     @BeforeEach
     void setUp() {
         userRepository.deleteAll();
@@ -109,7 +97,6 @@ public class ProductControllerTests {
     }
 
     @Test
-    @Order(1)
     void adminCreateProduct() throws Exception {
         ProductRequest productRequest = new ProductRequest();
         productRequest.setName("product");
@@ -129,7 +116,6 @@ public class ProductControllerTests {
     }
 
     @Test
-    @Order(2)
     void adminCreateDuplicateProduct() throws Exception {
         ProductRequest productRequest = new ProductRequest();
         productRequest.setName("product");
@@ -161,7 +147,6 @@ public class ProductControllerTests {
 
     /** User cannot create product */
     @Test
-    @Order(3)
     void userCreateProduct() throws Exception {
         ProductRequest productRequest = new ProductRequest();
         productRequest.setName("product");
@@ -182,7 +167,6 @@ public class ProductControllerTests {
     }
 
     @Test
-    @Order(4)
     void adminCreateProductWithEmptyBody() throws Exception {
         ProductRequest productRequest = new ProductRequest(); // 빈 요청 본문
 
@@ -198,7 +182,6 @@ public class ProductControllerTests {
     }
 
     @Test
-    @Order(5)
     void getProducts() throws Exception {
         ProductRequest productRequest = new ProductRequest();
         productRequest.setName("product");
@@ -230,7 +213,6 @@ public class ProductControllerTests {
     }
 
     @Test
-    @Order(6)
     void adminUpdateProduct() throws Exception {
         ProductRequest productRequest = new ProductRequest();
         productRequest.setName("product");
@@ -262,7 +244,6 @@ public class ProductControllerTests {
     }
 
     @Test
-    @Order(7)
     void deleteProduct() throws Exception {
         ProductRequest productRequest = new ProductRequest();
         productRequest.setName("product");
