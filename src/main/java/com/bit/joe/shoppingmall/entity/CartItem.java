@@ -29,4 +29,9 @@ public class CartItem {
     private int quantity;
 
     private BigDecimal price;
+
+    /** Set the total price of the cart item */
+    public void setTotalPrice() {
+        this.price = BigDecimal.valueOf((long) this.quantity * this.product.getPrice());
+    }
 }

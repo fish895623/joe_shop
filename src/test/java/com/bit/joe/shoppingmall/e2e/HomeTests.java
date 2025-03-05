@@ -1,8 +1,6 @@
 package com.bit.joe.shoppingmall.e2e;
 
-
-import com.bit.joe.shoppingmall.utils.TestUtils;
-import com.microsoft.playwright.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.TestInstance;
@@ -12,12 +10,13 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import com.bit.joe.shoppingmall.utils.TestUtils;
+import com.microsoft.playwright.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-//@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+// @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @TestPropertySource("classpath:application-test.properties")
 public class HomeTests {
     static Playwright playwright;
