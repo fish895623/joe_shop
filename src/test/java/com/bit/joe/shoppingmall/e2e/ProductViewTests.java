@@ -1,6 +1,7 @@
 package com.bit.joe.shoppingmall.e2e;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.TestPropertySource;
@@ -9,9 +10,9 @@ import com.bit.joe.shoppingmall.utils.TestUtils;
 import com.microsoft.playwright.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource("classpath:application-test.properties")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class HomeTests {
+@TestPropertySource("classpath:application-test.properties")
+public class ProductViewTests {
     static Playwright playwright;
     static Browser browser;
     Page page;
@@ -31,9 +32,9 @@ public class HomeTests {
     }
 
     @Test
-    void testHomePageLoads() throws InterruptedException {
-        page.navigate(LOCALHOST);
-        TestUtils.screenShot(page, "root_page");
+    void testHomePageLoads() {
+        page.navigate(LOCALHOST + "product");
+        TestUtils.screenShot(page, "product_page");
     }
 
     @AfterEach
