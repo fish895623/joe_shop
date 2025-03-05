@@ -54,14 +54,14 @@ public class SecurityConfig {
                                                 sessionAuthenticationStrategy())
                                         .maximumSessions(1) // 동시 로그인 세션 수 제한
                                         .expiredUrl("/login?expired=true")) // 세션 만료 시 리디렉션 URL
-//                .rememberMe(rememberMe ->
-//                        rememberMe.key("common-cookie-key") // remember-me 쿠키 키
-//                                .tokenValiditySeconds(1209600)) // 14일 동안 로그인 유지
+                //                .rememberMe(rememberMe ->
+                //                        rememberMe.key("common-cookie-key") // remember-me 쿠키 키
+                //                                .tokenValiditySeconds(1209600)) // 14일 동안 로그인 유지
                 .logout(
                         logout ->
                                 logout.logoutUrl("/user/logout")
                                         .logoutSuccessUrl("/login")
-                                        .invalidateHttpSession(true)// 로그아웃 시 세션 무효화
+                                        .invalidateHttpSession(true) // 로그아웃 시 세션 무효화
                                         .clearAuthentication(true) // 인증 정보 초기화
                                         .deleteCookies("JSESSIONID")) // JSESSIONID 쿠키 삭제
                 .build();
@@ -74,7 +74,8 @@ public class SecurityConfig {
         authenticationManagerBuilder.authenticationProvider(customAuthenticationProvider);
         authenticationManagerBuilder.authenticationProvider(customDaoAuthenticationProvider);
         return authenticationManagerBuilder.build();
-        // Provider의 authenticate() 메서드에서 전달된 토큰을 검증 -> 인증이 성공하면 Authentication 객체를 반환(SecurityContext에 저장)
+        // Provider의 authenticate() 메서드에서 전달된 토큰을 검증 -> 인증이 성공하면 Authentication 객체를
+        // 반환(SecurityContext에 저장)
     }
 
     @Bean
