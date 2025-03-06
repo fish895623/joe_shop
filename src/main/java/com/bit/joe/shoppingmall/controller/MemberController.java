@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class MemberController {
     @GetMapping
     public String index() {
-        return "thymeleaf/admin/member";
+        return "admin/member";
     }
 }
