@@ -1,5 +1,6 @@
 package com.bit.joe.shoppingmall.service.Impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -73,10 +74,15 @@ public class CartService {
                                 () -> {
                                     Cart newCart = new Cart();
                                     newCart.setUser(user);
-                                    newCart.setCartItems(List.<CartItem>of());
+                                    newCart.setCartItems(new ArrayList<>(List.of()));
                                     return newCart;
                                 });
         // find cart by user (found by user) or create a new cart if not found
+
+        // if cart items is null, set it to an empty list
+        if (cart.getCartItems() == null) {
+            cart.setCartItems(new ArrayList<>(List.of()));
+        }
 
         for (CartItem cartItem : cart.getCartItems()) {
             if (cartItem.getProduct().getId().equals(productIdToAppend)) {

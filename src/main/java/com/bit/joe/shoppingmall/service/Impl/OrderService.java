@@ -58,21 +58,23 @@ public class OrderService {
             return Response.builder().status(400).message("Order already exists").build();
         }
 
+        LocalDateTime orderDate = LocalDateTime.now();
+
         // make order entity and save it
         Order order =
                 Order.builder()
                         .user(userService.getLoginUser()) // get logged-in user
                         .status(OrderStatus.ORDER) // set order status to ORDER
-                        .orderDate(LocalDateTime.now()) // set order date to now
+                        .orderDate(orderDate) // set order date to now
                         .build();
-        orderRepository.save(order);
+        Order orderSaved = orderRepository.save(order);
 
         // get saved order entity(with id)
-        Order orderSaved =
-                orderRepository
-                        .findByOrderDateAndUserId(
-                                orderRequest.getOrderDate(), orderRequest.getUserId())
-                        .orElseThrow(() -> new RuntimeException("Order not found"));
+//        Order orderSaved =
+//                orderRepository
+//                        .findByOrderDateAndUserId(
+//                            orderDate, orderRequest.getUserId())
+//                        .orElseThrow(() -> new RuntimeException("Order not found"));
 
         // Make orderItems after saving order entity, because orderItem needs orderId to be saved.
         List<OrderItem> orderItems =
