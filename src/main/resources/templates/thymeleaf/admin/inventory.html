@@ -6,33 +6,31 @@
     <title>Inventory</title>
   </head>
   <body>
-    <div class="container1">
-      <p>
-        <button onclick="location.href = 'http://www.naver.com'">
-          관리 홈
-        </button>
-      </p>
-      <p>
-        <button onclick="location.href = 'http://www.naver.com'">
-          회원관리
-        </button>
-      </p>
-      <p>
-        <button onclick="location.href = 'http://www.naver.com'">
-          재고관리
-        </button>
-      </p>
-    </div>
+    <nav>
+      <ul>
+        <li><a href="http://www.naver.com"> 관리 홈</a></li>
+        <li><a href="http://www.naver.com"> 회원관리</a></li>
+        <li><a href="http://www.naver.com"> 재고관리</a></li>
+      </ul>
+    </nav>
 
     <div>
       <!-- 드롭다운 클릭해서 밑에 테이블에 들어갈 수 있도록 -->
       <h3>상품(재고)관리</h3>
       <table border="1">
-        <tr>
-          <th>
-            <form action="#">
-              <label for="category">카테고리</label>
-              <br />
+        <thead>
+          <tr>
+            <th>카테고리</th>
+            <th>상품명</th>
+            <th>상품코드</th>
+            <th>수량</th>
+            <th>금액</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>
               <select name="category" id="cat">
                 <option value="select">Select item</option>
                 <option value="top">Top</option>
@@ -44,14 +42,9 @@
                 <option value="makeup">MakeUp</option>
                 <option value="furniture">Furniture</option>
               </select>
-              <!-- <input type="submit" value="Submit" /> -->
-            </form>
-          </th>
+            </td>
 
-          <th>
-            <form action="#">
-              <label for="product-name">상품명</label>
-              <br />
+            <td>
               <select name="product-name" id="p_name">
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -63,12 +56,9 @@
                 <option value="8">8</option>
                 <option value="9">9</option>
               </select>
-            </form>
-          </th>
-          <th>
-            <form action="#">
-              <label for="product-code">상품코드</label>
-              <br />
+            </td>
+
+            <td>
               <select name="product-code" id="p_code">
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -80,13 +70,9 @@
                 <option value="8">8</option>
                 <option value="9">9</option>
               </select>
-            </form>
-          </th>
+            </td>
 
-          <th>
-            <form action="#">
-              <label for="quentity">수량</label>
-              <br />
+            <td>
               <select name="quentity" id="qty">
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -98,13 +84,9 @@
                 <option value="8">8</option>
                 <option value="9">9</option>
               </select>
-            </form>
-          </th>
+            </td>
 
-          <th>
-            <form action="#">
-              <label for="price">금액</label>
-              <br />
+            <td>
               <select name="price" id="price">
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -116,25 +98,35 @@
                 <option value="8">8</option>
                 <option value="9">9</option>
               </select>
-            </form>
-          </th>
-        </tr>
-
-        <tr>
-          <th>카테고리</th>
-          <th>상품명</th>
-          <th>상품코드</th>
-          <th>수량</th>
-          <th>금액</th>
-        </tr>
-        <tr>
-          <td>d</td>
-          <td>d</td>
-          <td>d</td>
-          <td>d</td>
-          <td>d</td>
-        </tr>
+            </td>
+          </tr>
+        </tbody>
       </table>
     </div>
+
+    <script>
+      const tableBody = document.querySelector("table tbody");
+
+      function loadTableData(data) {
+        tableBody.innerHTML = "";
+        data.forEach((item) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+                    <td>${item.카테고리}</td>
+                    <td>${item.상품명}</td>
+                    <td>${item.상품코드}</td>
+                    <td>${item.수량}</td>
+                    <td>${item.금액}</td>`;
+          tableBody.appendChild(row);
+        });
+      }
+
+      fetch("")
+        .then((response) => response.json())
+        .then((data) => {
+          loadTableData(data);
+        })
+        .catch((error) => console.error("Error loading the JSON data:", error));
+    </script>
   </body>
 </html>
