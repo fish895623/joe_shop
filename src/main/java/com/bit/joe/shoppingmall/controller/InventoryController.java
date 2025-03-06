@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class InventoryController {
     @GetMapping
     public String index() {
-        return "thymeleaf/admin/inventory";
+        return "admin/inventory";
     }
 }

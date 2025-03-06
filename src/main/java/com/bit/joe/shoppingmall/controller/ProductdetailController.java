@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class ProductdetailController {
     @GetMapping
     public String productdetail() {
-        return "thymeleaf/product/product-detail";
+        return "product/product-detail";
     }
 }

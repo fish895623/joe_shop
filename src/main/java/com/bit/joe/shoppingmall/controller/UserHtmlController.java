@@ -10,21 +10,21 @@ public class UserHtmlController {
 
     @GetMapping("/main")
     public String Main() {
-        return "thymeleaf/user/mainPage";
+        return "user/mainPage";
     }
 
     @GetMapping("/login")
     public String Login() {
-        return "thymeleaf/user/login";
+        return "user/login";
     }
 
     @GetMapping("/signUp")
     public String SignUp() {
-        return "thymeleaf/user/signUp";
+        return "user/signUp";
     }
 
     @GetMapping("/myPage")
     public String MyPage() {
-        return "thymeleaf/user/myPage";
+        return "user/myPage";
     }
 }
