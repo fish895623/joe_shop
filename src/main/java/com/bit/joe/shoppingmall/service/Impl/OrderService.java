@@ -39,6 +39,7 @@ public class OrderService {
 
     /**
      * {@summary} Create an order
+     *
      * @param orderRequest
      * @return Response
      */
@@ -103,6 +104,7 @@ public class OrderService {
 
     /**
      * {@summary} Change order status
+     *
      * @param orderRequest
      * @return
      */
@@ -126,6 +128,7 @@ public class OrderService {
 
     /**
      * {@summary} Check if condition for progress request is ok
+     *
      * @param orderStatus
      * @param requestType
      * @return
@@ -145,6 +148,7 @@ public class OrderService {
 
     /**
      * {@summary} Progress order request
+     *
      * @param orderRequest
      * @return
      */
