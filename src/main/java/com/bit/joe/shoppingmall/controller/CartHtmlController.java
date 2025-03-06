@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class CartHtmlController {
     @GetMapping
     public String cart() {
-        return "thymeleaf/product/cart";
+        return "product/cart";
     }
 }

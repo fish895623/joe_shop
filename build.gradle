@@ -1,3 +1,5 @@
+import com.diffplug.spotless.LineEnding
+
 plugins {
     id 'java'
     id 'war'
@@ -114,6 +116,7 @@ tasks.withType(JavaExec).configureEach {
 }
 
 spotless {
+    lineEndings = LineEnding.UNIX
     java {
         googleJavaFormat().aosp()
 
