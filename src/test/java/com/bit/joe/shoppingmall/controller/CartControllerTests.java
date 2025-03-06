@@ -11,16 +11,15 @@ import com.bit.joe.shoppingmall.enums.UserRole;
 import com.bit.joe.shoppingmall.mapper.CategoryMapper;
 import com.bit.joe.shoppingmall.mapper.ProductMapper;
 import com.bit.joe.shoppingmall.mapper.UserMapper;
-import com.bit.joe.shoppingmall.repository.CartRepository;
-import com.bit.joe.shoppingmall.repository.CategoryRepository;
-import com.bit.joe.shoppingmall.repository.ProductRepository;
-import com.bit.joe.shoppingmall.repository.UserRepository;
+import com.bit.joe.shoppingmall.repository.*;
 import com.bit.joe.shoppingmall.service.Impl.CartService;
 import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
 import com.bit.joe.shoppingmall.service.Impl.ProductServiceImpl;
 import com.bit.joe.shoppingmall.service.UserService;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +35,7 @@ import java.util.Base64;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource("classpath:application-test.properties")
 @AutoConfigureMockMvc
+@Transactional
 class CartControllerTests {
     User adminEntity =
             User.builder()
@@ -78,7 +78,9 @@ class CartControllerTests {
     @Autowired private CartService cartService;
     @Autowired private CartRepository cartRepository;
     @Autowired private UserService userService;
-    @Autowired private EntityManager entityManager;
+    @Autowired private CartItemRepository cartItemRepository;
+
+    @PersistenceContext private EntityManager entityManager;
 
     @BeforeEach
     public void setUp() {
@@ -111,21 +113,8 @@ class CartControllerTests {
         categoryRepository.flush();
     }
 
-    @AfterEach
-    public void tearDown() {
-        cartRepository.flush();
-        // Delete product
-        productRepository.deleteAll();
-        // Delete category
-        categoryRepository.deleteAll();
-        // Delete cart
-        cartRepository.deleteAll();
-        // Delete user
-        userRepository.deleteAll();
-    }
-
     @Test
-    void createCart() throws Exception {
+    void adminCreateCart() throws Exception {
         // perform login
         mockMvc.perform(
                         post("/api/cart/create")
@@ -136,8 +125,13 @@ class CartControllerTests {
     }
 
     @Test
-    void appendProductToCart() {}
-
-    @Test
-    void removeProductFromCart() {}
+    void userCreateCart() throws Exception {
+        // perform login
+        mockMvc.perform(
+                        post("/api/cart/create")
+                                .header("Authorization", userBasicAuth)
+                                .content("")
+                                .session(mockHttpSession))
+                .andExpect(status().isOk());
+    }
 }
