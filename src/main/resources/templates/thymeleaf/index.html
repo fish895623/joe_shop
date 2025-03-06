@@ -1,25 +1,26 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Get & Display Json Data</title>
-</head>
-<body>
-
+  </head>
+  <body>
     <h1>Products:</h1>
     <ul></ul>
 
     <script>
-        fetch('http://localhost:8080/product/get-all')
-        .then(res => res.json())
-        .then(data => {
-            console.log(data);
-            const productList = data.productList;
-            productList.forEach(product => {
-                const markup = `
+      fetch("http://localhost:8080/product/get-all")
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          const productList = data.productList;
+          productList.forEach((product) => {
+            const markup = `
                     <li>
                         <strong>ID:</strong> ${product.id} <br>
                         <strong>Name:</strong> ${product.name} <br>
@@ -27,11 +28,12 @@
                         <strong>Quantity:</strong> ${product.quantity} <br><br>
                     </li>
                 `;
-                document.querySelector('ul').insertAdjacentHTML('beforeend', markup);
-            });
+            document
+              .querySelector("ul")
+              .insertAdjacentHTML("beforeend", markup);
+          });
         })
-        .catch(error => console.log('Error:', error));
+        .catch((error) => console.log("Error:", error));
     </script>
-
-</body>
+  </body>
 </html>
