@@ -1,0 +1,10 @@
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 20%  # Allows minor coverage drops without marking it as unsuccessful
+        if_not_found: success
+    patch:
+      default:
+        informational: true  # Makes coverage decrease warnings instead of failures

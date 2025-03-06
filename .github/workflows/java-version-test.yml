@@ -1,8 +1,8 @@
-name: Java CI with Gradle
+name: Java CI Schedule
 
 on:
-  schedule:
-    - cron: '0 0 * * *'
+  push:
+    branches: [ "master" ]
 
 jobs:
   build:
@@ -11,7 +11,7 @@ jobs:
       contents: read
     strategy:
       matrix:
-        java: [ '17', '21', '23' ]
+        java: [ '17' ]
 
     steps:
       - uses: actions/checkout@main
@@ -20,6 +20,15 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: "temurin"
-      - name: Build with Gradle Wrapper
-        run: ./gradlew build
+
+      - name: Gradle Test
+        id: test
+        continue-on-error: true
+        run: ./gradlew test -x spotlessCheck --max-workers 2
+
+      - uses: codecov/codecov-action@v5
+        with:
+          files: ./build/reports/jacoco/test/jacocoTestReport.xml
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 

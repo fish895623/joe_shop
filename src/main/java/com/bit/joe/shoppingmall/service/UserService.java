@@ -2,6 +2,7 @@ package com.bit.joe.shoppingmall.service;
 
 import com.bit.joe.shoppingmall.dto.UserDto;
 import com.bit.joe.shoppingmall.dto.response.Response;
+import com.bit.joe.shoppingmall.entity.User;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -23,4 +24,6 @@ public interface UserService {
     Response logout(HttpSession session);
 
     Response withdraw(HttpSession session, UserDto userDto);
+
+    User getLoginUser();
 }

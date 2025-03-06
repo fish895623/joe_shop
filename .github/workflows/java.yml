@@ -1,8 +1,7 @@
 name: Java CI with Gradle
+run-name: JavaGradle
 
 on:
-  push:
-    branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
 
@@ -34,10 +33,10 @@ jobs:
       - name: Gradle Test
         id: test
         continue-on-error: true
-        run: ./gradlew test
+        run: ./gradlew test --max-workers 2
 
       - name: Build with Gradle Wrapper
-        run: ./gradlew build -x test -x spotlessCheck
+        run: ./gradlew build -x test -x spotlessCheck --max-workers 2
 
       - uses: codecov/codecov-action@v5
         with:

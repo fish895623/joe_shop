@@ -4,6 +4,9 @@ import static com.bit.joe.shoppingmall.enums.OrderStatus.*;
 
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -186,7 +189,9 @@ public class UserServiceImpl implements UserService {
         // check if the user has any order that is not completed
         // if there is, return a response with status code 400 (BAD_REQUEST)
         // if there is not, continue to the next step
-        if (user.getOrders().stream().anyMatch(order -> !order.getStatus().equals(COMPLETE))) {
+        if (user.getOrders() != null
+                && user.getOrders().stream()
+                        .anyMatch(order -> !order.getStatus().equals(COMPLETE))) {
             return Response.builder()
                     .status(400)
                     .message("Cannot withdraw account, order progressing")
@@ -203,5 +208,15 @@ public class UserServiceImpl implements UserService {
         // Invalidate session -> logout user
 
         return Response.builder().status(200).message("Withdraw successfully").build();
+    }
+
+    @Override
+    public User getLoginUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        //                log.info("User Email is: " + email);
+        return userRepository
+                .findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User Not found"));
     }
 }

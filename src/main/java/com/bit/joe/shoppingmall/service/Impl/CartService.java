@@ -1,10 +1,10 @@
 package com.bit.joe.shoppingmall.service.Impl;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.bit.joe.shoppingmall.dto.request.CartRequest;
 import com.bit.joe.shoppingmall.dto.response.Response;
 import com.bit.joe.shoppingmall.entity.Cart;
 import com.bit.joe.shoppingmall.entity.CartItem;
@@ -12,6 +12,7 @@ import com.bit.joe.shoppingmall.entity.Product;
 import com.bit.joe.shoppingmall.entity.User;
 import com.bit.joe.shoppingmall.exception.NotFoundException;
 import com.bit.joe.shoppingmall.repository.*;
+import com.bit.joe.shoppingmall.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,80 +26,84 @@ public class CartService {
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
+    private final UserService userService;
 
-    // --------------- createCart ---------------
-    /** {@summary} Create a cart initially (when user registers) */
-    public Response createCart(Long userId) {
-        User user =
-                userRepository
-                        .findById(userId)
-                        .orElseThrow(() -> new NotFoundException("User not found"));
+    /**
+     * Create a cart initially (when user registers)
+     *
+     * @return Response
+     */
+    public Response createCart() {
+
+        User user = userService.getLoginUser();
+        // get user from the context holder (logged-in user)
         Cart cart = new Cart();
-        // Create a new cart (empty)
-        cart.setUser(user);
-        // Set the user of the cart
+        // create a new cart (empty)
 
-        cartRepository.save(cart); // db로 저장
+        cart.setUser(user);
+        // set the user of the cart
+
+        cartRepository.save(cart);
+        // save the cart to the database
 
         return Response.builder().status(200).message("Cart created successfully").build();
+        // return success response with status code 200 -> cart created successfully
     }
 
-    // --------------- appendProductToCart ---------------
-    /** {@summary} Append a product to the cart */
-    public Response appendProductToCart(Long userId, Long productId, int quantity) {
+    /**
+     * Append a product to the cart
+     *
+     * @param cartRequest CartRequest
+     * @return Response
+     */
+    public Response appendProductToCart(CartRequest cartRequest) {
         // Create Cart if there is no not ordered cart, otherwise use the existing one
-        User user =
-                userRepository
-                        .findById(userId)
-                        .orElseThrow(() -> new NotFoundException("User not found"));
 
-        // find cart by user, if cart not found, create a new cart
-        Cart cart = cartRepository.findCartByUser(user).orElseGet(Cart::new);
+        Long productIdToAppend = cartRequest.getProductId();
+        int quantityToAppend = cartRequest.getQuantity();
+        // get parms from the request
 
-        // if cart is created now, set user
-        if (cart.getUser() == null) {
-            cart.setUser(user);
-            // set user to the cart
-        }
+        User user = userService.getLoginUser();
+        // get user from the context holder (logged-in user)
 
-        // if cart is already created, check if the product already exists in the cart
-        if (cart.getCartItems() != null) {
+        Cart cart =
+                cartRepository
+                        .findCartByUser(user)
+                        .orElseGet(
+                                () -> {
+                                    Cart newCart = new Cart();
+                                    newCart.setUser(user);
+                                    newCart.setCartItems(List.<CartItem>of());
+                                    return newCart;
+                                });
+        // find cart by user (found by user) or create a new cart if not found
 
-            // if same product already exists in the cart, update only quantity
-            for (CartItem cartItem : cart.getCartItems()) {
-                if (cartItem.getProduct().getId().equals(productId)) {
-                    cartItem.setQuantity(cartItem.getQuantity() + quantity);
-                    cartItem.setPrice(
-                            BigDecimal.valueOf(
-                                    (long) cartItem.getQuantity()
-                                            * cartItem.getProduct().getPrice()));
-                    cartItemRepository.save(cartItem);
-                    return Response.builder()
-                            .status(200)
-                            .message("Product quantity updated successfully")
-                            .build();
-                }
+        for (CartItem cartItem : cart.getCartItems()) {
+            if (cartItem.getProduct().getId().equals(productIdToAppend)) {
+                cartItem.setQuantity(cartItem.getQuantity() + quantityToAppend);
+                cartItem.setTotalPrice();
+                cartItemRepository.save(cartItem);
+                return Response.builder()
+                        .status(200)
+                        .message("Product quantity updated successfully(append product to cart)")
+                        .build();
             }
-        } else {
-
-            Product product =
-                    productRepository
-                            .findById(productId)
-                            .orElseThrow(() -> new NotFoundException("Product not found"));
-            // Find product by id
-
-            CartItem cartItem =
-                    CartItem.builder()
-                            .cart(cart)
-                            .product(product)
-                            .quantity(quantity)
-                            .price(BigDecimal.valueOf((long) quantity * product.getPrice()))
-                            .build();
-            // Create a new cart item with the found product, quantity and price
-
-            cart.setCartItems(List.of(cartItem));
-            // Add the cart item to the cart
         }
+        // if same product already exists in the cart, update only quantity
+
+        Product product =
+                productRepository
+                        .findById(productIdToAppend)
+                        .orElseThrow(() -> new NotFoundException("Product not found"));
+        // Find product by id
+
+        CartItem cartItem =
+                CartItem.builder().cart(cart).product(product).quantity(quantityToAppend).build();
+        cartItem.setTotalPrice();
+        // Create a new cart item with the found product, quantity and price
+
+        cart.appendCartItemToCart(cartItem);
+        // Add the cart item to the cart
 
         cartRepository.save(cart);
         // Save the cart
@@ -110,22 +115,43 @@ public class CartService {
         // return success response with status code 200 -> product appended to cart successfully
     }
 
-    // --------------- removeProductFromCart ---------------
-    /** {@summary} Remove a product from the cart */
-    public Response removeProductFromCart(Long userId, Long productId) {
+    /**
+     * Remove a product from the cart
+     *
+     * @param cartRequest CartRequest
+     * @return Response
+     */
+    public Response removeProductFromCart(CartRequest cartRequest) {
+
+        Long productIdToRemove = cartRequest.getProductId();
+        int quantityToRemove = cartRequest.getQuantity();
+
+        User user = userService.getLoginUser();
+        // get user from the context holder (logged-in user)
 
         Cart cart =
                 cartRepository
-                        .findCartByUser(
-                                userRepository
-                                        .findById(userId)
-                                        .orElseThrow(() -> new NotFoundException("User not found")))
+                        .findCartByUser(user)
                         .orElseThrow(() -> new NotFoundException("Cart not found"));
         // find cart by user (found by id)
 
         // remove product from cart if it exists
         for (CartItem cartItem : cart.getCartItems()) {
-            if (cartItem.getProduct().getId().equals(productId)) {
+            if (cartItem.getProduct().getId().equals(productIdToRemove)) {
+
+                // check if cart item quantity is greater than the quantity to remove
+                if (cartItem.getQuantity() > quantityToRemove) {
+                    cartItem.setQuantity(cartItem.getQuantity() - quantityToRemove);
+                    cartItem.setTotalPrice();
+                    cartItemRepository.save(cartItem);
+                    return Response.builder()
+                            .status(200)
+                            .message(
+                                    "Product quantity updated successfully(remove product from cart)")
+                            .build();
+                }
+
+                // remove the cart item from the cart
                 cart.getCartItems().remove(cartItem);
                 cartRepository.save(cart);
                 return Response.builder()
@@ -135,7 +161,10 @@ public class CartService {
             }
         }
 
-        return Response.builder().status(404).message("Product not found in cart").build();
+        return Response.builder()
+                .status(404)
+                .message("Product to be removed not found in cart")
+                .build();
         // return not found response with status code 404 -> product not found in cart
     }
 }
