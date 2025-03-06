@@ -116,7 +116,7 @@ tasks.withType(JavaExec).configureEach {
 }
 
 spotless {
-    lineEndings = LineEnding.WINDOWS
+    lineEndings = LineEnding.UNIX
     java {
         googleJavaFormat().aosp()
 
