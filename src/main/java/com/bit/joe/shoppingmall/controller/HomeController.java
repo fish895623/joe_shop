@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class HomeController {
     @GetMapping
     public String index() {
-        return "thymeleaf/user/mainPage";
+        return "user/mainPage";
     }
 }

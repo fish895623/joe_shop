@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class HistoryController {
     @GetMapping
     public String history() {
-        return "thymeleaf/product/history";
+        return "product/history";
     }
 }
