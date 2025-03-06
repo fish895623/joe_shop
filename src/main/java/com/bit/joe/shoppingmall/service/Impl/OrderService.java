@@ -70,11 +70,11 @@ public class OrderService {
         Order orderSaved = orderRepository.save(order);
 
         // get saved order entity(with id)
-//        Order orderSaved =
-//                orderRepository
-//                        .findByOrderDateAndUserId(
-//                            orderDate, orderRequest.getUserId())
-//                        .orElseThrow(() -> new RuntimeException("Order not found"));
+        //        Order orderSaved =
+        //                orderRepository
+        //                        .findByOrderDateAndUserId(
+        //                            orderDate, orderRequest.getUserId())
+        //                        .orElseThrow(() -> new RuntimeException("Order not found"));
 
         // Make orderItems after saving order entity, because orderItem needs orderId to be saved.
         List<OrderItem> orderItems =

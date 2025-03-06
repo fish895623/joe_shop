@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.Base64;
 import java.util.List;
 
-import com.bit.joe.shoppingmall.dto.request.CartRequest;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.bit.joe.shoppingmall.dto.*;
+import com.bit.joe.shoppingmall.dto.request.CartRequest;
 import com.bit.joe.shoppingmall.dto.request.OrderRequest;
 import com.bit.joe.shoppingmall.enums.UserGender;
 import com.bit.joe.shoppingmall.enums.UserRole;
@@ -63,9 +63,7 @@ public class OrderControllerTests {
     @Autowired private UserService userService;
     @Autowired private CartService cartService;
 
-    /**
-     * Set up before each test
-     */
+    /** Set up before each test */
     @BeforeEach
     void setUp() {
         userService.createUser(userDto);
@@ -158,10 +156,7 @@ public class OrderControllerTests {
 
         // create order request
         OrderRequest orderRequest =
-                OrderRequest.builder()
-                        .userId(1L)
-                        .cartItemIds(cartItemIds)
-                        .build();
+                OrderRequest.builder().userId(1L).cartItemIds(cartItemIds).build();
 
         // convert to json
         var insertData = new ObjectMapper().writeValueAsString(orderRequest);
