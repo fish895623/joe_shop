@@ -3,6 +3,7 @@ package com.bit.joe.shoppingmall.service.Impl;
 import static com.bit.joe.shoppingmall.enums.OrderStatus.*;
 import static com.bit.joe.shoppingmall.enums.RequestType.*;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +22,7 @@ import com.bit.joe.shoppingmall.mapper.OrderItemMapper;
 import com.bit.joe.shoppingmall.repository.CartItemRepository;
 import com.bit.joe.shoppingmall.repository.OrderItemRepository;
 import com.bit.joe.shoppingmall.repository.OrderRepository;
-import com.bit.joe.shoppingmall.repository.UserRepository;
+import com.bit.joe.shoppingmall.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,42 +34,46 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    private final UserRepository userRepository;
     private final CartItemRepository cartItemRepository;
+    private final UserService userService;
 
+    /**
+     * {@summary} Create an order
+     * @param orderRequest
+     * @return Response
+     */
     public Response createOrder(OrderRequest orderRequest) {
 
+        // TODO: Do we need this check?
+        // Check if order already exists
         boolean isOrderExist =
                 orderRepository
                         .findByOrderDateAndUserId(
                                 orderRequest.getOrderDate(), orderRequest.getUserId())
                         .isPresent();
-        // Check if order already exists
 
+        // return error message if order already exists
         if (isOrderExist) {
             return Response.builder().status(400).message("Order already exists").build();
         }
-        // return error message if order already exists
 
-        // 1. 주문 생성
+        // make order entity and save it
         Order order =
                 Order.builder()
-                        .user(
-                                userRepository
-                                        .findById(orderRequest.getUserId())
-                                        .orElseThrow(() -> new RuntimeException("User not found")))
-                        .status(OrderStatus.ORDER)
-                        .orderDate(orderRequest.getOrderDate())
+                        .user(userService.getLoginUser()) // get logged-in user
+                        .status(OrderStatus.ORDER) // set order status to ORDER
+                        .orderDate(LocalDateTime.now()) // set order date to now
                         .build();
         orderRepository.save(order);
 
+        // get saved order entity(with id)
         Order orderSaved =
                 orderRepository
                         .findByOrderDateAndUserId(
                                 orderRequest.getOrderDate(), orderRequest.getUserId())
                         .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        // 2. 주문 목록 생성
+        // Make orderItems after saving order entity, because orderItem needs orderId to be saved.
         List<OrderItem> orderItems =
                 orderRequest.getCartItemIds().stream()
                         .map(
@@ -88,15 +93,19 @@ public class OrderService {
                                             cartItem, orderSaved);
                                 })
                         .toList();
-        // create order items from cart items
 
-        orderItemRepository.saveAll(orderItems);
         // save order items
+        orderItemRepository.saveAll(orderItems);
 
-        return Response.builder().message("Order created successfully").build();
         // return success message
+        return Response.builder().message("Order created successfully").build();
     }
 
+    /**
+     * {@summary} Change order status
+     * @param orderRequest
+     * @return
+     */
     public Response changeOrderStatus(OrderRequest orderRequest) {
 
         Order order =
@@ -115,8 +124,12 @@ public class OrderService {
         // return success message
     }
 
-    // --------------- isConditionOk ---------------
-    /** {@summary} Check if the condition for request is ok */
+    /**
+     * {@summary} Check if condition for progress request is ok
+     * @param orderStatus
+     * @param requestType
+     * @return
+     */
     public Boolean isConditionOk(OrderStatus orderStatus, RequestType requestType) {
         Map<OrderStatus, RequestType> mapping = new HashMap<>();
         mapping.put(CONFIRM, REQUEST_CANCEL);
@@ -130,43 +143,46 @@ public class OrderService {
         return requestType == mapping.get(orderStatus);
     }
 
-    // --------------- progressOrderRequest ---------------
-    /** {@summary} Progress an order requests */
+    /**
+     * {@summary} Progress order request
+     * @param orderRequest
+     * @return
+     */
     public Response progressOrderRequest(OrderRequest orderRequest) {
 
+        // get order object
         Order order =
                 orderRepository
                         .findById(orderRequest.getOrderId())
                         .orElseThrow(() -> new NotFoundException("Order not found"));
-        // get order object
 
-        boolean isConditionOk = isConditionOk(order.getStatus(), orderRequest.getRequestType());
         // check if condition is ok
+        boolean isConditionOk = isConditionOk(order.getStatus(), orderRequest.getRequestType());
 
+        // return error message if condition is not ok
         if (!isConditionOk) {
             return Response.builder().status(400).message("Request type is not valid").build();
         }
-        // return error message if condition is not ok
 
-        Map<RequestType, OrderStatus> mapping = new HashMap<>();
+        // hashmap for request type and new status
+        Map<RequestType, OrderStatus> requestTypeOrderStatusHashMap = new HashMap<>();
+        requestTypeOrderStatusHashMap.put(REQUEST_CANCEL, CANCEL_REQUESTED);
+        requestTypeOrderStatusHashMap.put(CONFIRM_CANCEL, CANCELLED);
+        requestTypeOrderStatusHashMap.put(REQUEST_RETURN, RETURN_REQUESTED);
+        requestTypeOrderStatusHashMap.put(PROGRESS_RETURN, RETURN_IN_PROGRESS);
+        requestTypeOrderStatusHashMap.put(COMPLETE_RETURN, RETURNED);
 
-        mapping.put(REQUEST_CANCEL, CANCEL_REQUESTED);
-        mapping.put(CONFIRM_CANCEL, CANCELLED);
-        mapping.put(REQUEST_RETURN, RETURN_REQUESTED);
-        mapping.put(PROGRESS_RETURN, RETURN_IN_PROGRESS);
-        mapping.put(COMPLETE_RETURN, RETURNED);
-
-        OrderStatus newStatus = mapping.get(orderRequest.getRequestType());
+        // get new status from request type, return error message if request type is invalid
+        OrderStatus newStatus = requestTypeOrderStatusHashMap.get(orderRequest.getRequestType());
         if (newStatus == null) {
             return Response.builder().status(400).message("Invalid request type").build();
         }
-        // get new status from request type, return error message if request type is invalid
 
+        // switch case for request type
         orderRequest.setStatus(newStatus);
         changeOrderStatus(orderRequest);
-        // switch case for request type
 
-        return Response.builder().status(200).message("Order request progress").build();
         // return success message
+        return Response.builder().status(200).message("Order request progress").build();
     }
 }
