@@ -6,43 +6,57 @@
     <title>Member</title>
   </head>
   <body>
-    <!-- sidebar로 변경될 수 있음 -->
-    <div class="container1">
-      <p>
-        <button onclick="location.href = 'http://www.naver.com'">
-          관리 홈
-        </button>
-      </p>
-      <p>
-        <button onclick="location.href = 'http://www.naver.com'">
-          회원관리
-        </button>
-      </p>
-      <p>
-        <button onclick="location.href = 'http://www.naver.com'">
-          재고관리
-        </button>
-      </p>
-    </div>
+    <nav>
+      <ul>
+        <li><a href="http://www.naver.com"> 관리 홈</a></li>
+        <li><a href="http://www.naver.com"> 회원관리</a></li>
+        <li><a href="http://www.naver.com"> 재고관리</a></li>
+      </ul>
+    </nav>
 
     <div>
-      <table border="3px">
-        회원정보
-        <tr>
-          <th>이름</th>
-          <th>아이디</th>
-          <th>이메일</th>
-          <th>비밀번호</th>
-          <th>주소</th>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
+      <table id="dataTable" border="1">
+        <caption>
+          <strong>회원정보</strong>
+        </caption>
+        <thead>
+          <tr>
+            <th>이름</th>
+            <th>아이디</th>
+            <th>이메일</th>
+            <th>비밀번호</th>
+            <th>주소</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- JSON 데이터 추가되는 곳 -->
+        </tbody>
       </table>
     </div>
+
+    <script>
+      const tableBody = document.querySelector("#dataTable tbody");
+
+      function loadTableData(data) {
+        tableBody.innerHTML = "";
+        data.forEach((item) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+              <td>${item.이름}</td>
+                    <td>${item.아이디}</td>
+                    <td>${item.이메일}</td>
+                    <td>${item.비밀번호}</td>
+                    <td>${item.주소}</td>`;
+          tableBody.appendChild(row);
+        });
+      }
+
+      fetch("")
+        .then((reponse) => response.json())
+        .then((data) => {
+          loadTableData(data);
+        })
+        .catch((error) => console.error("Error loading the JSON data:", error));
+    </script>
   </body>
 </html>
