@@ -50,23 +50,19 @@ public class CartItemController {
         return ResponseEntity.status(200).body(cartItemService.getCartItem(cartItemRequest));
     }
 
-    // get all cart items
     @GetMapping("/get-all")
-    public ResponseEntity<Response> getAllCartItems() {
-        log.info("get all cart items");
+    public ResponseEntity<Response> getAllCartItems(@RequestParam(required = false) Long userId) {
 
-        return ResponseEntity.status(200).body(cartItemService.getAllCartItems());
-    }
-
-    // get all cart items by user id
-    @GetMapping("/get-all/{userId}")
-    public ResponseEntity<Response> getAllCartItemsByUserId(@PathVariable Long userId) {
-        log.info("get all cart items by user id");
-
-        return ResponseEntity.status(200)
-                .body(
-                        cartItemService.getCartItems(
-                                CartItemRequest.builder().userId(userId).build()));
+        if (userId != null) {
+            log.info("get all cart items by user id");
+            return ResponseEntity.status(200)
+                    .body(
+                            cartItemService.getCartItems(
+                                    CartItemRequest.builder().userId(userId).build()));
+        } else {
+            log.info("get all cart items");
+            return ResponseEntity.status(200).body(cartItemService.getAllCartItems());
+        }
     }
 
     @GetMapping("/clear")
