@@ -3,7 +3,6 @@ package com.bit.joe.shoppingmall.service.Impl;
 import static com.bit.joe.shoppingmall.enums.OrderStatus.*;
 import static com.bit.joe.shoppingmall.enums.RequestType.*;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,27 +47,12 @@ public class OrderService {
      */
     public Response createOrder(OrderRequest orderRequest) {
 
-        // TODO: Do we need this check?
-        // Check if order already exists
-        boolean isOrderExist =
-                orderRepository
-                        .findByOrderDateAndUserId(
-                                orderRequest.getOrderDate(), orderRequest.getUserId())
-                        .isPresent();
-
-        // return error message if order already exists
-        if (isOrderExist) {
-            return Response.builder().status(400).message("Order already exists").build();
-        }
-
-        LocalDateTime orderDate = LocalDateTime.now();
-
         // make order entity and save it
         Order order =
                 Order.builder()
                         .user(userService.getLoginUser()) // get logged-in user
                         .status(OrderStatus.ORDER) // set order status to ORDER
-                        .orderDate(orderDate) // set order date to now
+                        .orderDate(orderRequest.getOrderDate()) // set order date to now
                         .build();
         Order orderSaved = orderRepository.save(order);
 
@@ -97,7 +81,7 @@ public class OrderService {
         orderItemRepository.saveAll(orderItems);
 
         // return success message
-        return Response.builder().message("Order created successfully").build();
+        return Response.builder().status(200).message("Order created successfully").build();
     }
 
     /**
