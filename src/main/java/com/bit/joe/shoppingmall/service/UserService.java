@@ -11,13 +11,11 @@ public interface UserService {
 
     Response updateUser(Long userId, UserDto userRequest);
 
-    Response getAllUsers();
+    Response deleteUser(Long userId);
 
     Response getUserById(Long userId);
 
     Response getUserByEmail(String email);
-
-    Response deleteUser(Long userId);
 
     Response login(String email, String password);
 
@@ -26,4 +24,6 @@ public interface UserService {
     Response withdraw(HttpSession session, UserDto userDto);
 
     User getLoginUser();
+
+    Response getAllUsers();
 }

@@ -1,8 +1,11 @@
 package com.bit.joe.shoppingmall.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bit.joe.shoppingmall.dto.UserDto;
 import com.bit.joe.shoppingmall.dto.response.Response;
+import com.bit.joe.shoppingmall.entity.User;
 import com.bit.joe.shoppingmall.enums.UserRole;
 import com.bit.joe.shoppingmall.service.UserService;
 
@@ -26,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
     private final UserService userService;
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @GetMapping("/get-all")
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -128,26 +133,70 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<Response> login(HttpSession session, @RequestBody UserDto userDto) {
-        session.removeAttribute("user");
-        // Set user to null -> logout user
+        //        session.removeAttribute("user");
+        //        // Set user to null -> logout user
+        //
+        //        Response resp = userService.login(userDto.getEmail(), userDto.getPassword());
+        //        // Login user with email and password and get response
+        //
+        //        session.setAttribute("user", resp.getUser());
+        //        // Set user to session
+        //
+        //        return ResponseEntity.status(HttpStatus.OK).body(resp);
+        //        // return success response with status code 200 (OK)
+
+        logger.info("Login attempt with email: {}", userDto.getEmail());
 
         Response resp = userService.login(userDto.getEmail(), userDto.getPassword());
-        // Login user with email and password and get response
+        if (resp.getStatus() == 200) {
+            logger.info("Login successful for user: {}", userDto.getEmail());
+        } else {
+            logger.error("Login failed for user: {}", userDto.getEmail());
+        }
 
-        session.setAttribute("user", resp.getUser());
-        // Set user to session
+        // Store essential user info in the session
+        session.setAttribute("userId", resp.getUser().getId());
+        session.setAttribute("userRole", resp.getUser().getRole());
+        logger.info("User session set for: {}", userDto.getEmail());
 
         return ResponseEntity.status(HttpStatus.OK).body(resp);
-        // return success response with status code 200 (OK)
+
+        //        // Perform login operation (check email and password)
+        //        Response resp = userService.login(userDto.getEmail(), userDto.getPassword());
+        //
+        //        // Log the result of login (success or failure)
+        //        if (resp.getStatus() == 200) {
+        //            logger.info("Login successful for user: {}", userDto.getEmail());
+        //        } else {
+        //            logger.error("Login failed for user: {}", userDto.getEmail());
+        //        }
+        //
+        //        // Set user to session (store in session if login is successful)
+        //        session.setAttribute("user", resp.getUser());
+        //        logger.info("User session set for: {}", userDto.getEmail());
+        //
+        //        // Return success response with status code 200
+        //        return ResponseEntity.status(HttpStatus.OK).body(resp);
     }
 
-    @GetMapping("/logout")
-    public ResponseEntity<Response> logout(HttpSession session) {
+    //    @GetMapping("/logout")
+    //    public ResponseEntity<Response> logout(HttpSession session) {
+    //
+    //        Response resp = userService.logout(session);
+    //        // Logout user and get response
+    //
+    //        return ResponseEntity.status(HttpStatus.OK).body(resp);
+    //    }
 
-        Response resp = userService.logout(session);
-        // Logout user and get response
-
-        return ResponseEntity.status(HttpStatus.OK).body(resp);
+    @GetMapping("/user/me")
+    public ResponseEntity<User> getLoggedInUser() {
+        try {
+            User user = userService.getLoginUser();
+            return ResponseEntity.ok(user); // If authenticated, return user info
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .build(); // If not authenticated, return 401
+        }
     }
 
     @GetMapping("/withdraw")

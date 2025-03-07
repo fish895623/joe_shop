@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -24,16 +24,10 @@
   <h1>이미지(이벤트로 넘기기)</h1>
 </div>
 <br />
-<div class="container">
-  <div><img src="image1.jpg" alt="이미지1" /></div>
-  <div><img src="image2.jpg" alt="이미지2" /></div>
-  <div><img src="image3.jpg" alt="이미지3" /></div>
-  <div><img src="image4.jpg" alt="이미지4" /></div>
-  <div><img src="image5.jpg" alt="이미지5" /></div>
-  <div><img src="image6.jpg" alt="이미지6" /></div>
-</div>
+
 
 <div th:replace="~{common/footer :: footer}"></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

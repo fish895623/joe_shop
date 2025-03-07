@@ -14,6 +14,9 @@ import com.bit.joe.shoppingmall.entity.User;
 import com.bit.joe.shoppingmall.exception.NotFoundException;
 import com.bit.joe.shoppingmall.repository.UserRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 public class CustomDaoAuthenticationProvider extends DaoAuthenticationProvider {
 
@@ -64,6 +67,7 @@ public class CustomDaoAuthenticationProvider extends DaoAuthenticationProvider {
         }
     }
 
+    @Slf4j
     @Component
     public static class CustomUserDetailsService implements UserDetailsService {
         private final UserRepository userRepository;
@@ -74,6 +78,7 @@ public class CustomDaoAuthenticationProvider extends DaoAuthenticationProvider {
 
         @Override
         public UserDetails loadUserByUsername(String email) {
+            log.info("Email Name: {}", email);
             User user =
                     userRepository
                             .findByEmail(email)

@@ -2,20 +2,56 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
+  <title>Login</title>
 </head>
-  <body>
-  <h1>로그인</h1>
-  <hr />
-  <p>이메일 : <input type="text" /></p>
-  <p>비밀번호 : <input type="text" /></p>
+<body>
+<h1>로그인</h1>
+<hr />
+<form class="form">
+  <p>이메일 : <input id="email" name="email" type="text" placeholder="Enter your email" /></p>
+  <p>비밀번호 : <input id="password" name="password" type="password" placeholder="Enter your password" /></p>
   <br />
-  <input type="submit" value="로그인하기" />
-  <br />
-  <p><a href="/user/signUp">아직 회원이 아니신가요?</a></p>
-  </body>
-</html>
+  <button type="submit">Log In</button>
+</form>
+<br />
+<p><a href="/user/signUp">아직 회원이 아니신가요?</a></p>
 
+<div id="error-message" style="color: red; display: none;">Invalid credentials. Please try again.</div>
+
+<script>
+  const formEl = document.querySelector('.form');
+  formEl.addEventListener('submit', event => {
+    event.preventDefault();
+
+    const formData = new FormData(formEl);
+    const data = Object.fromEntries(formData);
+
+    console.log(formData);
+    fetch('/user/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+      .then((res) => res.json())
+      .then((responseData) => {
+        if (responseData.status === 200) {
+          console.log('Login successful:', responseData);
+          window.location.href = '/'; // Redirect to main page after successful login
+        } else {
+          document.getElementById('error-message').style.display = 'block'; // Show error message if login fails
+          console.error('Login failed:', responseData);
+        }
+      })
+      .catch((error) => {
+        console.error('Error during login:', error);
+        document.getElementById('error-message').style.display = 'block'; // Show error message if fetch fails
+      });
+  });
+</script>
+
+</body>
+</html>

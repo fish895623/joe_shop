@@ -12,13 +12,15 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
-import org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy;
+import org.springframework.security.web.context.*;
 
 import com.bit.joe.shoppingmall.enums.UserRole;
+import com.bit.joe.shoppingmall.security.handler.CustomLogoutSuccessHandler;
 
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -34,8 +36,18 @@ public class SecurityConfig {
     }
 
     @Bean
+    public SecurityContextRepository securityContextRepository() {
+        return new DelegatingSecurityContextRepository(
+                new RequestAttributeSecurityContextRepository(),
+                new HttpSessionSecurityContextRepository());
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
+                //                .addFilterAfter(new
+                // SecurityContextPersistenceFilter(securityContextRepository()),
+                // SecurityContextPersistenceFilter.class)
                 .authorizeHttpRequests(
                         request ->
                                 request.requestMatchers("/user/get-all")
@@ -50,21 +62,29 @@ public class SecurityConfig {
                 .sessionManagement(
                         session ->
                                 session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                                        .sessionAuthenticationStrategy(
-                                                sessionAuthenticationStrategy())
-                                        .maximumSessions(1) // 동시 로그인 세션 수 제한
-                                        .expiredUrl("/login?expired=true")) // 세션 만료 시 리디렉션 URL
-                //                .rememberMe(rememberMe ->
-                //                        rememberMe.key("common-cookie-key") // remember-me 쿠키 키
-                //                                .tokenValiditySeconds(1209600)) // 14일 동안 로그인 유지
+                                        .maximumSessions(1)
+                                        .expiredUrl("/login?expired=true"))
+                .formLogin(
+                        httpSecurityFormLoginConfigurer -> {
+                            log.info("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+                            httpSecurityFormLoginConfigurer
+                                    .loginPage("/user/login")
+                                    .usernameParameter("email")
+                                    .passwordParameter("password");
+                        })
                 .logout(
                         logout ->
-                                logout.logoutUrl("/user/logout")
-                                        .logoutSuccessUrl("/login")
-                                        .invalidateHttpSession(true) // 로그아웃 시 세션 무효화
-                                        .clearAuthentication(true) // 인증 정보 초기화
-                                        .deleteCookies("JSESSIONID")) // JSESSIONID 쿠키 삭제
+                                logout.logoutUrl("/logout")
+                                        .logoutSuccessHandler(customLogoutSuccessHandler())
+                                        .invalidateHttpSession(true)
+                                        .clearAuthentication(true)
+                                        .deleteCookies("JSESSIONID"))
                 .build();
+    }
+
+    @Bean
+    public CustomLogoutSuccessHandler customLogoutSuccessHandler() {
+        return new CustomLogoutSuccessHandler();
     }
 
     @Bean
@@ -74,8 +94,6 @@ public class SecurityConfig {
         authenticationManagerBuilder.authenticationProvider(customAuthenticationProvider);
         authenticationManagerBuilder.authenticationProvider(customDaoAuthenticationProvider);
         return authenticationManagerBuilder.build();
-        // Provider의 authenticate() 메서드에서 전달된 토큰을 검증 -> 인증이 성공하면 Authentication 객체를
-        // 반환(SecurityContext에 저장)
     }
 
     @Bean
@@ -83,19 +101,8 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(12);
     }
 
-    // ======================================== undeveloped yet
-    // ========================================
-    @Bean
-    public SessionAuthenticationStrategy sessionAuthenticationStrategy() {
-        return new SessionFixationProtectionStrategy();
-    }
-
     @PostConstruct
     public void init() {
         SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
     }
-
-    // ======================================== undeveloped yet
-    // ========================================
-
 }
