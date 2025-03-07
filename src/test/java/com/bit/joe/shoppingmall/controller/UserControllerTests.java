@@ -5,7 +5,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Base64;
+import com.bit.joe.shoppingmall.dto.UserDto;
+import com.bit.joe.shoppingmall.entity.User;
+import com.bit.joe.shoppingmall.enums.UserGender;
+import com.bit.joe.shoppingmall.enums.UserRole;
+import com.bit.joe.shoppingmall.mapper.UserMapper;
+import com.bit.joe.shoppingmall.repository.*;
+import com.bit.joe.shoppingmall.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.transaction.Transactional;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,91 +22,67 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.bit.joe.shoppingmall.config.MySQLContainerConfig;
-import com.bit.joe.shoppingmall.dto.UserDto;
-import com.bit.joe.shoppingmall.entity.User;
-import com.bit.joe.shoppingmall.enums.UserGender;
-import com.bit.joe.shoppingmall.enums.UserRole;
-import com.bit.joe.shoppingmall.mapper.UserMapper;
-import com.bit.joe.shoppingmall.repository.CategoryRepository;
-import com.bit.joe.shoppingmall.repository.UserRepository;
-import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
-import com.bit.joe.shoppingmall.service.Impl.UserServiceImpl;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Base64;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.servlet.http.HttpSession;
-import jakarta.transaction.Transactional;
-
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestMethodOrder(MethodOrderer.Random.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Testcontainers
+@TestPropertySource("classpath:application-test.properties")
 @AutoConfigureMockMvc
 @Transactional
-@ContextConfiguration(initializers = MySQLContainerConfig.class)
 public class UserControllerTests {
-    @Container public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:lts");
-
-    UserDto userDto =
-            UserDto.builder()
-                    .name("admin")
-                    .password("admin")
-                    .email("admin@example.com")
-                    .role(UserRole.ADMIN)
-                    .gender(UserGender.MALE)
-                    .birth("2021-01-01")
-                    .active(true)
-                    .build();
-
-    String basicAuthHeader =
-            "Basic "
-                    + Base64.getEncoder()
-                            .encodeToString(
-                                    (userDto.getEmail() + userDto.getPassword()).getBytes());
-
+    User adminEntity, userEntity;
+    String adminBasicAuth, userBasicAuth;
     MockHttpSession mockHttpSession = new MockHttpSession();
-
-    private MockMvc mockMvc;
-
+    @Autowired private MockMvc mockMvc;
     @Autowired private UserRepository userRepository;
-    @Autowired private CategoryRepository categoryRepository;
-    @Autowired private UserServiceImpl userService;
-    @Autowired private CategoryServiceImpl categoryService;
-    @Autowired private HttpSession session;
-    @Autowired private CategoryController categoryController;
-    @PersistenceContext private EntityManager entityManager;
-
-    @BeforeAll
-    static void setUpContainer() {
-        mySQLContainer.start();
-    }
-
-    @AfterAll
-    static void stopContainer() {
-        mySQLContainer.stop();
-    }
+    @Autowired private UserService userService;
 
     @BeforeEach
     public void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new UserController(userService)).build();
+        adminEntity =
+            User.builder()
+                .name("admin")
+                .gender(UserGender.MALE)
+                .role(UserRole.ADMIN)
+                .birth("2021-01-01")
+                .email("admin@example.com")
+                .password("admin")
+                .active(true)
+                .build();
+        userEntity =
+            User.builder()
+                .name("user")
+                .password("user")
+                .email("user@example.com")
+                .role(UserRole.USER)
+                .gender(UserGender.MALE)
+                .birth("2021-01-01")
+                .active(true)
+                .build();
+        adminBasicAuth =
+            "Basic "
+                + Base64.getEncoder()
+                .encodeToString(
+                    (adminEntity.getEmail() + ":" + adminEntity.getPassword())
+                        .getBytes());
+        userBasicAuth =
+            "Basic "
+                + Base64.getEncoder()
+                .encodeToString(
+                    (userEntity.getEmail() + ":" + userEntity.getPassword())
+                        .getBytes());
     }
 
     @Test
     @DisplayName("Register admin user")
-    @Order(1)
     public void registerAdminUser() throws Exception {
+        // prepare data
+        String userDtoJson = new ObjectMapper().writeValueAsString(UserMapper.toDto(adminEntity));
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String userDtoJson = objectMapper.writeValueAsString(userDto);
-
+        // test
         mockMvc.perform(
                         post("/user/register")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -107,21 +92,31 @@ public class UserControllerTests {
 
     @Test
     @DisplayName("Get all users")
-    @Order(2)
     public void getAllUsers() throws Exception {
+        userService.createUser(UserMapper.toDto(adminEntity));
 
         MockHttpSession mockHttpSession = new MockHttpSession();
 
         mockMvc.perform(
                         get("/user/get-all")
-                                .header("Authorization", basicAuthHeader)
+                                .header("Authorization", adminBasicAuth)
                                 .session(mockHttpSession))
                 .andExpect(status().isOk());
+
+        mockMvc.perform(
+                        get("/user/get-all")
+                                .header("Authorization", userBasicAuth)
+                                .session(mockHttpSession))
+                .andExpect(
+                        result -> {
+                            var status = result.getResponse().getStatus();
+                            Assertions.assertTrue(
+                                    status >= 400 && status < 500, "User cannot get all users");
+                        });
     }
 
     @Test
     @DisplayName("Register user with empty body")
-    @Order(3)
     public void registerUserWithEmptyBody() throws Exception {
         UserDto userDto = new UserDto();
 
@@ -137,21 +132,18 @@ public class UserControllerTests {
 
     @Test
     @DisplayName("Login user")
-    @Order(4)
     public void loginUser() throws Exception {
-        userRepository.save(UserMapper.toEntity(userDto));
+        userService.createUser(UserMapper.toDto(userEntity));
 
         MockHttpSession mockHttpSession = new MockHttpSession();
-        String basicAuthHeader =
-                "Basic " + Base64.getEncoder().encodeToString("admin@example.com:admin".getBytes());
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String userDtoJson = objectMapper.writeValueAsString(userDto);
+        String userDtoJson = objectMapper.writeValueAsString(UserMapper.toDto(userEntity));
 
         mockMvc.perform(
                         post("/user/login")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", basicAuthHeader)
+                                .header("Authorization", userBasicAuth)
                                 .content(userDtoJson)
                                 .session(mockHttpSession))
                 .andExpect(status().isOk());
@@ -159,52 +151,47 @@ public class UserControllerTests {
 
     @Test
     @DisplayName("Update user")
-    @Order(5)
     public void updateUser() throws Exception {
-        User user = userRepository.save(UserMapper.toEntity(userDto));
+        // Save the user entity to the repository
+        userEntity = userRepository.save(userEntity);
 
+        // Create a mock HTTP session and set the user attribute
         MockHttpSession mockHttpSession = new MockHttpSession();
-        mockHttpSession.setAttribute("user", UserMapper.toDto(user));
+        mockHttpSession.setAttribute("user", UserMapper.toDto(userEntity));
 
-        UserDto userDto = new UserDto();
-        userDto.setEmail("admin@example.com");
-        userDto.setName("admin");
-        userDto.setPassword("admin");
-        userDto.setRole(UserRole.ADMIN);
-        userDto.setGender(UserGender.FEMALE);
-        userDto.setBirth("2021-01-01");
-        userDto.setActive(true);
+        // Create a UserDto from the saved user entity and modify it
+        UserDto userDto = UserMapper.toDto(userEntity);
+        userDto.setActive(false);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String userDtoJson = objectMapper.writeValueAsString(userDto);
+        // Convert the UserDto to JSON
+        String userDtoJson = new ObjectMapper().writeValueAsString(userDto);
 
+        // Perform the PUT request to update the user
         mockMvc.perform(
-                        put("/user/update/3")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(userDtoJson)
-                                .header("Authorization", basicAuthHeader)
-                                .session(mockHttpSession))
-                .andExpect(status().isOk());
+                put("/user/update/" + userEntity.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(userDtoJson)
+                    .header("Authorization", userBasicAuth)
+                    .session(mockHttpSession))
+            .andExpect(status().isOk());
     }
 
     // 유저 탈퇴 테스트
     @Test
     @DisplayName("Withdraw user")
-    @Order(6)
     public void withdrawUser() throws Exception {
-
-        User user = userRepository.save(UserMapper.toEntity(userDto));
+        userRepository.save(userEntity);
 
         MockHttpSession mockHttpSession = new MockHttpSession();
-        mockHttpSession.setAttribute("user", UserMapper.toDto(user));
+        mockHttpSession.setAttribute("user", UserMapper.toDto(userEntity));
 
-        String userDtoJson = new ObjectMapper().writeValueAsString(UserMapper.toDto(user));
+        String userDtoJson = new ObjectMapper().writeValueAsString(UserMapper.toDto(userEntity));
 
         mockMvc.perform(
                         get("/user/withdraw")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(userDtoJson)
-                                .header("Authorization", basicAuthHeader)
+                                .header("Authorization", userBasicAuth)
                                 .session(mockHttpSession))
                 .andExpect(status().isOk());
     }
