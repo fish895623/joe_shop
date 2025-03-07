@@ -102,6 +102,7 @@ public class OrderService {
 
     /**
      * {@summary} Change order status
+     *
      * @param orderRequest 주문 요청 객체
      */
     public Response changeOrderStatus(OrderRequest orderRequest) {
@@ -124,11 +125,11 @@ public class OrderService {
 
     /**
      * {@summary} Check if condition for progress request is ok
+     *
      * @param orderStatus 주문 상태
      * @param requestType 요청 타입
      * @return Boolean
-
-         */
+     */
     public Boolean isConditionOk(OrderStatus orderStatus, RequestType requestType) {
         Map<OrderStatus, RequestType> mapping = new HashMap<>();
         mapping.put(CONFIRM, REQUEST_CANCEL);
@@ -144,8 +145,8 @@ public class OrderService {
 
     /**
      * {@summary} Progress order request
+     *
      * @param orderRequest 주문 요청 객체
-
      * @return Response
      */
     public Response progressOrderRequest(OrderRequest orderRequest) {
@@ -188,6 +189,7 @@ public class OrderService {
 
     /**
      * {@summary} Get order
+     *
      * @param userId 유저 아이디
      * @param orderId 주문 아이디
      * @return Response

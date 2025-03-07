@@ -11,6 +11,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
     /**
      * Find all order items by order
+     *
      * @param order 찾고자 하는 주문 아이템을 가지고 있는 주문
      * @return List<OrderItem>
      */
