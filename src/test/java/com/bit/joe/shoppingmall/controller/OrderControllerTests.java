@@ -1,8 +1,11 @@
 package com.bit.joe.shoppingmall.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
 
@@ -15,11 +18,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.bit.joe.shoppingmall.dto.*;
 import com.bit.joe.shoppingmall.dto.request.CartRequest;
 import com.bit.joe.shoppingmall.dto.request.OrderRequest;
+import com.bit.joe.shoppingmall.enums.OrderStatus;
+import com.bit.joe.shoppingmall.enums.RequestType;
 import com.bit.joe.shoppingmall.enums.UserGender;
 import com.bit.joe.shoppingmall.enums.UserRole;
 import com.bit.joe.shoppingmall.repository.CartRepository;
@@ -29,9 +33,12 @@ import com.bit.joe.shoppingmall.service.Impl.CartService;
 import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
 import com.bit.joe.shoppingmall.service.Impl.ProductServiceImpl;
 import com.bit.joe.shoppingmall.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import jakarta.transaction.Transactional;
 
+/** OrderControllerTests */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource("classpath:application-test.properties")
@@ -147,19 +154,22 @@ public class OrderControllerTests {
     /**
      * Test create order
      *
-     * @throws Exception
+     * @throws Exception if the test fails
      */
     @Test
-    void createOrder() throws Exception {
+    void orderApiTest() throws Exception {
         // prepare request data
         List<Long> cartItemIds = List.of(1L, 2L, 3L);
-
-        // create order request
+        LocalDateTime orderDate = LocalDateTime.now();
         OrderRequest orderRequest =
-                OrderRequest.builder().userId(1L).cartItemIds(cartItemIds).build();
-
-        // convert to json
-        var insertData = new ObjectMapper().writeValueAsString(orderRequest);
+                OrderRequest.builder()
+                        .userId(1L)
+                        .cartItemIds(cartItemIds)
+                        .orderDate(orderDate)
+                        .build();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        var insertData = objectMapper.writeValueAsString(orderRequest);
 
         // perform request
         mockMvc.perform(
@@ -168,5 +178,50 @@ public class OrderControllerTests {
                                 .content(insertData)
                                 .header("Authorization", userBasicAuth))
                 .andExpect(status().isOk());
+
+        // prepare request data
+        orderRequest = OrderRequest.builder().orderId(1L).status(OrderStatus.DELIVERED).build();
+        insertData = new ObjectMapper().writeValueAsString(orderRequest);
+
+        // check change-status api is working
+        mockMvc.perform(
+                        get("/api/order/change-status")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(insertData))
+                .andExpect(status().isOk());
+
+        // check get api is working and also check the status-change worked
+        mockMvc.perform(get("/api/order/get/1/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.order.id").value(1))
+                .andExpect(jsonPath("$.order.user.id").value(1))
+                .andExpect(jsonPath("$.order.status").value(OrderStatus.DELIVERED.name()));
+
+        // bad request
+        // -> Order not found
+        mockMvc.perform(get("/api/order/get/1/2")).andExpect(status().is4xxClientError());
+
+        // prepare request data
+        orderRequest =
+                OrderRequest.builder().requestType(RequestType.REQUEST_RETURN).orderId(1L).build();
+        insertData = new ObjectMapper().writeValueAsString(orderRequest);
+
+        // check request api is working
+        mockMvc.perform(
+                        get("/api/order/request")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(insertData))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/order/get/1/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.order.status").value(OrderStatus.RETURN_REQUESTED.name()));
+
+        // make bad request
+        // -> request type is not valid
+        mockMvc.perform(
+                        get("/api/order/request")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(insertData))
+                .andExpect(status().is4xxClientError());
     }
 }
