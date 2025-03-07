@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class MemberController {
     @GetMapping
     public String index() {
-        return "admin/member"; // Html 페이지로 이동
+        return "admin/member";
     }
 }
