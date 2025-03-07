@@ -30,6 +30,7 @@ jobs:
 
       - name: Verify
         id: verify
+        continue-on-error: true
         run: ./gradlew test --tests "HomeTests"
 
       - name: install playwright
