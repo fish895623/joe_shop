@@ -19,9 +19,11 @@ import com.bit.joe.shoppingmall.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -128,6 +130,8 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<Response> login(HttpSession session, @RequestBody UserDto userDto) {
+        log.info("Login User: {}", session.getAttributeNames());
+        log.info(userDto.toString());
         session.removeAttribute("user");
         // Set user to null -> logout user
 

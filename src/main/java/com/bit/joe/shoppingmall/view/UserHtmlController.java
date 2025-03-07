@@ -1,8 +1,8 @@
-package com.bit.joe.shoppingmall.controller;
+package com.bit.joe.shoppingmall.view;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/user")
@@ -15,7 +15,7 @@ public class UserHtmlController {
 
     @GetMapping("/login")
     public String Login() {
-        return "user/login";
+        return "login";
     }
 
     @GetMapping("/signUp")
