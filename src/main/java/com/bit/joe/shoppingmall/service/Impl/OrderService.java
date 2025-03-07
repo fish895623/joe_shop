@@ -69,13 +69,6 @@ public class OrderService {
                         .build();
         Order orderSaved = orderRepository.save(order);
 
-        // get saved order entity(with id)
-        //        Order orderSaved =
-        //                orderRepository
-        //                        .findByOrderDateAndUserId(
-        //                            orderDate, orderRequest.getUserId())
-        //                        .orElseThrow(() -> new RuntimeException("Order not found"));
-
         // Make orderItems after saving order entity, because orderItem needs orderId to be saved.
         List<OrderItem> orderItems =
                 orderRequest.getCartItemIds().stream()
@@ -152,7 +145,7 @@ public class OrderService {
      * {@summary} Progress order request
      *
      * @param orderRequest
-     * @return
+     * @return Response
      */
     public Response progressOrderRequest(OrderRequest orderRequest) {
 
