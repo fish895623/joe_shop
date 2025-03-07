@@ -10,15 +10,18 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.bit.joe.shoppingmall.dto.OrderDto;
 import com.bit.joe.shoppingmall.dto.request.OrderRequest;
 import com.bit.joe.shoppingmall.dto.response.Response;
 import com.bit.joe.shoppingmall.entity.CartItem;
 import com.bit.joe.shoppingmall.entity.Order;
 import com.bit.joe.shoppingmall.entity.OrderItem;
+import com.bit.joe.shoppingmall.entity.User;
 import com.bit.joe.shoppingmall.enums.OrderStatus;
 import com.bit.joe.shoppingmall.enums.RequestType;
 import com.bit.joe.shoppingmall.exception.NotFoundException;
 import com.bit.joe.shoppingmall.mapper.OrderItemMapper;
+import com.bit.joe.shoppingmall.mapper.OrderMapper;
 import com.bit.joe.shoppingmall.repository.CartItemRepository;
 import com.bit.joe.shoppingmall.repository.OrderItemRepository;
 import com.bit.joe.shoppingmall.repository.OrderRepository;
@@ -40,7 +43,7 @@ public class OrderService {
     /**
      * {@summary} Create an order
      *
-     * @param orderRequest
+     * @param orderRequest 주문 요청 객체
      * @return Response
      */
     public Response createOrder(OrderRequest orderRequest) {
@@ -99,9 +102,7 @@ public class OrderService {
 
     /**
      * {@summary} Change order status
-     *
-     * @param orderRequest
-     * @return
+     * @param orderRequest 주문 요청 객체
      */
     public Response changeOrderStatus(OrderRequest orderRequest) {
 
@@ -123,11 +124,11 @@ public class OrderService {
 
     /**
      * {@summary} Check if condition for progress request is ok
-     *
-     * @param orderStatus
-     * @param requestType
-     * @return
-     */
+     * @param orderStatus 주문 상태
+     * @param requestType 요청 타입
+     * @return Boolean
+
+         */
     public Boolean isConditionOk(OrderStatus orderStatus, RequestType requestType) {
         Map<OrderStatus, RequestType> mapping = new HashMap<>();
         mapping.put(CONFIRM, REQUEST_CANCEL);
@@ -143,8 +144,8 @@ public class OrderService {
 
     /**
      * {@summary} Progress order request
-     *
-     * @param orderRequest
+     * @param orderRequest 주문 요청 객체
+
      * @return Response
      */
     public Response progressOrderRequest(OrderRequest orderRequest) {
@@ -183,5 +184,43 @@ public class OrderService {
 
         // return success message
         return Response.builder().status(200).message("Order request progress").build();
+    }
+
+    /**
+     * {@summary} Get order
+     * @param userId 유저 아이디
+     * @param orderId 주문 아이디
+     * @return Response
+     */
+    public Response getOrder(Long userId, Long orderId) {
+        User loginUser = userService.getLoginUser();
+        // get authentication from the context holder
+
+        // compare userId from the context holder and userId from the request
+        if (!userId.equals(loginUser.getId())) {
+            return Response.builder().status(405).message("Can not get other user's order").build();
+        }
+
+        // get order object
+        Order order = orderRepository.findById(orderId).orElse(null);
+
+        // if order is null, return error message
+        if (order == null) {
+            return Response.builder().status(404).message("Order not found").build();
+        }
+
+        // Order Items setting
+        List<OrderItem> orderItems = orderItemRepository.findByOrder(order);
+        order.setOrderItems(orderItems);
+
+        // Convert order to OrderDto
+        OrderDto orderDto = OrderMapper.toDto(order);
+
+        // return success message
+        return Response.builder()
+                .status(200)
+                .message("Get order successfully")
+                .order(orderDto)
+                .build();
     }
 }
