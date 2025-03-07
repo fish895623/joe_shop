@@ -24,13 +24,8 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: "temurin"
-
-      - name: Verify
-        id: verify
-        run: ./gradlew test --tests "HomeTests"
-
+          
       - name: install playwright
-        if: steps.verify.outputs.result == 'failure'
         run: ./gradlew installPlaywright --args="install-deps"
 
       - name: Gradle Test
