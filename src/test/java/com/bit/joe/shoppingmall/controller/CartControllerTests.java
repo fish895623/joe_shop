@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -18,17 +19,10 @@ import com.bit.joe.shoppingmall.entity.Product;
 import com.bit.joe.shoppingmall.entity.User;
 import com.bit.joe.shoppingmall.enums.UserGender;
 import com.bit.joe.shoppingmall.enums.UserRole;
-import com.bit.joe.shoppingmall.mapper.CategoryMapper;
-import com.bit.joe.shoppingmall.mapper.ProductMapper;
 import com.bit.joe.shoppingmall.mapper.UserMapper;
 import com.bit.joe.shoppingmall.repository.*;
-import com.bit.joe.shoppingmall.service.Impl.CartService;
-import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
-import com.bit.joe.shoppingmall.service.Impl.ProductServiceImpl;
 import com.bit.joe.shoppingmall.service.UserService;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 
 @TestMethodOrder(MethodOrderer.Random.class)
@@ -36,6 +30,7 @@ import jakarta.transaction.Transactional;
 @TestPropertySource("classpath:application-test.properties")
 @AutoConfigureMockMvc
 @Transactional
+@Rollback
 class CartControllerTests {
     User adminEntity =
             User.builder()
@@ -69,18 +64,9 @@ class CartControllerTests {
                                             .getBytes());
     MockHttpSession mockHttpSession = new MockHttpSession();
     @Autowired private MockMvc mockMvc;
-    @Autowired private UserRepository userRepository;
     @Autowired private CategoryRepository categoryRepository;
-    @Autowired private CategoryServiceImpl categoryService;
     @Autowired private ProductRepository productRepository;
-    @Autowired private ProductServiceImpl productService;
-    @Autowired private CartController cartController;
-    @Autowired private CartService cartService;
-    @Autowired private CartRepository cartRepository;
     @Autowired private UserService userService;
-    @Autowired private CartItemRepository cartItemRepository;
-
-    @PersistenceContext private EntityManager entityManager;
 
     @BeforeEach
     public void setUp() {
@@ -89,28 +75,21 @@ class CartControllerTests {
         userService.createUser(UserMapper.toDto(userEntity));
 
         // Prepare data
-        Category category = Category.builder().id(1L).categoryName("Test Category").build();
-        categoryService.createCategory(CategoryMapper.categoryToDto(category));
+        Category category = Category.builder().categoryName("Test Category").build();
+        category = categoryRepository.save(category);
 
         Product product =
                 Product.builder()
-                        .id(1L)
                         .name("Test Product")
                         .category(category)
                         .imageURL("image")
                         .quantity(10)
                         .price(1000)
                         .build();
-        var productDto = ProductMapper.toDto(product);
-
-        productService.createProduct(
-                productDto.getCategory().getId(),
-                productDto.getImageUrl(),
-                productDto.getName(),
-                productDto.getQuantity(),
-                productDto.getPrice());
+        productRepository.save(product);
 
         categoryRepository.flush();
+        productRepository.flush();
     }
 
     @Test
