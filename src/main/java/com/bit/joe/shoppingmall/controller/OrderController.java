@@ -25,22 +25,30 @@ public class OrderController {
 
     @PostMapping("/create")
     public ResponseEntity<Response> createOrder(@RequestBody OrderRequest orderRequest) {
-        return ResponseEntity.ok(orderService.createOrder(orderRequest));
+        Response resp = orderService.createOrder(orderRequest);
+
+        return ResponseEntity.status(resp.getStatus()).body(resp);
     }
 
     @GetMapping("/get/{userId}/{orderId}")
     public ResponseEntity<Response> getOrder(
             @PathVariable Long userId, @PathVariable Long orderId) {
-        return ResponseEntity.ok(orderService.getOrder(userId, orderId));
+        Response resp = orderService.getOrder(userId, orderId);
+
+        return ResponseEntity.status(resp.getStatus()).body(resp);
     }
 
     @GetMapping("/change-status")
     public ResponseEntity<Response> changeStatus(@RequestBody OrderRequest orderRequest) {
-        return ResponseEntity.ok(orderService.changeOrderStatus(orderRequest));
+        Response resp = orderService.changeOrderStatus(orderRequest);
+
+        return ResponseEntity.status(resp.getStatus()).body(resp);
     }
 
     @GetMapping("/request")
     public ResponseEntity<Response> requestHandle(@RequestBody OrderRequest orderRequest) {
-        return ResponseEntity.ok(orderService.progressOrderRequest(orderRequest));
+        Response resp = orderService.progressOrderRequest(orderRequest);
+
+        return ResponseEntity.status(resp.getStatus()).body(resp);
     }
 }
