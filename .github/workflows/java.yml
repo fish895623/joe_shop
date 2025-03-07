@@ -4,7 +4,7 @@ run-name: JavaGradle
 on:
   pull_request:
     branches: [ "master" ]
-    types: [ synchronize, ready_for_review ] 
+    types: [ synchronize, ready_for_review ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
@@ -39,6 +39,20 @@ jobs:
           files: ./build/reports/jacoco/test/jacocoTestReport.xml
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  lint:
+    runs-on: "self-hosted"
+
+    steps:
+      - uses: actions/checkout@main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Apply Prettier
+        run: npx prettier -w "src/main/resources/templates/**/*.html"
+
+      - name: Check Prettier
+        run: git diff --exit-code
 
   build:
     runs-on: "self-hosted"
