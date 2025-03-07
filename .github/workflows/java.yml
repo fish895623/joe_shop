@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   test:
-    runs-on: "Linux"
+    runs-on: self-hosted
     timeout-minutes: 10
     permissions:
       contents: read
@@ -40,7 +40,7 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   lint:
-    runs-on: "self-hosted"
+    runs-on: self-hosted
 
     steps:
       - uses: actions/checkout@main
@@ -55,7 +55,7 @@ jobs:
         run: git diff --exit-code
 
   build:
-    runs-on: "self-hosted"
+    runs-on: self-hosted
     timeout-minutes: 10
     permissions:
       contents: read
