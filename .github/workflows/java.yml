@@ -3,8 +3,8 @@ run-name: JavaGradle
 
 on:
   pull_request:
-    branches: [ "master" ]
-    types: [ synchronize, ready_for_review, opened ]
+    branches: ["master"]
+    types: [synchronize, ready_for_review, opened]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
@@ -14,6 +14,7 @@ jobs:
   test:
     runs-on: self-hosted
     timeout-minutes: 10
+    needs: [lint, build]
     permissions:
       contents: read
 
@@ -74,9 +75,9 @@ jobs:
       - name: Check Prettier
         run: git diff --exit-code
 
-
   build:
     runs-on: self-hosted
+    needs: lint
     timeout-minutes: 10
     permissions:
       contents: read
