@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -21,11 +21,12 @@
         </caption>
         <thead>
           <tr>
-            <th>이름</th>
-            <th>아이디</th>
-            <th>이메일</th>
-            <th>비밀번호</th>
-            <th>주소</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Password</th>
+            <th>Birth</th>
+            <th>Gender</th>
+            <th>Role</th>
           </tr>
         </thead>
         <tbody>
@@ -35,26 +36,36 @@
     </div>
 
     <script>
-      const tableBody = document.querySelector("#dataTable tbody");
-
       function loadTableData(data) {
+        const tableBody = document.querySelector("#dataTable tbody");
         tableBody.innerHTML = "";
         data.forEach((item) => {
+          console.log("Processing item:", item);
           const row = document.createElement("tr");
           row.innerHTML = `
-              <td>${item.이름}</td>
-                    <td>${item.아이디}</td>
-                    <td>${item.이메일}</td>
-                    <td>${item.비밀번호}</td>
-                    <td>${item.주소}</td>`;
+              <td>${item.name}</td>
+                    <td>${item.email}</td>
+                    <td>${"*".repeat(8)}</td>
+                    <td>${item.birth}</td>
+                    <td>${item.gender}</td>
+                    <td>${item.role}</td>`;
           tableBody.appendChild(row);
         });
       }
 
-      fetch("")
+      fetch("/user/get-all", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
         .then((response) => response.json())
         .then((data) => {
-          loadTableData(data);
+          console.log(data); // 전체 응답 데이터를 로그로 출력
+          if (data.status === 200 && data.userList) {
+            loadTableData(data.userList);
+          } else {
+            console.error("데이터 로드 실패:", data.message);
+          }
         })
         .catch((error) => console.error("Error loading the JSON data:", error));
     </script>
