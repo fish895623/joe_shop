@@ -130,5 +130,4 @@ spotless {
 tasks.register('installPlaywright', JavaExec) {
     mainClass = 'com.microsoft.playwright.CLI'
     classpath = sourceSets.main.runtimeClasspath
-    args = ['install', '--with-deps']
 }

@@ -3,7 +3,8 @@ run-name: JavaGradle
 
 on:
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
+    types: [synchronize, ready_for_review, opened]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
@@ -11,8 +12,9 @@ concurrency:
 
 jobs:
   test:
-    runs-on: "Linux"
+    runs-on: self-hosted
     timeout-minutes: 10
+    needs: [lint, build]
     permissions:
       contents: read
 
@@ -27,10 +29,18 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Verify
+        id: verify
+        run: ./gradlew test --tests "HomeTests"
+
+      - name: install playwright
+        if: steps.verify.outputs.result == 'failure'
+        run: ./gradlew installPlaywright --args="install-deps"
+
       - name: Gradle Test
         id: test
         continue-on-error: true
-        run: ./gradlew test --max-workers 2
+        run: ./gradlew test
 
       - uses: codecov/codecov-action@v5
         continue-on-error: true
@@ -38,17 +48,16 @@ jobs:
           files: ./build/reports/jacoco/test/jacocoTestReport.xml
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-  build:
-    runs-on: "self-hosted"
-    timeout-minutes: 10
-    permissions:
-      contents: read
+  lint:
+    runs-on: self-hosted
 
     steps:
       - uses: actions/checkout@main
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - uses: actions/setup-java@v4
         with:
           java-version: "17"
           distribution: "temurin"
@@ -56,8 +65,31 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Apply Prettier
+        run: npx prettier -w "src/main/resources/templates/**/*.html"
+
       - name: spotless Check
-        run: ./gradlew spotlessCheck
+        run: ./gradlew spotlessApply
+
+      - name: Check Prettier
+        run: git diff --exit-code
+
+  build:
+    runs-on: self-hosted
+    needs: lint
+    timeout-minutes: 10
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@main
+      - uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Build with Gradle Wrapper
-        run: ./gradlew build -x test -x spotlessCheck --max-workers 2
+        run: ./gradlew build -x test -x spotlessCheck

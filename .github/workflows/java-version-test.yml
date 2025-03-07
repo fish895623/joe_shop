@@ -4,9 +4,13 @@ on:
   push:
     branches: [ "master" ]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
-    runs-on: "Linux"
+    runs-on: self-hosted
     permissions:
       contents: read
     strategy:
@@ -20,11 +24,14 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: "temurin"
+          
+      - name: install playwright
+        run: ./gradlew installPlaywright --args="install-deps"
 
       - name: Gradle Test
         id: test
         continue-on-error: true
-        run: ./gradlew test -x spotlessCheck --max-workers 2
+        run: ./gradlew test
 
       - uses: codecov/codecov-action@v5
         with:

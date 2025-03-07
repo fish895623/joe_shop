@@ -34,6 +34,11 @@ public class SecurityConfig {
     }
 
     @Bean
+    public static BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder(12);
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
@@ -76,11 +81,6 @@ public class SecurityConfig {
         return authenticationManagerBuilder.build();
         // Provider의 authenticate() 메서드에서 전달된 토큰을 검증 -> 인증이 성공하면 Authentication 객체를
         // 반환(SecurityContext에 저장)
-    }
-
-    @Bean
-    public static BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder(12);
     }
 
     // ======================================== undeveloped yet
