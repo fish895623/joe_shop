@@ -4,6 +4,9 @@ on:
   push:
     branches: [ "master" ]
 
+concurrency:
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: "Linux"
