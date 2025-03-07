@@ -16,9 +16,6 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: read
-    container:
-      image: mcr.microsoft.com/playwright/java:v1.50.0-noble
-      options: --user 1001
 
     steps:
       - uses: actions/checkout@main
@@ -30,6 +27,14 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+
+      - name: Verify
+        id: verify
+        run: ./gradlew test --tests "HomeTests"
+
+      - name: install playwright
+        if: steps.verify.outputs.result == 'failure'
+        run: ./gradlew installPlaywright --args="install-deps chrome"
 
       - name: Gradle Test
         id: test
