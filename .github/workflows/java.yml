@@ -35,7 +35,7 @@ jobs:
 
       - name: install playwright
         if: steps.verify.outputs.result == 'failure'
-        run: ./gradlew installPlaywright --args="install-deps chrome"
+        run: ./gradlew installPlaywright --args="install --with-deps"
 
       - name: Gradle Test
         id: test
