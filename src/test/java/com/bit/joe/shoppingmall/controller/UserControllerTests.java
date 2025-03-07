@@ -5,16 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.bit.joe.shoppingmall.dto.UserDto;
-import com.bit.joe.shoppingmall.entity.User;
-import com.bit.joe.shoppingmall.enums.UserGender;
-import com.bit.joe.shoppingmall.enums.UserRole;
-import com.bit.joe.shoppingmall.mapper.UserMapper;
-import com.bit.joe.shoppingmall.repository.*;
-import com.bit.joe.shoppingmall.service.UserService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import jakarta.transaction.Transactional;
+import java.util.Base64;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +16,16 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Base64;
+import com.bit.joe.shoppingmall.dto.UserDto;
+import com.bit.joe.shoppingmall.entity.User;
+import com.bit.joe.shoppingmall.enums.UserGender;
+import com.bit.joe.shoppingmall.enums.UserRole;
+import com.bit.joe.shoppingmall.mapper.UserMapper;
+import com.bit.joe.shoppingmall.repository.*;
+import com.bit.joe.shoppingmall.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.transaction.Transactional;
 
 @TestMethodOrder(MethodOrderer.Random.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -43,37 +43,37 @@ public class UserControllerTests {
     @BeforeEach
     public void setUp() {
         adminEntity =
-            User.builder()
-                .name("admin")
-                .gender(UserGender.MALE)
-                .role(UserRole.ADMIN)
-                .birth("2021-01-01")
-                .email("admin@example.com")
-                .password("admin")
-                .active(true)
-                .build();
+                User.builder()
+                        .name("admin")
+                        .gender(UserGender.MALE)
+                        .role(UserRole.ADMIN)
+                        .birth("2021-01-01")
+                        .email("admin@example.com")
+                        .password("admin")
+                        .active(true)
+                        .build();
         userEntity =
-            User.builder()
-                .name("user")
-                .password("user")
-                .email("user@example.com")
-                .role(UserRole.USER)
-                .gender(UserGender.MALE)
-                .birth("2021-01-01")
-                .active(true)
-                .build();
+                User.builder()
+                        .name("user")
+                        .password("user")
+                        .email("user@example.com")
+                        .role(UserRole.USER)
+                        .gender(UserGender.MALE)
+                        .birth("2021-01-01")
+                        .active(true)
+                        .build();
         adminBasicAuth =
-            "Basic "
-                + Base64.getEncoder()
-                .encodeToString(
-                    (adminEntity.getEmail() + ":" + adminEntity.getPassword())
-                        .getBytes());
+                "Basic "
+                        + Base64.getEncoder()
+                                .encodeToString(
+                                        (adminEntity.getEmail() + ":" + adminEntity.getPassword())
+                                                .getBytes());
         userBasicAuth =
-            "Basic "
-                + Base64.getEncoder()
-                .encodeToString(
-                    (userEntity.getEmail() + ":" + userEntity.getPassword())
-                        .getBytes());
+                "Basic "
+                        + Base64.getEncoder()
+                                .encodeToString(
+                                        (userEntity.getEmail() + ":" + userEntity.getPassword())
+                                                .getBytes());
     }
 
     @Test
@@ -168,12 +168,12 @@ public class UserControllerTests {
 
         // Perform the PUT request to update the user
         mockMvc.perform(
-                put("/user/update/" + userEntity.getId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(userDtoJson)
-                    .header("Authorization", userBasicAuth)
-                    .session(mockHttpSession))
-            .andExpect(status().isOk());
+                        put("/user/update/" + userEntity.getId())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(userDtoJson)
+                                .header("Authorization", userBasicAuth)
+                                .session(mockHttpSession))
+                .andExpect(status().isOk());
     }
 
     // 유저 탈퇴 테스트
