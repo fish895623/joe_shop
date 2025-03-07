@@ -8,104 +8,125 @@
   <body>
     <nav>
       <ul>
-        <li><a href="http://127.0.0.1:8080/admin"> 관리 홈</a></li>
-        <li><a href="http://127.0.0.1:8080/admin/member"> 회원관리</a></li>
-        <li><a href="http://127.0.0.1:8080/admin/inventory"> 재고관리</a></li>
+        <li><a href="http://www.naver.com"> 관리 홈</a></li>
+        <li><a href="http://www.naver.com"> 회원관리</a></li>
+        <li><a href="http://www.naver.com"> 재고관리</a></li>
       </ul>
     </nav>
 
     <div>
-
+      <!-- 드롭다운 클릭해서 밑에 테이블에 들어갈 수 있도록 -->
       <h3>상품(재고)관리</h3>
       <table border="1">
         <thead>
           <tr>
-            <th>카테고리 <select name="category" id="cat">
-              <option value="select">Select item</option>
-              <option value="top">Top</option>
-              <option value="bottom">Bottom</option>
-              <option value="outer">Outer</option>
-              <option value="shoes">Shoes</option>
-              <option value="accessary">Acc</option>
-              <option value="youth">Youth</option>
-              <option value="makeup">MakeUp</option>
-              <option value="furniture">Furniture</option>
-            </select></th>
-            <th>상품명 <select name="product-name" id="p_name">
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-            </select></th>
-            <th>상품코드 <select name="product-code" id="p_code">
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-            </select></th>
-            <th>수량<select name="quentity" id="qty">
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-            </select></th>
-            <th>금액<select name="price" id="price">
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-            </select></th>
-            <td><button onclick="addRow()">추가</button></td>
+            <th>카테고리</th>
+            <th>상품명</th>
+            <th>상품코드</th>
+            <th>수량</th>
+            <th>금액</th>
           </tr>
         </thead>
 
-        <tbody id="tableBody">
-          <!-- 새로운 데이터 행 추가될 부분 -->
+        <tbody>
+          <tr>
+            <td>
+              <select name="category" id="cat">
+                <option value="select">Select item</option>
+                <option value="top">Top</option>
+                <option value="bottom">Bottom</option>
+                <option value="outer">Outer</option>
+                <option value="shoes">Shoes</option>
+                <option value="accessary">Acc</option>
+                <option value="youth">Youth</option>
+                <option value="makeup">MakeUp</option>
+                <option value="furniture">Furniture</option>
+              </select>
+            </td>
+
+            <td>
+              <select name="product-name" id="p_name">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+              </select>
+            </td>
+
+            <td>
+              <select name="product-code" id="p_code">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+              </select>
+            </td>
+
+            <td>
+              <select name="quentity" id="qty">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+              </select>
+            </td>
+
+            <td>
+              <select name="price" id="price">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+              </select>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
 
-      <script>
-        function addRow() {
+    <script>
+      const tableBody = document.querySelector("table tbody");
 
-          const catSelect = document.getElementById('cat').value;
-          const pNameSelect = document.getElementById('p_name').value;
-          const pCodeSelect = document.getElementById('p_code').value;
-          const qtySelect = document.getElementById('qty').value;
-          const priceSelect = document.getElementById('price').value;
-
-          const tableBody = document.getElementById('tableBody');
-          const row = document.createElement('tr');
-
+      function loadTableData(data) {
+        tableBody.innerHTML = "";
+        data.forEach((item) => {
+          const row = document.createElement("tr");
           row.innerHTML = `
-            <td>${catSelect}</td>
-            <td>${pNameSelect}</td>
-            <td>${pCodeSelect}</td>
-            <td>${qtySelect}</td>
-            <td>${priceSelect}</td>`;
-
+                    <td>${item.카테고리}</td>
+                    <td>${item.상품명}</td>
+                    <td>${item.상품코드}</td>
+                    <td>${item.수량}</td>
+                    <td>${item.금액}</td>`;
           tableBody.appendChild(row);
-        }
-      </script>
+        });
+      }
+
+      fetch("")
+        .then((response) => response.json())
+        .then((data) => {
+          loadTableData(data);
+        })
+        .catch((error) => console.error("Error loading the JSON data:", error));
+    </script>
   </body>
 </html>
