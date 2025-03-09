@@ -60,7 +60,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         User userEntity = new User();
         userEntity.setEmail(username);
-        userEntity.setPassword("temppassword");
+        userEntity.setPassword("4321");
         userEntity.setRole(UserRole.valueOf(role));
 
         CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);
