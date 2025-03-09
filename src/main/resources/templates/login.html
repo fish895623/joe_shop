@@ -88,7 +88,7 @@
   </div>
 
   <!-- Login Form - action points to Spring Security's default login processing URL -->
-  <form action="/login" method="post">
+  <form action="/login" method="post" onsubmit="event.preventDefault()">
     <div class="form-group">
       <label for="username">Username</label>
       <input type="text" id="username" name="username" required>
@@ -112,16 +112,13 @@
         fetch('/login', {
             method: 'POST',
             body: formData
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.headers.get('authorization');
-            })
-            .then(data => {
-                // document.cookie = `token=${data}`;
-            })
+        }).then(response => {
+            if (response.ok) {
+                window.location.href = '/';
+            } else {
+                window.location.href = '/';
+            }
+        });
     }
 
     const urlParams = new URLSearchParams(window.location.search);
