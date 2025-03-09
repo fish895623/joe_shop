@@ -99,12 +99,12 @@
       <input type="password" id="password" name="password" required>
     </div>
 
-    <button type="submit" onclick="hello()">Login</button>
+    <button type="submit" onclick="postLogin()">Login</button>
   </form>
 </div>
 
 <script>
-    const hello = () => {
+    const postLogin = () => {
         const formData = new FormData();
         formData.append('username', document.getElementById("username").value);
         formData.append('password', document.getElementById("password").value);
@@ -120,7 +120,7 @@
                 return response.headers.get('authorization');
             })
             .then(data => {
-                localStorage.setItem('token', data);
+                // document.cookie = `token=${data}`;
             })
     }
 

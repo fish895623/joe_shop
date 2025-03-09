@@ -1,7 +1,13 @@
 package com.bit.joe.shoppingmall.jwt;
 
-import java.util.Collection;
-import java.util.Iterator;
+import com.bit.joe.shoppingmall.dto.CustomUserDetails;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,12 +16,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.bit.joe.shoppingmall.dto.CustomUserDetails;
-
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
+import java.util.Collection;
+import java.util.Iterator;
 
 @RequiredArgsConstructor
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
@@ -56,6 +58,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String token = jwtUtil.createJwt(username, role, 60 * 60 * 10L);
 
+        Cookie cookie = new Cookie("token", token);
+
+        response.addCookie(cookie);
         response.addHeader("Authorization", "Bearer " + token);
     }
 
