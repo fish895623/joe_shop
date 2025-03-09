@@ -33,7 +33,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         if (authorization == null || !authorization.startsWith("Bearer ")) {
 
-            log.info("token null");
+            log.info("Authorization Bearer header is null");
             filterChain.doFilter(request, response);
 
             return;
@@ -54,7 +54,6 @@ public class JWTFilter extends OncePerRequestFilter {
 
         User userEntity = new User();
         userEntity.setEmail(username);
-        userEntity.setPassword("4321");
         userEntity.setRole(UserRole.valueOf(role));
 
         CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);
