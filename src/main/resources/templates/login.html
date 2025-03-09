@@ -105,18 +105,25 @@
 
 <script>
     const hello = () => {
-        fetch('/api/user/login', {
+        const formData = new FormData();
+        formData.append('username', document.getElementById("username").value);
+        formData.append('password', document.getElementById("password").value);
+
+        fetch('/login', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                username: document.getElementById("username").value,
-                password: document.getElementById("password").value,
-            })
+            body: formData
         })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.headers.get('authorization');
+            })
+            .then(data => {
+                localStorage.setItem('token', data);
+            })
     }
-    // Display error message if error parameter exists in URL
+
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('error')) {
         document.getElementById('error-message').style.display = 'block';
