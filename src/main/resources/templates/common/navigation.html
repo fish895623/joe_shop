@@ -17,12 +17,45 @@
       </form>
 
       <!-- Navigation Links -->
-      <div class="navbar-nav ms-auto">
+      <div class="navbar-nav ms-auto" id="link-bar">
         <a class="nav-link" href="/user/myPage">My Page</a>
         <a class="nav-link" href="/history">My Order</a>
         <a class="nav-link" href="/cart">My Cart</a>
-        <a class="nav-link" href="/user/login">Log In</a>
       </div>
     </div>
   </nav>
+  <script src="/global.js"></script>
+  <script>
+      const token = getTokenFromCookie()
+      const parseToken = parseJwt(token)
+      const role = getUserRole(parseToken)
+
+      const doc = document.getElementById("link-bar")
+
+      const loginElement = document.createElement('a')
+      loginElement.className = "nav-link"
+      loginElement.href = "/user/login"
+      loginElement.innerText = "Log In"
+
+      const logoutElement = document.createElement('a')
+      logoutElement.className = "nav-link"
+      logoutElement.innerText = "Log Out"
+      logoutElement.onclick = function() {
+          fetch('/api/user/logout', {
+              method: 'GET',
+          }).then(response => {
+              if (response.ok) {
+                  window.location.href = '/'
+              } else {
+                  alert('Logout failed')
+              }
+          })
+      }
+
+      if (parseToken != null) {
+          doc.appendChild(logoutElement)
+      } else {
+          doc.appendChild(loginElement)
+      }
+  </script>
 </div>

@@ -114,11 +114,23 @@
             body: formData
         }).then(response => {
             if (response.ok) {
-                window.location.href = '/';
+                gotoMainPage();
             } else {
                 window.location.href = '/';
             }
         });
+    }
+
+    const gotoMainPage = () => {
+        fetch('/api/user/info')
+            .then(response => response.json())
+            .then(data=> {
+                if (data.user.role === 'ADMIN') {
+                    window.location.href = '/admin';
+                } else {
+                    window.location.href = '/';
+                }
+            })
     }
 
     const urlParams = new URLSearchParams(window.location.search);

@@ -17,6 +17,9 @@ import com.bit.joe.shoppingmall.dto.response.Response;
 import com.bit.joe.shoppingmall.enums.UserRole;
 import com.bit.joe.shoppingmall.service.UserService;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +31,22 @@ import lombok.extern.slf4j.Slf4j;
 public class UserController {
 
     private final UserService userService;
+
+    @GetMapping("/info")
+    public ResponseEntity<Response> getRole() {
+        //        // get Current User Information Authenticated by JWT
+        //        Authentication authentication =
+        // SecurityContextHolder.getContext().getAuthentication();
+        //        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        // get user details from authentication
+        UserDto user = new UserDto();
+        user.setEmail("admin");
+        user.setRole(UserRole.valueOf("ADMIN"));
+        // get user from user details
+        log.info("User Info: {}", user);
+
+        return ResponseEntity.status(HttpStatus.OK).body(Response.builder().user(user).build());
+    }
 
     @GetMapping("/get-all")
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -146,11 +165,15 @@ public class UserController {
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<Response> logout(HttpSession session) {
+    public ResponseEntity<Response> logout(
+            HttpServletResponse response, HttpServletRequest request) {
 
-        Response resp = userService.logout(session);
-        // Logout user and get response
+        Cookie cookie = new Cookie("token", null);
+        cookie.setPath("/");
 
+        response.addCookie(cookie);
+
+        Response resp = Response.builder().status(200).message("Logout successfully").build();
         return ResponseEntity.status(HttpStatus.OK).body(resp);
     }
 
