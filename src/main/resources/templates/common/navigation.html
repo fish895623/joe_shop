@@ -7,11 +7,11 @@
       <!-- Search Bar and Button -->
       <form class="d-flex ms-auto" role="search">
         <input
-                class="form-control me-2"
-                type="search"
-                placeholder="Search"
-                aria-label="Search"
-                style="width: 500px"
+          class="form-control me-2"
+          type="search"
+          placeholder="Search"
+          aria-label="Search"
+          style="width: 500px"
         />
         <button class="btn btn-outline-light" type="submit">Search</button>
       </form>
@@ -24,37 +24,39 @@
     </div>
   </nav>
   <script src="/global.js"></script>
-  <script >
-      const token = getTokenFromLocalStorage()
-      const parseToken = parseJwt(token)
-      const role = getUserRole(parseToken)
-      const username = parseToken?.username
+  <script>
+    const token = getTokenFromLocalStorage();
+    const parseToken = parseJwt(token);
+    const role = getUserRole(parseToken);
+    const username = parseToken?.username;
 
-      const doc = document.getElementById("link-bar")
+    const doc = document.getElementById("link-bar");
 
-      const loginElement = document.createElement('a')
-      loginElement.className = "nav-link"
-      loginElement.href = "/user/login"
-      loginElement.innerText = "Log In"
+    const loginElement = document.createElement("a");
+    loginElement.className = "nav-link noselect";
+    loginElement.innerText = "Log In";
+    loginElement.onclick = function () {
+      window.location.href = "/user/login";
+    };
 
-      const logoutElement = document.createElement('a')
-      logoutElement.className = "nav-link"
-      logoutElement.innerText = "Log Out"
-      logoutElement.onclick = function() {
-          localStorage.removeItem("token")
-          window.location.href = "/"
-      }
+    const logoutElement = document.createElement("a");
+    logoutElement.className = "nav-link noselect";
+    logoutElement.innerText = "Log Out";
+    logoutElement.onclick = function () {
+      localStorage.removeItem("token");
+      window.location.href = "/";
+    };
 
-      const userElement = document.createElement('a')
-      userElement.className = "nav-link"
-      userElement.href = "/user/myPage"
-      userElement.innerText = username
+    const userElement = document.createElement("a");
+    userElement.className = "nav-link";
+    userElement.href = "/user/myPage";
+    userElement.innerText = username;
 
-      if (parseToken != null) {
-          doc.appendChild(userElement)
-          doc.appendChild(logoutElement)
-      } else {
-          doc.appendChild(loginElement)
-      }
+    if (parseToken != null) {
+      doc.appendChild(userElement);
+      doc.appendChild(logoutElement);
+    } else {
+      doc.appendChild(loginElement);
+    }
   </script>
 </div>

@@ -1,35 +1,35 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MainPage</title>
-  <th:block th:insert="~{common/head :: library}"></th:block>
-</head>
-<body>
-<!-- Corrected th:replace to properly include the navbar fragment -->
-<th:block th:replace="~{common/navigation :: navbar}"/>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MainPage</title>
+    <th:block th:insert="~{common/head :: library}"></th:block>
+  </head>
+  <body>
+    <!-- Corrected th:replace to properly include the navbar fragment -->
+    <th:block th:replace="~{common/navigation :: navbar}" />
 
-<hr/>
-<div>
-  <label>
-    <input type="text"/>
-  </label>
-  <span><input type="submit" value="입력"/></span>
-</div>
-<div id="mainImage">
-  <h1>이미지(이벤트로 넘기기)</h1>
-</div>
-<br/>
-<div class="container">
-  <div><img src="" alt="이미지1"/></div>
-  <div><img src="" alt="이미지2"/></div>
-  <div><img src="" alt="이미지3"/></div>
-  <div><img src="" alt="이미지4"/></div>
-  <div><img src="" alt="이미지5"/></div>
-  <div><img src="" alt="이미지6"/></div>
-</div>
+    <hr />
+    <div>
+      <label>
+        <input type="text" />
+      </label>
+      <span><input type="submit" value="입력" /></span>
+    </div>
+    <div id="mainImage">
+      <h1>이미지(이벤트로 넘기기)</h1>
+    </div>
+    <br />
+    <div class="container">
+      <div><img src="" alt="이미지1" /></div>
+      <div><img src="" alt="이미지2" /></div>
+      <div><img src="" alt="이미지3" /></div>
+      <div><img src="" alt="이미지4" /></div>
+      <div><img src="" alt="이미지5" /></div>
+      <div><img src="" alt="이미지6" /></div>
+    </div>
 
-<th:block th:replace="~{common/footer :: footer}"/>
-</body>
+    <th:block th:replace="~{common/footer :: footer}" />
+  </body>
 </html>

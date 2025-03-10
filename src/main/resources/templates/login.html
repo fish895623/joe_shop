@@ -1,140 +1,140 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login Page</title>
-  <style>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Page</title>
+    <style>
       body {
-          font-family: Arial, sans-serif;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 100vh;
-          margin: 0;
-          background-color: #f5f5f5;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f5f5f5;
       }
 
       .login-container {
-          background-color: white;
-          padding: 2rem;
-          border-radius: 5px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-          width: 350px;
+        background-color: white;
+        padding: 2rem;
+        border-radius: 5px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        width: 350px;
       }
 
       h2 {
-          text-align: center;
-          margin-bottom: 1.5rem;
+        text-align: center;
+        margin-bottom: 1.5rem;
       }
 
       .form-group {
-          margin-bottom: 1rem;
+        margin-bottom: 1rem;
       }
 
       label {
-          display: block;
-          margin-bottom: 0.5rem;
-          font-weight: bold;
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
       }
 
       input[type="text"],
       input[type="password"] {
-          width: 100%;
-          padding: 0.5rem;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-          box-sizing: border-box;
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
       }
 
       button {
-          background-color: #4285f4;
-          color: white;
-          border: none;
-          padding: 0.75rem;
-          width: 100%;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 1rem;
+        background-color: #4285f4;
+        color: white;
+        border: none;
+        padding: 0.75rem;
+        width: 100%;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
       }
 
       button:hover {
-          background-color: #3367d6;
+        background-color: #3367d6;
       }
 
       .error-message {
-          color: #d93025;
-          margin-bottom: 1rem;
+        color: #d93025;
+        margin-bottom: 1rem;
       }
 
       .logout-message {
-          color: #188038;
-          margin-bottom: 1rem;
+        color: #188038;
+        margin-bottom: 1rem;
       }
-  </style>
-</head>
-<body>
-<div class="login-container">
-  <h2>Please Log In</h2>
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <h2>Please Log In</h2>
 
-  <!-- Error message container (will be handled by Spring Security) -->
-  <div class="error-message" id="error-message" style="display: none;">
-    Invalid username and password.
-  </div>
+      <!-- Error message container (will be handled by Spring Security) -->
+      <div class="error-message" id="error-message" style="display: none">
+        Invalid username and password.
+      </div>
 
-  <!-- Logout message container (will be handled by Spring Security) -->
-  <div class="logout-message" id="logout-message" style="display: none;">
-    You have been logged out successfully.
-  </div>
+      <!-- Logout message container (will be handled by Spring Security) -->
+      <div class="logout-message" id="logout-message" style="display: none">
+        You have been logged out successfully.
+      </div>
 
-  <!-- Login Form - action points to Spring Security's default login processing URL -->
-  <form action="/login" method="post" onsubmit="event.preventDefault()">
-    <div class="form-group">
-      <label for="username">Username</label>
-      <input type="text" id="username" name="username" required>
+      <!-- Login Form - action points to Spring Security's default login processing URL -->
+      <form action="/login" method="post" onsubmit="event.preventDefault()">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+
+        <button type="submit" onclick="postLogin()">Login</button>
+      </form>
     </div>
 
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input type="password" id="password" name="password" required>
-    </div>
-
-    <button type="submit" onclick="postLogin()">Login</button>
-  </form>
-</div>
-
-<script>
-    const postLogin = () => {
+    <script>
+      const postLogin = () => {
         const formData = new FormData();
-        formData.append('username', document.getElementById("username").value);
-        formData.append('password', document.getElementById("password").value);
+        formData.append("username", document.getElementById("username").value);
+        formData.append("password", document.getElementById("password").value);
 
-        fetch('/login', {
-            method: 'POST',
-            body: formData
-        }).then(response => {
-            // save response Authorization Headers token to local storage
-            if (response.ok) {
-                const token = response.headers.get('Authorization');
-                // save token Bearer to local storage
-                localStorage.setItem('token', token.replace('Bearer ', ''));
-                window.location.href = '/';
-            } else {
-                // Handle error
-                document.getElementById('error-message').style.display = 'block';
-            }
+        fetch("/login", {
+          method: "POST",
+          body: formData,
+        }).then((response) => {
+          // save response Authorization Headers token to local storage
+          if (response.ok) {
+            const token = response.headers.get("Authorization");
+            // save token Bearer to local storage
+            localStorage.setItem("token", token.replace("Bearer ", ""));
+            window.location.href = "/";
+          } else {
+            // Handle error
+            document.getElementById("error-message").style.display = "block";
+          }
         });
-    }
+      };
 
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('error')) {
-        document.getElementById('error-message').style.display = 'block';
-    }
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has("error")) {
+        document.getElementById("error-message").style.display = "block";
+      }
 
-    // Display logout message if logout parameter exists in URL
-    if (urlParams.has('logout')) {
-        document.getElementById('logout-message').style.display = 'block';
-    }
-</script>
-</body>
+      // Display logout message if logout parameter exists in URL
+      if (urlParams.has("logout")) {
+        document.getElementById("logout-message").style.display = "block";
+      }
+    </script>
+  </body>
 </html>
