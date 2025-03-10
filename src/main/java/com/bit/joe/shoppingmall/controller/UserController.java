@@ -31,15 +31,19 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/info")
-    public ResponseEntity<Response> getRole() {
-        UserDto user = new UserDto();
-        user.setEmail("admin");
-        user.setRole(UserRole.valueOf("ADMIN"));
-        // get user from user details
+    @PostMapping("/info")
+    public ResponseEntity<Response> getRole(
+            @RequestBody UserDto userDto,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        // load current authenticated user information
+
+        UserDto user = userService.getUserByEmail(userDto.getEmail()).getUser();
+
         log.info("User Info: {}", user);
 
-        return ResponseEntity.status(HttpStatus.OK).body(Response.builder().user(user).build());
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Response.builder().status(200).user(user).build());
     }
 
     @GetMapping("/get-all")

@@ -23,7 +23,7 @@ public class UserHtmlController {
         return "user/signUp";
     }
 
-    @GetMapping("/myPage")
+    @GetMapping("/my-page")
     public String MyPage() {
         return "user/myPage";
     }

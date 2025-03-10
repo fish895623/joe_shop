@@ -1,57 +1,308 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Document</title>
+    <title>My Profile - Joe Shop</title>
+    <th:block th:replace="~{common/head :: library}"></th:block>
   </head>
   <body>
-    <h1>My Page</h1>
-    <hr />
-    <div class="profile-container">
-      <div>
-        <p>이름 : <input type="text" /></p>
-      </div>
-      <div>
-        <p>이메일 : <input type="text" /></p>
-      </div>
-      <div>
-        <p>비밀번호 : <input type="text" /></p>
-      </div>
-      <div>
-        <p>
-          비밀번호 확인 :
-          <input type="text" />
-        </p>
-        <div>
-          <p>비밀번호 변경 : <input type="text" /></p>
+    <th:block th:replace="~{common/navigation :: navbar}"></th:block>
+
+    <div class="container my-5">
+      <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+          <div class="card shadow">
+            <div class="card-header bg-dark text-white">
+              <h3 class="mb-0">내 프로필</h3>
+            </div>
+            <div class="card-body">
+              <form id="profileForm" class="needs-validation" novalidate>
+                <div class="mb-3">
+                  <label for="name" class="form-label">이름</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="name"
+                    name="name"
+                    required
+                  />
+                  <div class="invalid-feedback">이름을 입력해주세요.</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="email" class="form-label">이메일</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    name="email"
+                    readonly
+                  />
+                  <div class="form-text">이메일은 변경할 수 없습니다.</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="currentPassword" class="form-label"
+                    >현재 비밀번호</label
+                  >
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="currentPassword"
+                    name="currentPassword"
+                  />
+                </div>
+
+                <div class="mb-3">
+                  <label for="newPassword" class="form-label"
+                    >새 비밀번호</label
+                  >
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="newPassword"
+                    name="newPassword"
+                  />
+                  <div class="form-text">
+                    비밀번호를 변경하려면 입력하세요. 그렇지 않으면 비워두세요.
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="confirmPassword" class="form-label"
+                    >비밀번호 확인</label
+                  >
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                  />
+                  <div class="invalid-feedback">
+                    비밀번호가 일치하지 않습니다.
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="birth" class="form-label">생년월일</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="birth"
+                    name="birth"
+                    required
+                  />
+                  <div class="invalid-feedback">생년월일을 입력해주세요.</div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label d-block">성별</label>
+                  <div class="form-check form-check-inline">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="gender"
+                      id="genderMale"
+                      value="MALE"
+                      required
+                    />
+                    <label class="form-check-label" for="genderMale"
+                      >남성</label
+                    >
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="gender"
+                      id="genderFemale"
+                      value="FEMALE"
+                      required
+                    />
+                    <label class="form-check-label" for="genderFemale"
+                      >여성</label
+                    >
+                  </div>
+                  <div class="invalid-feedback">성별을 선택해주세요.</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="phone" class="form-label">전화번호</label>
+                  <input
+                    type="tel"
+                    class="form-control"
+                    id="phone"
+                    name="phone"
+                    placeholder="010-0000-0000"
+                    required
+                  />
+                  <div class="invalid-feedback">전화번호를 입력해주세요.</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="address" class="form-label">주소</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="address"
+                    name="address"
+                    required
+                  />
+                  <div class="invalid-feedback">주소를 입력해주세요.</div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                  <button type="button" id="editBtn" class="btn btn-primary">
+                    수정
+                  </button>
+                  <button
+                    type="submit"
+                    id="saveBtn"
+                    class="btn btn-success"
+                    disabled
+                  >
+                    저장
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
-      <div>
-        <p>생년월일 : <input type="text" /></p>
-      </div>
-      <div>
-        <p>성별 : <input type="radio" />남성 <input type="radio" />여성</p>
-      </div>
-      <div>
-        <p>
-          전화번호 :
-          <input type="text" />
-        </p>
-      </div>
-      <div>
-        <p>주소 : <input type="text" /></p>
-      </div>
     </div>
-    <div>
-      <p>
-        <input type="button" value="수정" />
-        <input type="button" value="확인" />
-      </p>
-    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("profileForm");
+        const editBtn = document.getElementById("editBtn");
+        const saveBtn = document.getElementById("saveBtn");
+        const newPasswordInput = document.getElementById("newPassword");
+        const confirmPasswordInput = document.getElementById("confirmPassword");
+        const allInputs = form.querySelectorAll("input:not([readonly])");
+
+        // Disable all form fields initially
+        allInputs.forEach((input) => (input.disabled = true));
+
+        // Enable editing mode
+        editBtn.addEventListener("click", () => {
+          allInputs.forEach((input) => (input.disabled = false));
+          saveBtn.disabled = false;
+          editBtn.disabled = true;
+        });
+
+        // Password confirmation validation
+        confirmPasswordInput.addEventListener("input", () => {
+          if (newPasswordInput.value !== confirmPasswordInput.value) {
+            confirmPasswordInput.setCustomValidity(
+              "비밀번호가 일치하지 않습니다.",
+            );
+          } else {
+            confirmPasswordInput.setCustomValidity("");
+          }
+        });
+
+        // Load user data
+        const token = getTokenFromCookie("token");
+        const userData = parseJwt(token);
+
+        if (userData) {
+          loadUserData(userData.username);
+        } else {
+          window.location.href = "/user/login";
+        }
+
+        // Form submission
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+
+          if (!form.checkValidity()) {
+            e.stopPropagation();
+            form.classList.add("was-validated");
+            return;
+          }
+
+          const formData = new FormData(form);
+          const data = Object.fromEntries(formData);
+
+          // Remove empty password fields
+          if (!data.newPassword) {
+            delete data.newPassword;
+            delete data.confirmPassword;
+          }
+
+          saveUserData(data);
+        });
+
+        function loadUserData(username) {
+          // Show loading state
+          document.body.classList.add("cursor-wait");
+
+          fetch(`/api/user/info`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              email: `${username}`,
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.status === 200) {
+                document.getElementById("name").value = data.user.name || "";
+                document.getElementById("email").value = data.user.email || "";
+                document.getElementById("birth").value = data.user.birth || "";
+                document.getElementById("phone").value = data.user.phone || "";
+                document.getElementById("address").value =
+                  data.user.address || "";
+
+                if (data.user.gender === "MALE") {
+                  document.getElementById("genderMale").checked = true;
+                } else if (data.user.gender === "FEMALE") {
+                  document.getElementById("genderFemale").checked = true;
+                }
+              } else {
+              }
+            })
+            .catch((error) => {
+              console.error("Error fetching user data:", error);
+            })
+            .finally(() => {
+              document.body.classList.remove("cursor-wait");
+            });
+        }
+
+        function saveUserData(userData) {
+          // Show loading state
+          saveBtn.disabled = true;
+          saveBtn.innerHTML =
+            '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 저장 중...';
+
+          fetch("/api/user/update", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(userData),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(data);
+            })
+            .catch((error) => {
+              console.error("Error updating profile:", error);
+            })
+            .finally(() => {
+              saveBtn.disabled = false;
+              saveBtn.innerHTML = "저장";
+              allInputs.forEach((input) => (input.disabled = true));
+              editBtn.disabled = false;
+            });
+        }
+      });
+    </script>
   </body>
 </html>
