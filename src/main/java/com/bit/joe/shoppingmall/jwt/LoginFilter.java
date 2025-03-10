@@ -13,6 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.bit.joe.shoppingmall.dto.CustomUserDetails;
 
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +57,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String token = jwtUtil.createJwt(username, role, 36000000L);
 
-        response.addHeader("Authorization", "Bearer " + token);
+        Cookie cookie = new Cookie("token", token);
+        cookie.setPath("/");
+
+        response.addCookie(cookie);
     }
 
     @Override

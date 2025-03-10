@@ -115,9 +115,6 @@
         }).then((response) => {
           // save response Authorization Headers token to local storage
           if (response.ok) {
-            const token = response.headers.get("Authorization");
-            // save token Bearer to local storage
-            localStorage.setItem("token", token.replace("Bearer ", ""));
             window.location.href = "/";
           } else {
             // Handle error

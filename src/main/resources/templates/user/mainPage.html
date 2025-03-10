@@ -4,13 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MainPage</title>
-    <th:block th:insert="~{common/head :: library}"></th:block>
+    <th:block th:replace="~{common/head :: library}"></th:block>
   </head>
   <body>
     <!-- Corrected th:replace to properly include the navbar fragment -->
     <th:block th:replace="~{common/navigation :: navbar}" />
-
-    <hr />
     <div>
       <label>
         <input type="text" />

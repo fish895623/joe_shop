@@ -29,23 +29,32 @@ public class JWTFilter extends OncePerRequestFilter {
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String authorization = request.getHeader("Authorization");
         String token = null;
 
-        if (authorization != null && authorization.startsWith("Bearer ")) {
-            token = authorization.split(" ")[1];
-            log.info("Token found in Authorization header");
+        var cookies = request.getCookies();
+
+        if (cookies != null) {
+            for (var cookie : cookies) {
+                if (cookie.getName().equals("token")) {
+                    token = cookie.getValue();
+                    log.info("Token found in cookie");
+                    break;
+                } else {
+                    log.info("No Token found");
+                }
+            }
         }
 
-        if (token == null) {
+        if (token == null || token.isEmpty()) {
             log.info("Token not found");
-            filterChain.doFilter(request, response);
 
+            filterChain.doFilter(request, response);
             return;
         }
 
         if (jwtUtil.isExpired(token)) {
             log.info("Token expired");
+
             filterChain.doFilter(request, response);
             return;
         }
