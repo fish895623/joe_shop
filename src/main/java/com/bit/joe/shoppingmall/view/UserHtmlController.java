@@ -18,12 +18,12 @@ public class UserHtmlController {
         return "login";
     }
 
-    @GetMapping("/signUp")
+    @GetMapping("/register")
     public String SignUp() {
         return "user/signUp";
     }
 
-    @GetMapping("/myPage")
+    @GetMapping("/my-page")
     public String MyPage() {
         return "user/myPage";
     }

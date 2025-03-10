@@ -11,8 +11,16 @@ function getTokenFromCookie() {
 
 function parseJwt(token) {
   try {
+    if (!token) {
+      console.info("No token provided");
+      return null;
+    }
     // Get the payload part (second part) of the JWT token
-    const base64Url = token.split(".")[1];
+    const tokenParts = String(token).split(".");
+    if (tokenParts.length !== 3) {
+      return null;
+    }
+    const base64Url = tokenParts[1];
     // Replace non-url compatible chars with standard base64 chars
     const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
     // Decode the base64 string

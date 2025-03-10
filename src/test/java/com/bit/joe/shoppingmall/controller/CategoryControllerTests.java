@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -39,6 +40,8 @@ import jakarta.transaction.Transactional;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource("classpath:application-test.properties")
 @AutoConfigureMockMvc
+@Transactional
+@Rollback
 public class CategoryControllerTests {
     UserDto adminDto =
             UserDto.builder()
@@ -93,9 +96,7 @@ public class CategoryControllerTests {
 
     @Test
     void createCategory() throws Exception {
-        CategoryDto categoryDto = new CategoryDto();
-        categoryDto.setId(1L);
-        categoryDto.setCategoryName("Test Category");
+        CategoryDto categoryDto = CategoryDto.builder().categoryName("Test Category").build();
 
         String contentJson = new ObjectMapper().writeValueAsString(categoryDto);
 
@@ -111,18 +112,21 @@ public class CategoryControllerTests {
     }
 
     @Test
-    @Transactional
     void getCategories() throws Exception {
         // Get All Categories
         mockMvc.perform(get("/category/get-all")).andExpect(status().isOk());
 
         // Get Single Category
         Category category = new Category();
-        category.setId(1L);
         category.setCategoryName("Test Category");
-        categoryService.createCategory(CategoryMapper.categoryToDto(category));
+        Long savedCategoryId =
+                categoryService
+                        .createCategory(CategoryMapper.categoryToDto(category))
+                        .getCategory()
+                        .getId();
 
-        mockMvc.perform(get("/category/get-category-by-id/1")).andExpect(status().isOk());
+        mockMvc.perform(get("/category/get-category-by-id/" + savedCategoryId))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -150,7 +154,6 @@ public class CategoryControllerTests {
         String insertData;
 
         CategoryDto categoryDto = new CategoryDto();
-        categoryDto.setId(1L);
         categoryDto.setCategoryName("Test Category");
 
         insertData = new ObjectMapper().writeValueAsString(categoryDto);
@@ -162,9 +165,15 @@ public class CategoryControllerTests {
                                 .session(mockHttpSession))
                 .andExpect(status().isOk());
 
+        // get created category especially id
+        Category createdCategory =
+                categoryRepository.findByCategoryName(categoryDto.getCategoryName()).orElse(null);
+        assert createdCategory != null; // createdCategory must not be null
+        Long createdCategoryId = createdCategory.getId();
+
         // delete data
         mockMvc.perform(
-                        delete("/category/delete/" + categoryDto.getId())
+                        delete("/category/delete/" + createdCategoryId)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header("Authorization", adminBasicAuth)
                                 .session(mockHttpSession))
