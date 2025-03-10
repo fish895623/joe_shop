@@ -8,9 +8,9 @@
   <body>
     <nav>
       <ul>
-        <li><a href="http://www.naver.com"> 관리 홈</a></li>
-        <li><a href="http://www.naver.com"> 회원관리</a></li>
-        <li><a href="http://www.naver.com"> 재고관리</a></li>
+        <li><a href="http://127.0.0.1:8080/admin"> 관리 홈</a></li>
+        <li><a href="http://127.0.0.1:8080/admin/member"> 회원관리</a></li>
+        <li><a href="http://127.0.0.1:8080/admin/inventory"> 재고관리</a></li>
       </ul>
     </nav>
 
@@ -20,113 +20,115 @@
       <table border="1">
         <thead>
           <tr>
-            <th>카테고리</th>
-            <th>상품명</th>
-            <th>상품코드</th>
-            <th>수량</th>
-            <th>금액</th>
+            <th>
+              category
+              <select id="categoryDropdown"></select>
+            </th>
+            <th>
+              imageurl
+              <select id="imgDropdown"></select>
+            </th>
+            <th>product<select id="productDropdown"></select></th>
+            <th>quentity<select id="quantityDropdown"></select></th>
+            <th>price<select id="priceDropdown"></select></th>
+            <th>
+              <button id="addRowButton">담기</button>
+            </th>
           </tr>
         </thead>
-
-        <tbody>
-          <tr>
-            <td>
-              <select name="category" id="cat">
-                <option value="select">Select item</option>
-                <option value="top">Top</option>
-                <option value="bottom">Bottom</option>
-                <option value="outer">Outer</option>
-                <option value="shoes">Shoes</option>
-                <option value="accessary">Acc</option>
-                <option value="youth">Youth</option>
-                <option value="makeup">MakeUp</option>
-                <option value="furniture">Furniture</option>
-              </select>
-            </td>
-
-            <td>
-              <select name="product-name" id="p_name">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-              </select>
-            </td>
-
-            <td>
-              <select name="product-code" id="p_code">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-              </select>
-            </td>
-
-            <td>
-              <select name="quentity" id="qty">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-              </select>
-            </td>
-
-            <td>
-              <select name="price" id="price">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-              </select>
-            </td>
-          </tr>
-        </tbody>
+        <tbody id="tableBody"></tbody>
       </table>
     </div>
 
     <script>
-      const tableBody = document.querySelector("table tbody");
+      document.addEventListener("DOMContentLoaded", function () {
+        const tableBody = document.querySelector("tableBody");
 
-      function loadTableData(data) {
-        tableBody.innerHTML = "";
-        data.forEach((item) => {
+        // 데이터를 불러와 드롭다운에 채우는 함수
+        function loadData() {
+          fetch("http://localhost:8080/product/get-all")
+            .then((response) => response.json())
+            .then((data) => {
+              const categoryDropdown =
+                document.getElementById("categoryDropdown");
+              const imageDropdown = document.getElementById("imgDropdown");
+              const productDropdown =
+                document.getElementById("productDropdown");
+              const quantityDropdown =
+                document.getElementById("quantityDropdown");
+              const priceDropdown = document.getElementById("priceDropdown");
+
+              categoryDropdown.innerHTML = "";
+              imageDropdown.innerHTML = "";
+              productDropdown.innerHTML = "";
+              quantityDropdown.innerHTML = "";
+              priceDropdown.innerHTML = "";
+
+              data.productList.forEach((product) => {
+                // Category dropdown
+                const categoryOption = document.createElement("option");
+                categoryOption.value = product.category.categoryName;
+                categoryOption.textContent = product.category.categoryName;
+                categoryDropdown.appendChild(categoryOption);
+
+                // Image dropdown
+                const imageOption = document.createElement("option");
+                imageOption.value = product.imageUrl;
+                imageOption.textContent = product.imageUrl;
+                imageDropdown.appendChild(imageOption);
+
+                // Product dropdown
+                const productOption = document.createElement("option");
+                productOption.value = product.name;
+                productOption.textContent = product.name;
+                productDropdown.appendChild(productOption);
+
+                // Quantity dropdown
+                const quantityOption = document.createElement("option");
+                quantityOption.value = product.quantity;
+                quantityOption.textContent = product.quantity;
+                quantityDropdown.appendChild(quantityOption);
+
+                // Price dropdown
+                const priceOption = document.createElement("option");
+                priceOption.value = product.price;
+                priceOption.textContent = `$${product.price}`;
+                priceDropdown.appendChild(priceOption);
+              });
+            })
+            .catch((error) =>
+              console.error("Error loading categories:", error),
+            );
+        }
+
+        // 버튼 클릭 시 선택된 값을 기반으로 행 추가
+        function addRow() {
+          const categoryValue =
+            document.getElementById("categoryDropdown").value;
+          const imageValue = document.getElementById("imgDropdown").value;
+          const productValue = document.getElementById("productDropdown").value;
+          const quantityValue =
+            document.getElementById("quantityDropdown").value;
+          const priceValue = document.getElementById("priceDropdown").value;
+
+          // 새로운 행 생성 및 추가
           const row = document.createElement("tr");
           row.innerHTML = `
-                    <td>${item.카테고리}</td>
-                    <td>${item.상품명}</td>
-                    <td>${item.상품코드}</td>
-                    <td>${item.수량}</td>
-                    <td>${item.금액}</td>`;
+            <td>${categoryValue}</td>
+            <td>${imageValue}</td>
+            <td>${productValue}</td>
+            <td>${quantityValue}</td>
+            <td>${priceValue}</td>`;
           tableBody.appendChild(row);
-        });
-      }
+        }
 
-      fetch("")
-        .then((response) => response.json())
-        .then((data) => {
-          loadTableData(data);
-        })
-        .catch((error) => console.error("Error loading the JSON data:", error));
+        // 이벤트 리스너 등록
+        document
+          .getElementById("addRowButton")
+          .addEventListener("click", addRow);
+        // 초기 데이터 로드
+        loadData();
+      });
     </script>
   </body>
 </html>
