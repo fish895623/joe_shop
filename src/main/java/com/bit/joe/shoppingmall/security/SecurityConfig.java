@@ -48,7 +48,7 @@ public class SecurityConfig {
                         request ->
                                 request.requestMatchers("/")
                                         .permitAll()
-                                        .requestMatchers("/admin")
+                                        .requestMatchers("/admin/**")
                                         .hasAuthority(UserRole.ADMIN.name())
                                         .requestMatchers("/user/get-all")
                                         .hasAuthority(UserRole.ADMIN.name())
