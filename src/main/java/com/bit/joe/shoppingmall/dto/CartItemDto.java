@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
 public class CartItemDto {
     private Long id;
     private Long cartId;
+    private int quantity;
     private ProductDto product;
     private BigDecimal price;
 }
