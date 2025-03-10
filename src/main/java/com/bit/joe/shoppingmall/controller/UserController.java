@@ -1,5 +1,18 @@
 package com.bit.joe.shoppingmall.controller;
 
+import com.bit.joe.shoppingmall.dto.UserDto;
+import com.bit.joe.shoppingmall.dto.request.UpdateUserInfoRequest;
+import com.bit.joe.shoppingmall.dto.response.Response;
+import com.bit.joe.shoppingmall.enums.UserRole;
+import com.bit.joe.shoppingmall.service.UserService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,16 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bit.joe.shoppingmall.dto.UserDto;
-import com.bit.joe.shoppingmall.dto.response.Response;
-import com.bit.joe.shoppingmall.enums.UserRole;
-import com.bit.joe.shoppingmall.service.UserService;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -103,6 +107,36 @@ public class UserController {
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(userId, userDto));
+        // return success response with status code 200 (OK)
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<Response> updateUser(@RequestBody UpdateUserInfoRequest userDto) {
+
+        UserDto user = userService.getUserByEmail(userDto.getEmail()).getUser();
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(
+                            Response.builder()
+                                    .status(401)
+                                    .message("Unauthorized(in controller): User is not logged in")
+                                    .build());
+            // return unauthorized response with status code 401 -> user is not logged in
+        }
+
+        Long userId = user.getId();
+
+        user.setName(userDto.getName());
+        user.setBirth(userDto.getBirth());
+        user.setPhone(userDto.getPhone());
+        user.setAddress(userDto.getAddress());
+        user.setGender(userDto.getGender());
+        if (Objects.equals(userDto.getConfirmPassword(), userDto.getNewPassword())) {
+            user.setPassword(userDto.getNewPassword());
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(userId, user));
         // return success response with status code 200 (OK)
     }
 

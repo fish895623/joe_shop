@@ -286,14 +286,24 @@
             headers: {
               "Content-Type": "application/json",
             },
+            credentials: "include", // Include cookies
             body: JSON.stringify(userData),
           })
             .then((response) => response.json())
             .then((data) => {
-              console.log(data);
+              if (data.status === 200) {
+                alert("프로필이 성공적으로 업데이트되었습니다.");
+                location.reload();
+              } else {
+                alert(
+                  "프로필 업데이트에 실패했습니다: " +
+                    (data.message || "알 수 없는 오류"),
+                );
+              }
             })
             .catch((error) => {
               console.error("Error updating profile:", error);
+              alert("서버 오류가 발생했습니다.");
             })
             .finally(() => {
               saveBtn.disabled = false;
