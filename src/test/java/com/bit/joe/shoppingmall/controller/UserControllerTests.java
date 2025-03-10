@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -20,11 +21,13 @@ import com.bit.joe.shoppingmall.dto.UserDto;
 import com.bit.joe.shoppingmall.entity.User;
 import com.bit.joe.shoppingmall.enums.UserGender;
 import com.bit.joe.shoppingmall.enums.UserRole;
+import com.bit.joe.shoppingmall.jwt.JWTUtil;
 import com.bit.joe.shoppingmall.mapper.UserMapper;
 import com.bit.joe.shoppingmall.repository.*;
 import com.bit.joe.shoppingmall.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
 
 @TestMethodOrder(MethodOrderer.Random.class)
@@ -32,6 +35,7 @@ import jakarta.transaction.Transactional;
 @TestPropertySource("classpath:application-test.properties")
 @AutoConfigureMockMvc
 @Transactional
+@Rollback
 public class UserControllerTests {
     User adminEntity, userEntity;
     String adminBasicAuth, userBasicAuth;
@@ -39,6 +43,8 @@ public class UserControllerTests {
     @Autowired private MockMvc mockMvc;
     @Autowired private UserRepository userRepository;
     @Autowired private UserService userService;
+    // Inject JWTUtil to verify token contents
+    @Autowired JWTUtil jwtUtil;
 
     @BeforeEach
     public void setUp() {
@@ -74,6 +80,53 @@ public class UserControllerTests {
                                 .encodeToString(
                                         (userEntity.getEmail() + ":" + userEntity.getPassword())
                                                 .getBytes());
+    }
+
+    @Test
+    @DisplayName("Test form login and JWT cookie creation")
+    public void testFormLoginAndJwtCookie() throws Exception {
+        // Save the test user
+        userService.createUser(UserMapper.toDto(adminEntity));
+
+        // Perform form-based login
+        mockMvc.perform(
+                        post("/login")
+                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                                .param("username", adminEntity.getEmail())
+                                .param("password", adminEntity.getPassword()))
+                .andExpect(status().isOk())
+                .andExpect(
+                        result -> {
+                            // Check if cookie exists
+                            Cookie[] cookies = result.getResponse().getCookies();
+                            Assertions.assertNotNull(cookies, "Response should have cookies");
+
+                            // Find the token cookie
+                            Cookie tokenCookie = null;
+                            for (Cookie cookie : cookies) {
+                                if ("token".equals(cookie.getName())) {
+                                    tokenCookie = cookie;
+                                    break;
+                                }
+                            }
+
+                            // Verify cookie exists and has valid JWT token
+                            Assertions.assertNotNull(tokenCookie, "Should have a token cookie");
+                            String token = tokenCookie.getValue();
+                            Assertions.assertFalse(token.isEmpty(), "Token should not be empty");
+
+                            // Verify JWT properties
+                            Assertions.assertFalse(
+                                    jwtUtil.isExpired(token), "Token should not be expired");
+                            Assertions.assertEquals(
+                                    adminEntity.getEmail(),
+                                    jwtUtil.getUsername(token),
+                                    "Token should contain " + "correct username");
+                            Assertions.assertEquals(
+                                    adminEntity.getRole().name(),
+                                    jwtUtil.getRole(token),
+                                    "Token should contain " + "correct role");
+                        });
     }
 
     @Test
