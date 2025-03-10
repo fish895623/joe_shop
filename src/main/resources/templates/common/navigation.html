@@ -64,16 +64,16 @@
           window.location.href = "/";
         };
 
-    const userElement = document.createElement("a");
-    userElement.className = "nav-link";
-    userElement.href = "/user/myPage";
-    userElement.innerText = `My Page (${displayName}님)`;
+        const userElement = document.createElement("a");
+        userElement.className = "nav-link";
+        userElement.href = "/user/my-page";
+        userElement.innerText = `My Page (${displayName}님)`;
 
-    if (parseToken != null) {
-      doc.appendChild(userElement);
-      doc.appendChild(logoutElement);
-    } else {
-      doc.appendChild(loginElement);
+        if (parseToken != null) {
+          doc.appendChild(userElement);
+          doc.appendChild(logoutElement);
+        } else {
+          doc.appendChild(loginElement);
 
           // Add event listeners to redirect to login page if not logged in
           const myOrderLink = document.getElementById("myOrderLink");
