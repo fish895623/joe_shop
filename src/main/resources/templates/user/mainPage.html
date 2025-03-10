@@ -5,28 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MainPage</title>
     <th:block th:replace="~{common/head :: library}"></th:block>
+    <style>
+      .container {
+        padding-top: 1rem;
+      }
+    </style>
   </head>
   <body>
     <!-- Corrected th:replace to properly include the navbar fragment -->
     <th:block th:replace="~{common/navigation :: navbar}" />
-    <div>
-      <label>
-        <input type="text" />
-      </label>
-      <span><input type="submit" value="입력" /></span>
-    </div>
-    <div id="mainImage">
-      <h1>이미지(이벤트로 넘기기)</h1>
-    </div>
-    <br />
     <div class="container">
-      <div><img src="" alt="이미지1" /></div>
-      <div><img src="" alt="이미지2" /></div>
-      <div><img src="" alt="이미지3" /></div>
-      <div><img src="" alt="이미지4" /></div>
-      <div><img src="" alt="이미지5" /></div>
-      <div><img src="" alt="이미지6" /></div>
+      <div id="mainImage">
+        <h1>이미지(이벤트로 넘기기)</h1>
+      </div>
+      <br />
+      <div class="flex-box clothes">
+        <div class="wear">
+          <div class="wear-title"></div>
+          <img
+            src="https://www.w3schools.com/images/lamp.jpg"
+            alt="이미지0"
+            id="image-0"
+          />
+          <div class="wear-tag"></div>
+        </div>
+        <div class="wear">
+          <div class="wear-title"></div>
+          <img
+            src="https://www.w3schools.com/images/lamp.jpg"
+            alt="이미지1"
+            id="image-1"
+          />
+          <div class="wear-tag"></div>
+        </div>
+        <div class="wear">
+          <div class="wear-title"></div>
+          <img
+            src="https://www.w3schools.com/images/lamp.jpg"
+            alt="이미지2"
+            id="image-2"
+          />
+          <div class="wear-tag"></div>
+        </div>
+      </div>
     </div>
+
+    <script>
+      // JavaScript to handle image click events
+      const images = document.querySelectorAll(".clothes img");
+      const mainImage = document.getElementById("mainImage");
+
+      images.forEach((image) => {
+        image.addEventListener("click", () => {
+          console.log(image.id);
+        });
+      });
+    </script>
 
     <th:block th:replace="~{common/footer :: footer}" />
   </body>
