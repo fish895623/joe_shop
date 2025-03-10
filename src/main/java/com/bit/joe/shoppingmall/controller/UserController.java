@@ -17,15 +17,30 @@ import com.bit.joe.shoppingmall.dto.response.Response;
 import com.bit.joe.shoppingmall.enums.UserRole;
 import com.bit.joe.shoppingmall.service.UserService;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
+
+    @GetMapping("/info")
+    public ResponseEntity<Response> getRole() {
+        UserDto user = new UserDto();
+        user.setEmail("admin");
+        user.setRole(UserRole.valueOf("ADMIN"));
+        // get user from user details
+        log.info("User Info: {}", user);
+
+        return ResponseEntity.status(HttpStatus.OK).body(Response.builder().user(user).build());
+    }
 
     @GetMapping("/get-all")
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -78,7 +93,8 @@ public class UserController {
         if (!sessionUserId.equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Response.builder().status(403).message("Forbidden").build());
-            // return forbidden response with status code 403 -> user is not allowed to update other
+            // return forbidden response with status code 403 -> user is not allowed to
+            // update other
             // user's data
         }
 
@@ -110,7 +126,8 @@ public class UserController {
         if (!sessionUser.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Response.builder().status(403).message("Forbidden").build());
-            // return forbidden response with status code 403 -> user is not allowed to delete other
+            // return forbidden response with status code 403 -> user is not allowed to
+            // delete other
             // user's account
         } else {
             if (sessionUser.getRole().equals(UserRole.ADMIN)) {
@@ -127,26 +144,21 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Response> login(HttpSession session, @RequestBody UserDto userDto) {
-        session.removeAttribute("user");
-        // Set user to null -> logout user
+    public ResponseEntity<Response> login(@RequestBody UserDto userDto) {
+        log.info(userDto.toString());
 
         Response resp = userService.login(userDto.getEmail(), userDto.getPassword());
         // Login user with email and password and get response
-
-        session.setAttribute("user", resp.getUser());
-        // Set user to session
 
         return ResponseEntity.status(HttpStatus.OK).body(resp);
         // return success response with status code 200 (OK)
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<Response> logout(HttpSession session) {
+    public ResponseEntity<Response> logout(
+            HttpServletResponse response, HttpServletRequest request) {
 
-        Response resp = userService.logout(session);
-        // Logout user and get response
-
+        Response resp = Response.builder().status(200).message("Logout successfully").build();
         return ResponseEntity.status(HttpStatus.OK).body(resp);
     }
 
@@ -165,7 +177,8 @@ public class UserController {
         if (!user.getId().equals(userDto.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Response.builder().status(403).message("Forbidden").build());
-            // return forbidden response with status code 403 -> user is not allowed to delete other
+            // return forbidden response with status code 403 -> user is not allowed to
+            // delete other
             // user's account
         }
 

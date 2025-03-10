@@ -14,7 +14,7 @@
     <ul></ul>
 
     <script>
-      fetch("product/get-all")
+      fetch("/product/get-all")
         .then((res) => res.json())
         .then((data) => {
           console.log(data);

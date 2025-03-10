@@ -12,7 +12,9 @@ import com.bit.joe.shoppingmall.entity.CartItem;
 import com.bit.joe.shoppingmall.entity.Product;
 import com.bit.joe.shoppingmall.entity.User;
 import com.bit.joe.shoppingmall.exception.NotFoundException;
-import com.bit.joe.shoppingmall.repository.*;
+import com.bit.joe.shoppingmall.repository.CartItemRepository;
+import com.bit.joe.shoppingmall.repository.CartRepository;
+import com.bit.joe.shoppingmall.repository.ProductRepository;
 import com.bit.joe.shoppingmall.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -22,9 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class CartService {
-    private final UserRepository userRepository;
     private final ProductRepository productRepository;
-    private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final UserService userService;
