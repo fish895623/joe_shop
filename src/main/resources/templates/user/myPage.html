@@ -9,7 +9,6 @@
   </head>
   <body>
     <th:block th:replace="~{common/navigation :: navbar}"></th:block>
-
     <div class="container my-5">
       <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
@@ -72,7 +71,7 @@
 
                 <div class="mb-3">
                   <label for="confirmPassword" class="form-label"
-                    >비밀번호 확인</label
+                    >새 비밀번호 확인</label
                   >
                   <input
                     type="password"
@@ -172,7 +171,7 @@
         </div>
       </div>
     </div>
-
+    <th:block th:replace="~{common/footer :: footer}" />
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         const form = document.getElementById("profileForm");
