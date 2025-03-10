@@ -12,9 +12,11 @@ import com.bit.joe.shoppingmall.entity.CartItem;
 import com.bit.joe.shoppingmall.entity.Product;
 import com.bit.joe.shoppingmall.entity.User;
 import com.bit.joe.shoppingmall.exception.NotFoundException;
+import com.bit.joe.shoppingmall.mapper.CartMapper;
 import com.bit.joe.shoppingmall.repository.CartItemRepository;
 import com.bit.joe.shoppingmall.repository.CartRepository;
 import com.bit.joe.shoppingmall.repository.ProductRepository;
+import com.bit.joe.shoppingmall.repository.UserRepository;
 import com.bit.joe.shoppingmall.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class CartService {
     private final ProductRepository productRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
+    private final UserRepository userRepository;
     private final UserService userService;
 
     /**
@@ -34,9 +37,12 @@ public class CartService {
      *
      * @return Response
      */
-    public Response createCart() {
+    public Response createCart(CartRequest cartRequest) {
 
-        User user = userService.getLoginUser();
+        User user =
+                userRepository
+                        .findById(cartRequest.getUserId())
+                        .orElseThrow(() -> new NotFoundException("User not found"));
         // get user from the context holder (logged-in user)
         Cart cart = new Cart();
         // create a new cart (empty)
@@ -44,10 +50,17 @@ public class CartService {
         cart.setUser(user);
         // set the user of the cart
 
-        cartRepository.save(cart);
+        cart.setCartItems(List.<CartItem>of());
+        // set empty cart items
+
+        var createdCart = cartRepository.save(cart);
         // save the cart to the database
 
-        return Response.builder().status(200).message("Cart created successfully").build();
+        return Response.builder()
+                .status(200)
+                .message("Cart created successfully")
+                .cart(CartMapper.toDto(createdCart))
+                .build();
         // return success response with status code 200 -> cart created successfully
     }
 
