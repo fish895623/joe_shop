@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Base64;
-import java.util.List;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +20,14 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.bit.joe.shoppingmall.dto.UserDto;
 import com.bit.joe.shoppingmall.dto.request.CartItemRequest;
+import com.bit.joe.shoppingmall.dto.request.CartRequest;
 import com.bit.joe.shoppingmall.entity.Cart;
-import com.bit.joe.shoppingmall.entity.CartItem;
 import com.bit.joe.shoppingmall.entity.Category;
 import com.bit.joe.shoppingmall.entity.Product;
 import com.bit.joe.shoppingmall.entity.User;
 import com.bit.joe.shoppingmall.enums.UserGender;
 import com.bit.joe.shoppingmall.enums.UserRole;
+import com.bit.joe.shoppingmall.mapper.CartMapper;
 import com.bit.joe.shoppingmall.mapper.CategoryMapper;
 import com.bit.joe.shoppingmall.mapper.ProductMapper;
 import com.bit.joe.shoppingmall.mapper.UserMapper;
@@ -39,6 +39,7 @@ import com.bit.joe.shoppingmall.service.Impl.CartItemServiceImpl;
 import com.bit.joe.shoppingmall.service.Impl.CartService;
 import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
 import com.bit.joe.shoppingmall.service.Impl.ProductServiceImpl;
+import com.bit.joe.shoppingmall.service.UserService;
 
 import jakarta.transaction.Transactional;
 
@@ -53,7 +54,7 @@ public class CartItemControllerTests {
             UserDto.builder()
                     .name("admin")
                     .password("admin")
-                    .email("admin@example.com")
+                    .email("admin cartItem")
                     .role(UserRole.ADMIN)
                     .gender(UserGender.MALE)
                     .birth("2021-01-01")
@@ -62,7 +63,7 @@ public class CartItemControllerTests {
             UserDto.builder()
                     .name("user")
                     .password("user")
-                    .email("user@example.com")
+                    .email("user cartItem")
                     .role(UserRole.USER)
                     .gender(UserGender.MALE)
                     .birth("2021-01-01")
@@ -89,39 +90,63 @@ public class CartItemControllerTests {
     @Autowired private CartItemServiceImpl cartItemService;
     @Autowired private CartRepository cartRepository;
     @Autowired private CartService cartService;
+    @Autowired private UserService userService;
+
+    private User generalUser;
+    private User adminUser;
+    private Cart cart;
+    private Category category;
+    private Product product;
 
     @BeforeEach
     public void setUp() {
 
         // Create user
-        User adminUser = userRepository.save(UserMapper.toEntity(adminDto));
-        User generalUser = userRepository.save(UserMapper.toEntity(userDto));
+        userService.createUser(adminDto);
+        userService.createUser(userDto);
+
+        // get user data
+        generalUser = UserMapper.toEntity(userService.getUserByEmail(userDto.getEmail()).getUser());
+        adminUser = UserMapper.toEntity(userService.getUserByEmail(adminDto.getEmail()).getUser());
+
+        assert generalUser != null;
+        assert adminUser != null;
 
         // Create Cart
-        Cart cart = Cart.builder().user(generalUser).cartItems(List.<CartItem>of()).build();
-        cartRepository.save(cart);
+        CartRequest cartRequest = CartRequest.builder().userId(generalUser.getId()).build();
+        cart = CartMapper.toEntity(cartService.createCart(cartRequest).getCart());
+
+        assert cart != null;
 
         // Prepare data
-        Category category = Category.builder().id(1L).categoryName("Test Category").build();
-        categoryService.createCategory(CategoryMapper.categoryToDto(category));
+        Category categoryForCreate =
+                Category.builder().categoryName("Test Category for CartItem Test").build();
+        category =
+                CategoryMapper.toEntity(
+                        categoryService
+                                .createCategory(CategoryMapper.categoryToDto(categoryForCreate))
+                                .getCategory());
 
-        Product product =
+        Product productForCreate =
                 Product.builder()
-                        .id(1L)
-                        .name("Test Product")
+                        .name("Test Product for CartItem Test")
                         .category(category)
                         .imageURL("image")
                         .quantity(10)
                         .price(1000)
                         .build();
-        var productDto = ProductMapper.toDto(product);
+        var productDto = ProductMapper.toDto(productForCreate);
 
-        productService.createProduct(
-                productDto.getCategory().getId(),
-                productDto.getImageUrl(),
-                productDto.getName(),
-                productDto.getQuantity(),
-                productDto.getPrice());
+        product =
+                ProductMapper.toEntity(
+                        productService
+                                .createProduct(
+                                        productDto.getCategory().getId(),
+                                        productDto.getImageUrl(),
+                                        productDto.getName(),
+                                        productDto.getQuantity(),
+                                        productDto.getPrice())
+                                .getProduct());
     }
 
     @Test
@@ -131,7 +156,11 @@ public class CartItemControllerTests {
 
         // prepare request data
         CartItemRequest cartItemRequest =
-                CartItemRequest.builder().cartId(1L).productId(1L).quantity(1).build();
+                CartItemRequest.builder()
+                        .cartId(cart.getId())
+                        .productId(product.getId())
+                        .quantity(1)
+                        .build();
 
         var insertData = new ObjectMapper().writeValueAsString(cartItemRequest);
 
@@ -146,7 +175,11 @@ public class CartItemControllerTests {
 
         // prepare request data
         CartItemRequest updateCartItemRequest =
-                CartItemRequest.builder().cartId(1L).productId(1L).quantity(2).build();
+                CartItemRequest.builder()
+                        .cartId(cart.getId())
+                        .productId(product.getId())
+                        .quantity(2)
+                        .build();
 
         var updateData = new ObjectMapper().writeValueAsString(updateCartItemRequest);
 
@@ -158,11 +191,30 @@ public class CartItemControllerTests {
                 .andExpect(jsonPath("$.cartItem.quantity").value(2));
 
         // =================================================================================================
+        // test getCartItem
+
+        // prepare request data
+        CartItemRequest getCartItemRequest =
+                CartItemRequest.builder()
+                        .userId(generalUser.getId())
+                        .productId(product.getId())
+                        .build();
+
+        var getData = new ObjectMapper().writeValueAsString(getCartItemRequest);
+
+        mockMvc.perform(
+                        get("/api/cart-item/get")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(getData))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.cartItem.quantity").value(2));
+
+        // =================================================================================================
         // test deleteCartItem
 
         // prepare request data
         CartItemRequest deleteCartItemRequest =
-                CartItemRequest.builder().cartId(1L).productId(1L).build();
+                CartItemRequest.builder().cartId(cart.getId()).productId(product.getId()).build();
 
         var deleteData = new ObjectMapper().writeValueAsString(deleteCartItemRequest);
 
@@ -175,10 +227,13 @@ public class CartItemControllerTests {
         // check is cartItem deleted successfully
 
         // prepare request data
-        CartItemRequest getCartItemRequest =
-                CartItemRequest.builder().userId(1L).productId(1L).build();
+        getCartItemRequest =
+                CartItemRequest.builder()
+                        .userId(generalUser.getId())
+                        .productId(product.getId())
+                        .build();
 
-        var getData = new ObjectMapper().writeValueAsString(getCartItemRequest);
+        getData = new ObjectMapper().writeValueAsString(getCartItemRequest);
 
         mockMvc.perform(
                         get("/api/cart-item/get")
