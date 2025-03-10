@@ -1,92 +1,96 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
-</head>
-<body>
-<div th:fragment="navbar">
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3">
-    <div class="container">
-      <!-- Joe Shop Brand -->
-      <a class="navbar-brand" href="/">Joe Shop</a>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div th:fragment="navbar">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3">
+        <div class="container">
+          <!-- Joe Shop Brand -->
+          <a class="navbar-brand" href="/">Joe Shop</a>
 
-      <!-- Search Bar and Button -->
-      <form class="d-flex ms-auto" role="search">
-        <input
-                class="form-control me-2"
-                type="search"
-                placeholder="Search"
-                aria-label="Search"
-                style="width: 500px"
-        />
-        <button class="btn btn-outline-light" type="submit">Search</button>
-      </form>
+          <!-- Search Bar and Button -->
+          <form class="d-flex ms-auto" role="search">
+            <input
+              class="form-control me-2"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+              style="width: 500px"
+            />
+            <button class="btn btn-outline-light" type="submit">Search</button>
+          </form>
 
-      <!-- Navigation Links -->
-      <div class="navbar-nav ms-auto" id="link-bar">
-        <a class="nav-link" href="/history" id="myOrderLink">My Order</a>
-        <a class="nav-link" href="/cart" id="myCartLink">My Cart</a>
-      </div>
+          <!-- Navigation Links -->
+          <div class="navbar-nav ms-auto" id="link-bar">
+            <a class="nav-link" href="/history" id="myOrderLink">My Order</a>
+            <a class="nav-link" href="/cart" id="myCartLink">My Cart</a>
+          </div>
+        </div>
+      </nav>
+      <script src="/global.js"></script>
+      <script>
+        const token = getTokenFromCookie("token");
+        const parseToken = parseJwt(token);
+        const role = getUserRole(parseToken);
+        const username = parseToken?.username;
+
+        const displayName = username
+          ? username.split("@")[0].toUpperCase()
+          : "Guest";
+
+        const doc = document.getElementById("link-bar");
+
+        const loginElement = document.createElement("a");
+        loginElement.className = "nav-link";
+        loginElement.innerText = "Log In";
+        loginElement.onclick = function () {
+          window.location.href = "/user/login";
+        };
+
+        const logoutElement = document.createElement("a");
+        logoutElement.className = "nav-link";
+        logoutElement.innerText = "Log Out";
+        logoutElement.onclick = function () {
+          document.cookie =
+            "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+          window.location.href = "/";
+        };
+
+        const userElement = document.createElement("a");
+        userElement.className = "nav-link";
+        userElement.href = "/user/myPage";
+        userElement.innerText = `My Page (${displayName}님)`;
+
+        if (parseToken != null) {
+          doc.appendChild(userElement);
+          doc.appendChild(logoutElement);
+        } else {
+          doc.appendChild(loginElement);
+
+          // Add event listeners to redirect to login page if not logged in
+          const myOrderLink = document.getElementById("myOrderLink");
+          const myCartLink = document.getElementById("myCartLink");
+
+          // Redirect to login page if the user is not logged in and tries to access "My Order" or "My Cart"
+          myOrderLink.onclick = function (event) {
+            event.preventDefault(); // Prevent default link behavior
+            window.location.href = "/user/login"; // Redirect to login page
+          };
+
+          myCartLink.onclick = function (event) {
+            event.preventDefault(); // Prevent default link behavior
+            window.location.href = "/user/login"; // Redirect to login page
+          };
+        }
+      </script>
     </div>
-  </nav>
-  <script src="/global.js"></script>
-  <script>
-    const token = getTokenFromCookie("token");
-    const parseToken = parseJwt(token);
-    const role = getUserRole(parseToken);
-    const username = parseToken?.username;
-
-    const displayName = username ? username.split('@')[0].toUpperCase() : "Guest";
-
-    const doc = document.getElementById("link-bar");
-
-    const loginElement = document.createElement("a");
-    loginElement.className = "nav-link";
-    loginElement.innerText = "Log In";
-    loginElement.onclick = function () {
-      window.location.href = "/user/login";
-    };
-
-    const logoutElement = document.createElement("a");
-    logoutElement.className = "nav-link";
-    logoutElement.innerText = "Log Out";
-    logoutElement.onclick = function () {
-      document.cookie =
-        "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      window.location.href = "/";
-    };
-
-    const userElement = document.createElement("a");
-    userElement.className = "nav-link";
-    userElement.href = "/user/myPage";
-    userElement.innerText = `My Page (${displayName}님)`;
-
-    if (parseToken != null) {
-      doc.appendChild(userElement);
-      doc.appendChild(logoutElement);
-    } else {
-      doc.appendChild(loginElement);
-
-      // Add event listeners to redirect to login page if not logged in
-      const myOrderLink = document.getElementById('myOrderLink');
-      const myCartLink = document.getElementById('myCartLink');
-
-      // Redirect to login page if the user is not logged in and tries to access "My Order" or "My Cart"
-      myOrderLink.onclick = function(event) {
-        event.preventDefault();  // Prevent default link behavior
-        window.location.href = "/user/login";  // Redirect to login page
-      };
-
-      myCartLink.onclick = function(event) {
-        event.preventDefault();  // Prevent default link behavior
-        window.location.href = "/user/login";  // Redirect to login page
-      };
-    }
-  </script>
-</div>
-</body>
+  </body>
 </html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
@@ -195,7 +195,7 @@
         confirmPasswordInput.addEventListener("input", () => {
           if (newPasswordInput.value !== confirmPasswordInput.value) {
             confirmPasswordInput.setCustomValidity(
-              "비밀번호가 일치하지 않습니다."
+              "비밀번호가 일치하지 않습니다.",
             );
           } else {
             confirmPasswordInput.setCustomValidity("");
@@ -296,7 +296,7 @@
               } else {
                 alert(
                   "프로필 업데이트에 실패했습니다: " +
-                    (data.message || "알 수 없는 오류")
+                    (data.message || "알 수 없는 오류"),
                 );
               }
             })
