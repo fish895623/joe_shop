@@ -10,6 +10,8 @@ body {
 
 .main-content {
     flex: 1;
+    overflow-y: auto;
+    padding-bottom: 60px;
 }
 
 footer {
@@ -18,5 +20,8 @@ footer {
     left: 0;
     width: 100%;
     padding: 10px;
+    background-color: #333;
+    color: white;
     text-align: center;
+    z-index: 10;
 }
