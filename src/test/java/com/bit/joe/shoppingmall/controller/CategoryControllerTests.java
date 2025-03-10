@@ -5,14 +5,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Base64;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,18 +19,14 @@ import com.bit.joe.shoppingmall.dto.UserDto;
 import com.bit.joe.shoppingmall.entity.Category;
 import com.bit.joe.shoppingmall.enums.UserGender;
 import com.bit.joe.shoppingmall.enums.UserRole;
+import com.bit.joe.shoppingmall.jwt.JWTUtil;
 import com.bit.joe.shoppingmall.mapper.CategoryMapper;
 import com.bit.joe.shoppingmall.repository.CategoryRepository;
-import com.bit.joe.shoppingmall.repository.ProductRepository;
-import com.bit.joe.shoppingmall.repository.UserRepository;
 import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
-import com.bit.joe.shoppingmall.service.Impl.ProductServiceImpl;
 import com.bit.joe.shoppingmall.service.Impl.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
 
 @TestMethodOrder(MethodOrderer.Random.class)
@@ -47,7 +40,7 @@ public class CategoryControllerTests {
             UserDto.builder()
                     .name("admin")
                     .password("admin")
-                    .email("admin@example.com")
+                    .email("admin for category")
                     .role(UserRole.ADMIN)
                     .gender(UserGender.MALE)
                     .birth("2021-01-01")
@@ -56,42 +49,38 @@ public class CategoryControllerTests {
             UserDto.builder()
                     .name("user")
                     .password("user")
-                    .email("user@example.com")
+                    .email("user for category")
                     .role(UserRole.USER)
                     .gender(UserGender.MALE)
                     .birth("2021-01-01")
                     .build();
-    String adminBasicAuth =
-            "Basic "
-                    + Base64.getEncoder()
-                            .encodeToString(
-                                    (adminDto.getEmail() + ":" + adminDto.getPassword())
-                                            .getBytes());
-    String userBasicAuth =
-            "Basic "
-                    + Base64.getEncoder()
-                            .encodeToString(
-                                    (userDto.getEmail() + ":" + userDto.getPassword()).getBytes());
-    MockHttpSession mockHttpSession = new MockHttpSession();
+
+    String adminJwtToken;
+    String userJwtToken;
+
+    Cookie adminCookie;
+    Cookie userCookie;
+
     @Autowired private MockMvc mockMvc;
-    @Autowired private UserRepository userRepository;
     @Autowired private CategoryRepository categoryRepository;
     @Autowired private UserServiceImpl userService;
     @Autowired private CategoryServiceImpl categoryService;
-    @Autowired private HttpSession session;
-    @Autowired private CategoryController categoryController;
-    @Autowired private ProductController productController;
-    @PersistenceContext private EntityManager entityManager;
-    @Autowired private ProductServiceImpl productService;
-    @Autowired private ProductRepository productRepository;
+    @Autowired private JWTUtil jwtUtil;
 
     @BeforeEach
     public void setUp() {
-        userRepository.deleteAll();
-        categoryRepository.deleteAll();
-
         userService.createUser(userDto);
         userService.createUser(adminDto);
+
+        adminJwtToken =
+                jwtUtil.createJwt(adminDto.getEmail(), adminDto.getRole().name(), 36000000L);
+        userJwtToken = jwtUtil.createJwt(userDto.getEmail(), userDto.getRole().name(), 36000000L);
+
+        adminCookie = new Cookie("token", adminJwtToken);
+        userCookie = new Cookie("token", userJwtToken);
+
+        adminCookie.setPath("/");
+        userCookie.setPath("/");
     }
 
     @Test
@@ -103,9 +92,8 @@ public class CategoryControllerTests {
         mockMvc.perform(
                         post("/category/create")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", adminBasicAuth)
-                                .content(contentJson)
-                                .session(mockHttpSession))
+                                .cookie(adminCookie)
+                                .content(contentJson))
                 .andExpect(status().isOk());
         var repo = categoryRepository.findAll();
         Assertions.assertEquals(1, repo.size());
@@ -139,9 +127,8 @@ public class CategoryControllerTests {
         mockMvc.perform(
                         post("/category/create")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", adminBasicAuth)
                                 .content(contentJson)
-                                .session(mockHttpSession))
+                                .cookie(adminCookie))
                 .andExpect(status().isOk());
 
         var createdCategory = categoryRepository.findAll();
@@ -160,9 +147,8 @@ public class CategoryControllerTests {
         mockMvc.perform(
                         post("/category/create")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", adminBasicAuth)
-                                .content(insertData)
-                                .session(mockHttpSession))
+                                .cookie(adminCookie)
+                                .content(insertData))
                 .andExpect(status().isOk());
 
         // get created category especially id
@@ -174,9 +160,7 @@ public class CategoryControllerTests {
         // delete data
         mockMvc.perform(
                         delete("/category/delete/" + createdCategoryId)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", adminBasicAuth)
-                                .session(mockHttpSession))
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(
                         result -> {

@@ -24,9 +24,9 @@ public class CartController {
      * @return ResponseEntity<Response>
      */
     @PostMapping("/create")
-    public ResponseEntity<Response> createCart() {
+    public ResponseEntity<Response> createCart(@RequestBody CartRequest cartRequest) {
 
-        return ResponseEntity.ok(cartService.createCart());
+        return ResponseEntity.ok(cartService.createCart(cartRequest));
         // return success response with status code 200 (OK)
     }
 

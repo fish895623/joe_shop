@@ -42,8 +42,12 @@ public class ProductServiceImpl implements ProductService {
         product.setQuantity(quantity);
         product.setImageURL(image);
 
-        productRepository.save(product);
-        return Response.builder().status(200).message("Product created successfully").build();
+        product = productRepository.save(product);
+        return Response.builder()
+                .status(200)
+                .message("Product created successfully")
+                .product(ProductMapper.toDto(product))
+                .build();
     }
 
     @Override

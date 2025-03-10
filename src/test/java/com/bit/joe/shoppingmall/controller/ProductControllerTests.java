@@ -7,42 +7,41 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Base64;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpSession;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.bit.joe.shoppingmall.dto.*;
 import com.bit.joe.shoppingmall.dto.request.ProductRequest;
+import com.bit.joe.shoppingmall.dto.response.Response;
 import com.bit.joe.shoppingmall.enums.UserGender;
 import com.bit.joe.shoppingmall.enums.UserRole;
-import com.bit.joe.shoppingmall.mapper.UserMapper;
-import com.bit.joe.shoppingmall.repository.CategoryRepository;
-import com.bit.joe.shoppingmall.repository.ProductRepository;
-import com.bit.joe.shoppingmall.repository.UserRepository;
+import com.bit.joe.shoppingmall.jwt.JWTUtil;
 import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
 import com.bit.joe.shoppingmall.service.Impl.ProductServiceImpl;
+import com.bit.joe.shoppingmall.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Cookie;
+import jakarta.transaction.Transactional;
 
 @TestMethodOrder(MethodOrderer.Random.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource("classpath:application-test.properties")
 @AutoConfigureMockMvc
+@Transactional
+@Rollback
 public class ProductControllerTests {
     UserDto adminDto =
             UserDto.builder()
                     .name("admin")
                     .password("admin")
-                    .email("admin@example.com")
+                    .email("admin Product")
                     .role(UserRole.ADMIN)
                     .gender(UserGender.MALE)
                     .birth("2021-01-01")
@@ -51,44 +50,36 @@ public class ProductControllerTests {
             UserDto.builder()
                     .name("user")
                     .password("user")
-                    .email("user@example.com")
+                    .email("user Product")
                     .role(UserRole.USER)
                     .gender(UserGender.MALE)
                     .birth("2021-01-01")
                     .build();
-    String adminBasicAuth =
-            "Basic "
-                    + Base64.getEncoder()
-                            .encodeToString(
-                                    (adminDto.getEmail() + ":" + adminDto.getPassword())
-                                            .getBytes());
-    String userBasicAuth =
-            "Basic "
-                    + Base64.getEncoder()
-                            .encodeToString(
-                                    (userDto.getEmail() + ":" + userDto.getPassword()).getBytes());
-    MockHttpSession mockHttpSession = new MockHttpSession();
-    private MockMvc mockMvc;
-    @Autowired private HttpSession session;
-    @Autowired private CategoryController categoryController;
-    @Autowired private CategoryRepository categoryRepository;
+
+    @Autowired private MockMvc mockMvc;
     @Autowired private CategoryServiceImpl categoryService;
-    @Autowired private ProductController productController;
-    @Autowired private ProductRepository productRepository;
+    @Autowired private UserService userService;
     @Autowired private ProductServiceImpl productService;
-    @Autowired private UserRepository userRepository;
+    @Autowired private JWTUtil jwtUtil;
+
+    private Long savedCategoryId;
+    String adminJwtToken;
+    String userJwtToken;
 
     @BeforeEach
     void setUp() {
-        userRepository.deleteAll();
-        productRepository.deleteAll();
-        categoryRepository.deleteAll();
 
-        var categoryDto = CategoryDto.builder().id(1L).categoryName("category").build();
-        categoryService.createCategory(categoryDto);
-        userRepository.save(UserMapper.toEntity(userDto));
-        userRepository.save(UserMapper.toEntity(adminDto));
-        mockMvc = MockMvcBuilders.standaloneSetup(new ProductController(productService)).build();
+        CategoryDto categoryDto = CategoryDto.builder().categoryName("category").build();
+        Response resp = categoryService.createCategory(categoryDto);
+        savedCategoryId = resp.getCategory().getId();
+
+        userService.createUser(adminDto);
+        userService.createUser(userDto);
+
+        adminJwtToken =
+                jwtUtil.createJwt(adminDto.getEmail(), adminDto.getRole().toString(), 36000000L);
+        userJwtToken =
+                jwtUtil.createJwt(userDto.getEmail(), userDto.getRole().toString(), 36000000L);
     }
 
     @Test
@@ -98,14 +89,17 @@ public class ProductControllerTests {
         productRequest.setPrice(1000);
         productRequest.setQuantity(10);
         productRequest.setImage("image");
-        productRequest.setCategoryId(1L);
+        productRequest.setCategoryId(savedCategoryId);
 
         String contentJson = new ObjectMapper().writeValueAsString(productRequest);
+
+        var cookie = new Cookie("token", adminJwtToken);
+        cookie.setPath("/");
 
         mockMvc.perform(
                         post("/product/create")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", adminBasicAuth)
+                                .cookie(cookie)
                                 .content(contentJson))
                 .andExpect(status().isOk());
     }
@@ -117,14 +111,17 @@ public class ProductControllerTests {
         productRequest.setPrice(1000);
         productRequest.setQuantity(10);
         productRequest.setImage("image");
-        productRequest.setCategoryId(1L);
+        productRequest.setCategoryId(savedCategoryId);
 
         String contentJson = new ObjectMapper().writeValueAsString(productRequest);
+
+        var cookie = new Cookie("token", adminJwtToken);
+        cookie.setPath("/");
 
         mockMvc.perform(
                         post("/product/create")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", adminBasicAuth)
+                                .cookie(cookie)
                                 .content(contentJson))
                 .andExpect(status().isOk());
 
@@ -132,7 +129,7 @@ public class ProductControllerTests {
         mockMvc.perform(
                         post("/product/create")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", adminBasicAuth)
+                                .cookie(cookie)
                                 .content(contentJson))
                 .andExpect(status().is4xxClientError()) // 중복 -> expect to 400 Bad Request
                 .andExpect(
@@ -148,16 +145,19 @@ public class ProductControllerTests {
         productRequest.setPrice(1000);
         productRequest.setQuantity(10);
         productRequest.setImage("image");
-        productRequest.setCategoryId(1L);
+        productRequest.setCategoryId(savedCategoryId);
 
         ObjectMapper objectMapper = new ObjectMapper();
         String contentJson = objectMapper.writeValueAsString(productRequest);
+
+        var cookie = new Cookie("token", userJwtToken);
+        cookie.setPath("/");
 
         mockMvc.perform(
                         post("/product/create")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(contentJson)
-                                .header("Authorization", userBasicAuth))
+                                .cookie(cookie))
                 .andExpect(status().is4xxClientError());
     }
 
@@ -168,10 +168,13 @@ public class ProductControllerTests {
         ObjectMapper objectMapper = new ObjectMapper();
         String contentJson = objectMapper.writeValueAsString(productRequest);
 
+        var cookie = new Cookie("token", adminJwtToken);
+        cookie.setPath("/");
+
         mockMvc.perform(
                         post("/product/create")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", adminBasicAuth) // 인증 추가
+                                .cookie(cookie)
                                 .content(contentJson))
                 .andExpect(status().is4xxClientError());
     }
@@ -183,27 +186,35 @@ public class ProductControllerTests {
         productRequest.setPrice(1000);
         productRequest.setQuantity(10);
         productRequest.setImage("image");
-        productRequest.setCategoryId(1L);
+        productRequest.setCategoryId(savedCategoryId);
 
-        productService.createProduct(
-                productRequest.getCategoryId(),
-                productRequest.getImage(),
-                productRequest.getName(),
-                productRequest.getQuantity(),
-                productRequest.getPrice());
+        Response resp =
+                productService.createProduct(
+                        productRequest.getCategoryId(),
+                        productRequest.getImage(),
+                        productRequest.getName(),
+                        productRequest.getQuantity(),
+                        productRequest.getPrice());
+
+        Long createdproductId = resp.getProduct().getId();
+        Long categoryIdOfcreatedProduct = resp.getProduct().getCategory().getId();
 
         // Test
         // 제품 목록 조회
         mockMvc.perform(get("/product/get-all")).andExpect(status().isOk());
 
         // 특정 제품 ID로 조회
-        mockMvc.perform(get("/product/get-by-product-id/1")).andExpect(status().isOk());
+        mockMvc.perform(get("/product/get-by-product-id/" + createdproductId))
+                .andExpect(status().isOk());
 
         // 카테고리 ID로 제품 조회
-        mockMvc.perform(get("/product/get-by-category-id/1")).andExpect(status().isOk());
+        mockMvc.perform(get("/product/get-by-category-id/" + categoryIdOfcreatedProduct))
+                .andExpect(status().isOk());
 
-        mockMvc.perform(get("/product/get-by-product-id/2")).andExpect(status().is4xxClientError());
-        mockMvc.perform(get("/product/get-by-category-id/2"))
+        // 존재하지 않는 제품 ID, 카테고리 ID로 조회
+        mockMvc.perform(get("/product/get-by-product-id/" + createdproductId + 1))
+                .andExpect(status().is4xxClientError());
+        mockMvc.perform(get("/product/get-by-category-id/" + categoryIdOfcreatedProduct + 1))
                 .andExpect(status().is4xxClientError());
     }
 
@@ -214,27 +225,30 @@ public class ProductControllerTests {
         productRequest.setPrice(1000);
         productRequest.setQuantity(10);
         productRequest.setImage("image");
-        productRequest.setCategoryId(1L);
+        productRequest.setCategoryId(savedCategoryId);
 
-        productService.createProduct(
-                productRequest.getCategoryId(),
-                productRequest.getImage(),
-                productRequest.getName(),
-                productRequest.getQuantity(),
-                productRequest.getPrice());
+        Response resp =
+                productService.createProduct(
+                        productRequest.getCategoryId(),
+                        productRequest.getImage(),
+                        productRequest.getName(),
+                        productRequest.getQuantity(),
+                        productRequest.getPrice());
 
         // Update product information
         productRequest.setName("product2");
 
+        // Created product ID
+        Long createdproductId = resp.getProduct().getId();
+
         String contentJson = new ObjectMapper().writeValueAsString(productRequest);
         mockMvc.perform(
-                        put("/product/update/1")
+                        put("/product/update/" + createdproductId)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", adminBasicAuth)
                                 .content(contentJson))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/product/get-by-product-id/1"))
+        mockMvc.perform(get("/product/get-by-product-id/" + createdproductId))
                 .andExpect(jsonPath("$.product.name").value("product2"));
     }
 
@@ -245,19 +259,21 @@ public class ProductControllerTests {
         productRequest.setPrice(1000);
         productRequest.setQuantity(10);
         productRequest.setImage("image");
-        productRequest.setCategoryId(1L);
+        productRequest.setCategoryId(savedCategoryId);
 
-        productService.createProduct(
-                productRequest.getCategoryId(),
-                productRequest.getImage(),
-                productRequest.getName(),
-                productRequest.getQuantity(),
-                productRequest.getPrice());
+        Response resp =
+                productService.createProduct(
+                        productRequest.getCategoryId(),
+                        productRequest.getImage(),
+                        productRequest.getName(),
+                        productRequest.getQuantity(),
+                        productRequest.getPrice());
+
+        Long createdproductId = resp.getProduct().getId();
 
         mockMvc.perform(
-                        delete("/product/delete/1")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", adminBasicAuth))
+                        delete("/product/delete/" + createdproductId)
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 }
