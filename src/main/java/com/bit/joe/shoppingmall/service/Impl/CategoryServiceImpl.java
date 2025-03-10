@@ -27,8 +27,12 @@ public class CategoryServiceImpl implements CategoryService {
     public Response createCategory(CategoryDto categoryRequest) {
         Category category = new Category();
         category.setCategoryName(categoryRequest.getCategoryName());
-        categoryRepository.save(category);
-        return Response.builder().status(200).message("Category created successfully").build();
+        category = categoryRepository.save(category);
+        return Response.builder()
+                .status(200)
+                .message("Category created successfully")
+                .category(CategoryMapper.categoryToDto(category))
+                .build();
     }
 
     @Override
