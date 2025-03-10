@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
     <meta
@@ -7,9 +7,12 @@
       content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
     />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Document</title>
+    <title>My Page</title>
+    <link rel="stylesheet" href="/style.css">
+    <th:block th:replace="~{common/head :: library}"></th:block>
   </head>
   <body>
+    <th:block th:replace="~{common/navigation :: navbar}" />
     <h1>My Page</h1>
     <hr />
     <div class="profile-container">
@@ -53,5 +56,7 @@
         <input type="button" value="확인" />
       </p>
     </div>
+
+    <th:block th:replace="~{common/footer :: footer}" />
   </body>
 </html>

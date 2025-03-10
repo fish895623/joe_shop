@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -102,23 +102,35 @@
         <button type="submit" onclick="postLogin()">Login</button>
       </form>
     </div>
-
+    <script src="/global.js"></script>
     <script>
       const postLogin = () => {
         const formData = new FormData();
         formData.append("username", document.getElementById("username").value);
         formData.append("password", document.getElementById("password").value);
-
         fetch("/login", {
           method: "POST",
           body: formData,
         }).then((response) => {
-          // save response Authorization Headers token to local storage
           if (response.ok) {
-            window.location.href = "/";
+            const token = getTokenFromCookie("token");
+            const parseToken = parseJwt(token);
+            const role = parseToken?.role;
+
+            console.log("Token from localStorage: ", token);
+            console.log("Parsed Token: ", parseToken);
+            console.log("User Role: ", role);
+
+            // setTimeout -> log 확인용 -> to be deleted later
+            setTimeout(() => {
+              if (role === "ADMIN") {
+                window.location.href = "/admin/insight";
+              } else {
+                window.location.href = "/";
+              }
+            }, 2000);
           } else {
-            // Handle error
-            document.getElementById("error-message").style.display = "block";
+            document.getElementById("error-message").style.display = "block"; // 로그인 실패 시 오류 메시지
           }
         });
       };
