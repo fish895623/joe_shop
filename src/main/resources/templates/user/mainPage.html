@@ -84,7 +84,10 @@
 
       images.forEach((image) => {
         image.addEventListener("click", () => {
-          console.log(image.id);
+          // split image-0 to 0
+          const imageId = image.id.split("-")[1];
+          console.log(imageId);
+          window.location.href = `/product?id=${imageId}`;
         });
       });
     </script>
