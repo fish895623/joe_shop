@@ -15,6 +15,7 @@ public class CartItemMapper {
                 .id(data.getId())
                 .cartId(data.getCart().getId())
                 .product(ProductMapper.toDto(data.getProduct()))
+                .quantity(data.getQuantity())
                 .price(data.getPrice())
                 .build();
     }
@@ -27,6 +28,7 @@ public class CartItemMapper {
                                 .findById(data.getCartId())
                                 .orElseThrow(() -> new RuntimeException("Cart not found")))
                 .product(ProductMapper.toEntity(data.getProduct()))
+                .quantity(data.getQuantity())
                 .price(data.getPrice())
                 .build();
     }

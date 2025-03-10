@@ -39,7 +39,9 @@ public class CartItemController {
     public ResponseEntity<Response> updateCartItem(@RequestBody CartItemRequest cartItemRequest) {
         log.info("update cart item");
 
-        return ResponseEntity.status(200).body(cartItemService.updateCartItem(cartItemRequest));
+        Response resp = cartItemService.updateCartItem(cartItemRequest);
+
+        return ResponseEntity.status(200).body(resp);
     }
 
     // get cart item

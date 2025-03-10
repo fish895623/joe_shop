@@ -111,7 +111,11 @@ public class CartItemServiceImpl implements CartItemService {
         cartItemRepository.save(cartItem);
         // save cart item
 
-        return Response.builder().status(200).message("Update cart item successfully").build();
+        return Response.builder()
+                .status(200)
+                .message("Update cart item successfully")
+                .cartItem(CartItemMapper.toDto(cartItem))
+                .build();
     }
 
     @Override
