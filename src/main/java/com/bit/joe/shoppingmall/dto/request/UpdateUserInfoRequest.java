@@ -2,6 +2,7 @@ package com.bit.joe.shoppingmall.dto.request;
 
 import com.bit.joe.shoppingmall.enums.UserGender;
 import com.bit.joe.shoppingmall.enums.UserRole;
+
 import lombok.Getter;
 import lombok.Setter;
 
