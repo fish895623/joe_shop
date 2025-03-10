@@ -25,7 +25,7 @@
 
 ## Checklist:
 
-- [ ] 코드 스타일 ./gradlew spotlessApply 를 적용하였습니다.
+- [ ] 코드 스타일 npx prettier -w **/*.html **/*.css **/*.js; gradle spotlessApply 를 적용하였습니다.
 - [ ] 올리기 전에 코드 리뷰 작업을 하였습니다.
 - [ ] 어려운 부분에 대해 주석을 추가했습니다
 - [ ] 문서에 해당 변경 사항을 반영했습니다

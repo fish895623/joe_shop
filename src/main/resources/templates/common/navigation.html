@@ -65,7 +65,19 @@
     userElement.href = "/user/myPage";
     userElement.innerText = `My Page (${displayName}님)`;
 
+    const historyElement = document.createElement("a");
+    historyElement.className = "nav-link";
+    historyElement.href = "/history";
+    historyElement.innerText = "My Order";
+
+    const cartElement = document.createElement("a");
+    cartElement.className = "nav-link";
+    cartElement.href = "/cart";
+    cartElement.innerText = "My Cart";
+
     if (parseToken != null) {
+      doc.appendChild(historyElement);
+      doc.appendChild(cartElement);
       doc.appendChild(userElement);
       doc.appendChild(logoutElement);
     } else {
