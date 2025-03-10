@@ -15,103 +15,100 @@
     </nav>
 
     <div>
-     <!-- 드롭다운 클릭해서 밑에 테이블에 들어갈 수 있도록 -->
+      <!-- 드롭다운 클릭해서 밑에 테이블에 들어갈 수 있도록 -->
       <h3>상품(재고)관리</h3>
       <table border="1">
         <thead>
           <tr>
-            <th>category
-              <select id="categoryDropdown">
-              </select>
-            </th>
-            <th>imageurl
-              <select id="imgDropdown">
-              </select>
+            <th>
+              category
+              <select id="categoryDropdown"></select>
             </th>
             <th>
-              product<select id="productDropdown">
-              </select>
+              imageurl
+              <select id="imgDropdown"></select>
             </th>
+            <th>product<select id="productDropdown"></select></th>
+            <th>quentity<select id="quantityDropdown"></select></th>
+            <th>price<select id="priceDropdown"></select></th>
             <th>
-              quentity<select id="quantityDropdown">
-              </select>
+              <button id="addRowButton">담기</button>
             </th>
-            <th>
-              price<select id="priceDropdown">
-              </select>
-            </th>
-            <th>
-              <button id="addRowButton">담기</button></th>
-          </tr>
           </tr>
         </thead>
         <tbody id="tableBody"></tbody>
       </table>
-
     </div>
 
     <script>
-     document.addEventListener("DOMContentLoaded", function () {
-  const tableBody = document.querySelector("tableBody");
+      document.addEventListener("DOMContentLoaded", function () {
+        const tableBody = document.querySelector("tableBody");
 
-   // 데이터를 불러와 드롭다운에 채우는 함수
-   function loadData() {
+        // 데이터를 불러와 드롭다운에 채우는 함수
+        function loadData() {
           fetch("http://localhost:8080/product/get-all")
             .then((response) => response.json())
             .then((data) => {
-              const categoryDropdown = document.getElementById("categoryDropdown");
+              const categoryDropdown =
+                document.getElementById("categoryDropdown");
               const imageDropdown = document.getElementById("imgDropdown");
-              const productDropdown = document.getElementById("productDropdown");
-              const quantityDropdown = document.getElementById("quantityDropdown");
+              const productDropdown =
+                document.getElementById("productDropdown");
+              const quantityDropdown =
+                document.getElementById("quantityDropdown");
               const priceDropdown = document.getElementById("priceDropdown");
 
               categoryDropdown.innerHTML = "";
-        imageDropdown.innerHTML = "";
-        productDropdown.innerHTML = "";
-        quantityDropdown.innerHTML = "";
-        priceDropdown.innerHTML = "";
+              imageDropdown.innerHTML = "";
+              productDropdown.innerHTML = "";
+              quantityDropdown.innerHTML = "";
+              priceDropdown.innerHTML = "";
 
-        data.productList.forEach((product) => {
-          // Category dropdown
-          const categoryOption = document.createElement("option");
-          categoryOption.value = product.category.categoryName;
-          categoryOption.textContent = product.category.categoryName;
-          categoryDropdown.appendChild(categoryOption);
+              data.productList.forEach((product) => {
+                // Category dropdown
+                const categoryOption = document.createElement("option");
+                categoryOption.value = product.category.categoryName;
+                categoryOption.textContent = product.category.categoryName;
+                categoryDropdown.appendChild(categoryOption);
 
-          // Image dropdown
-          const imageOption = document.createElement("option");
-          imageOption.value = product.imageUrl;
-          imageOption.textContent = product.imageUrl;
-          imageDropdown.appendChild(imageOption);
+                // Image dropdown
+                const imageOption = document.createElement("option");
+                imageOption.value = product.imageUrl;
+                imageOption.textContent = product.imageUrl;
+                imageDropdown.appendChild(imageOption);
 
-          // Product dropdown
-          const productOption = document.createElement("option");
-          productOption.value = product.name;
-          productOption.textContent = product.name;
-          productDropdown.appendChild(productOption);
+                // Product dropdown
+                const productOption = document.createElement("option");
+                productOption.value = product.name;
+                productOption.textContent = product.name;
+                productDropdown.appendChild(productOption);
 
-          // Quantity dropdown
-          const quantityOption = document.createElement("option");
-          quantityOption.value = product.quantity;
-          quantityOption.textContent = product.quantity;
-          quantityDropdown.appendChild(quantityOption);
+                // Quantity dropdown
+                const quantityOption = document.createElement("option");
+                quantityOption.value = product.quantity;
+                quantityOption.textContent = product.quantity;
+                quantityDropdown.appendChild(quantityOption);
 
-          // Price dropdown
-          const priceOption = document.createElement("option");
-          priceOption.value = product.price;
-          priceOption.textContent = `$${product.price}`;
-          priceDropdown.appendChild(priceOption);
-        });
-    })   .catch((error) => console.error("Error loading categories:", error));
-  }
-
+                // Price dropdown
+                const priceOption = document.createElement("option");
+                priceOption.value = product.price;
+                priceOption.textContent = `$${product.price}`;
+                priceDropdown.appendChild(priceOption);
+              });
+            })
+            .catch((error) =>
+              console.error("Error loading categories:", error),
+            );
+        }
 
         // 버튼 클릭 시 선택된 값을 기반으로 행 추가
         function addRow() {
-          const categoryValue = document.getElementById("categoryDropdown").value;
+          const categoryValue =
+            document.getElementById("categoryDropdown").value;
           const imageValue = document.getElementById("imgDropdown").value;
           const productValue = document.getElementById("productDropdown").value;
-          const quantityValue = document.getElementById("quantityDropdown").value;
+          const quantityValue =
+            document.getElementById("quantityDropdown").value;
           const priceValue = document.getElementById("priceDropdown").value;
 
           // 새로운 행 생성 및 추가
@@ -125,9 +122,11 @@
           tableBody.appendChild(row);
         }
 
-         // 이벤트 리스너 등록
-         document.getElementById("addRowButton").addEventListener("click", addRow);
-         // 초기 데이터 로드
+        // 이벤트 리스너 등록
+        document
+          .getElementById("addRowButton")
+          .addEventListener("click", addRow);
+        // 초기 데이터 로드
         loadData();
       });
     </script>
