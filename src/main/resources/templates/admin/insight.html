@@ -1,38 +1,221 @@
-<!doctype html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Title</title>
-  </head>
-  <body>
-    <nav>
-      <ul>
-        <li><a href="http://www.naver.com"> 관리 홈</a></li>
-        <li><a href="http://www.naver.com"> 회원관리</a></li>
-        <li><a href="http://www.naver.com"> 재고관리</a></li>
-      </ul>
-    </nav>
-
-    <td>
-      <div>
-        <div class="container2">
-          <button onclick="location.href = 'http://www.naver.com'">
-            유저인사이트1
-          </button>
-          <button onclick="location.href = 'http://www.naver.com'">
-            유저인사이트2
-          </button>
-        </div>
-
-        <div class="container3">
-          <button onclick="location.href = 'http://www.naver.com'">
-            판매내역
-          </button>
-          <button onclick="location.href = 'http://www.naver.com'">
-            재고관리
-          </button>
-        </div>
-      </div>
-    </td>
-  </body>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Insights Dashboard</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+  <h1>User Insights Dashboard</h1>
+  <h3>Average Sales by Gender and Category</h3>
+  <table class="table table-bordered">
+    <thead>
+    <tr>
+      <th>Gender</th>
+      <th>Category</th>
+      <th>Average Sales</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="sales : ${averageSales}">
+      <td th:text="${sales.gender}"></td>
+      <td th:text="${sales.categoryName}"></td>
+      <td th:text="${sales.averageSales}"></td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
 </html>
+
+<!--chart.js 쓰는 예제 코드-->
+<!--<!doctype html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org" lang="en">-->
+<!--<head>-->
+<!--  <meta charset="UTF-8">-->
+<!--  <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--  <title>Dashboard</title>-->
+<!--  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>-->
+<!--  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">-->
+<!--  <style>-->
+<!--    .container {-->
+<!--        margin-top: 50px;-->
+<!--    }-->
+<!--    .chart-container {-->
+<!--        max-width: 800px;-->
+<!--        margin: 0 auto;-->
+<!--    }-->
+<!--  </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<nav>-->
+<!--  <ul>-->
+<!--    <li><a href="/user/insight"> 관리 홈</a></li>-->
+<!--    <li><a href="/user/member"> 회원관리</a></li>-->
+<!--    <li><a href="/user/inventory"> 재고관리</a></li>-->
+<!--  </ul>-->
+<!--</nav>-->
+
+<!--<div class="container">-->
+<!--  <h1>User Insights Dashboard</h1>-->
+<!--  <br>-->
+<!--  &lt;!&ndash; Bar chart for Average Sales by Gender and Category &ndash;&gt;-->
+<!--  <h3>Average Sales by Gender and Category</h3>-->
+<!--  <div class="chart-container">-->
+<!--    <canvas id="salesBarChart"></canvas>-->
+<!--  </div>-->
+<!--  <br>-->
+<!--  &lt;!&ndash; Chart for Sales Trends &ndash;&gt;-->
+<!--  <h3>Sales Trends by Category</h3>-->
+<!--  <div class="chart-container">-->
+<!--    <canvas id="salesTrendChart"></canvas>-->
+<!--  </div>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--  // Sample data for Average Sales by Gender and Category-->
+<!--  const averageSalesData = [-->
+<!--      { userGender: 'Male', categoryName: 'Men', averageSales: 120 },-->
+<!--      { userGender: 'Female', categoryName: 'Men', averageSales: 150 },-->
+<!--      { userGender: 'Male', categoryName: 'Women', averageSales: 90 },-->
+<!--      { userGender: 'Female', categoryName: 'Women', averageSales: 100 },-->
+<!--      { userGender: 'Male', categoryName: 'Kids', averageSales: 40 },-->
+<!--      { userGender: 'Female', categoryName: 'Kids', averageSales: 55 },-->
+<!--      { userGender: 'Male', categoryName: 'Accessories', averageSales: 70 },-->
+<!--      { userGender: 'Female', categoryName: 'Accessories', averageSales: 80 }-->
+<!--  ];-->
+
+<!--  // Prepare data for Average Sales by Gender and Category (Bar chart)-->
+<!--  const categories = ['Men', 'Women', 'Kids', 'Accessories'];  // Predefined categories-->
+<!--  const genders = ['Male', 'Female']; // Predefined genders-->
+
+<!--  // Create a structure to store sales data for each gender/category combination-->
+<!--  const salesData = categories.reduce((acc, category) => {-->
+<!--    acc[category] = {-->
+<!--      Male: 0,-->
+<!--      Female: 0-->
+<!--    };-->
+<!--    return acc;-->
+<!--  }, {});-->
+
+<!--  // Populate the salesData with the average sales data-->
+<!--  averageSalesData.forEach(data => {-->
+<!--    if (salesData[data.categoryName]) {-->
+<!--      salesData[data.categoryName][data.userGender] = data.averageSales;-->
+<!--    }-->
+<!--  });-->
+
+<!--  // Prepare data for the bar chart-->
+<!--  const barChartLabels = categories;-->
+<!--  const maleSalesData = categories.map(category => salesData[category].Male);-->
+<!--  const femaleSalesData = categories.map(category => salesData[category].Female);-->
+
+<!--  // Create a bar chart for average sales by gender and category-->
+<!--  const ctxBar = document.getElementById('salesBarChart').getContext('2d');-->
+<!--  const salesBarChart = new Chart(ctxBar, {-->
+<!--    type: 'bar',-->
+<!--    data: {-->
+<!--      labels: barChartLabels,-->
+<!--      datasets: [-->
+<!--        {-->
+<!--          label: 'Male',-->
+<!--          data: maleSalesData,-->
+<!--          backgroundColor: 'rgba(54, 162, 235, 0.5)',  // Blue color for male bars-->
+<!--          borderColor: 'rgba(54, 162, 235, 1)',  // Blue color border for male bars-->
+<!--          borderWidth: 1-->
+<!--        },-->
+<!--        {-->
+<!--          label: 'Female',-->
+<!--          data: femaleSalesData,-->
+<!--          backgroundColor: 'rgba(255, 99, 132, 0.5)',  // Red color for female bars-->
+<!--          borderColor: 'rgba(255, 99, 132, 1)',  // Red color border for female bars-->
+<!--          borderWidth: 1-->
+<!--        }-->
+<!--      ]-->
+<!--    },-->
+<!--    options: {-->
+<!--      responsive: true,-->
+<!--      scales: {-->
+<!--        x: {-->
+<!--          title: {-->
+<!--            display: true,-->
+<!--            text: 'Category'-->
+<!--          },-->
+<!--          ticks: {-->
+<!--            autoSkip: false,  // To avoid overlapping of labels-->
+<!--            maxRotation: 45,  // Rotate labels if needed-->
+<!--            minRotation: 45-->
+<!--          }-->
+<!--        },-->
+<!--        y: {-->
+<!--          title: {-->
+<!--            display: true,-->
+<!--            text: 'Average Sales'-->
+<!--          },-->
+<!--          beginAtZero: true-->
+<!--        }-->
+<!--      }-->
+<!--    }-->
+<!--  });-->
+
+<!--  // Sample data for Sales Trends (Seasonality)-->
+<!--  const seasonalSalesData = [-->
+<!--      { categoryName: 'Men', month: 'January', totalSales: 200 },-->
+<!--      { categoryName: 'Men', month: 'February', totalSales: 250 },-->
+<!--      { categoryName: 'Women', month: 'January', totalSales: 100 },-->
+<!--      { categoryName: 'Women', month: 'February', totalSales: 120 },-->
+<!--      { categoryName: 'Kids', month: 'January', totalSales: 50 },-->
+<!--      { categoryName: 'Kids', month: 'February', totalSales: 60 },-->
+<!--      { categoryName: 'Accessories', month: 'January', totalSales: 80 },-->
+<!--      { categoryName: 'Accessories', month: 'February', totalSales: 40 }-->
+<!--  ];-->
+
+<!--  // Prepare data for the sales trends chart-->
+<!--  const trendCategories = [...new Set(seasonalSalesData.map(item => item.categoryName))];-->
+<!--  const months = [...new Set(seasonalSalesData.map(item => item.month))];-->
+
+<!--  const salesByCategory = trendCategories.map(category => {-->
+<!--    return months.map(month => {-->
+<!--      const sales = seasonalSalesData.find(item => item.categoryName === category && item.month === month);-->
+<!--      return sales ? sales.totalSales : 0;-->
+<!--    });-->
+<!--  });-->
+
+<!--  // Create a line chart showing sales trends by category-->
+<!--  const ctxLine = document.getElementById('salesTrendChart').getContext('2d');-->
+<!--  const salesTrendChart = new Chart(ctxLine, {-->
+<!--    type: 'line',-->
+<!--    data: {-->
+<!--      labels: months, // x-axis labels (months)-->
+<!--      datasets: trendCategories.map((category, index) => {-->
+<!--        return {-->
+<!--          label: category,-->
+<!--          data: salesByCategory[index],-->
+<!--          borderColor: `hsl(${(index * 360 / trendCategories.length) % 360}, 100%, 50%)`,-->
+<!--          fill: false-->
+<!--        };-->
+<!--      })-->
+<!--    },-->
+<!--    options: {-->
+<!--      responsive: true,-->
+<!--      scales: {-->
+<!--        x: {-->
+<!--          title: {-->
+<!--            display: true,-->
+<!--            text: 'Month'-->
+<!--          }-->
+<!--        },-->
+<!--        y: {-->
+<!--          title: {-->
+<!--            display: true,-->
+<!--            text: 'Total Sales'-->
+<!--          }-->
+<!--        }-->
+<!--      }-->
+<!--    }-->
+<!--  });-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
