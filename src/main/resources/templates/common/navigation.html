@@ -17,10 +17,7 @@
       </form>
 
       <!-- Navigation Links -->
-      <div class="navbar-nav ms-auto" id="link-bar">
-        <a class="nav-link" href="/history">My Order</a>
-        <a class="nav-link" href="/cart">My Cart</a>
-      </div>
+      <div class="navbar-nav ms-auto" id="link-bar"></div>
     </div>
   </nav>
   <script src="/global.js"></script>
@@ -53,7 +50,19 @@
     userElement.href = "/user/myPage";
     userElement.innerText = username;
 
+    const historyElement = document.createElement("a");
+    historyElement.className = "nav-link";
+    historyElement.href = "/history";
+    historyElement.innerText = "My Order";
+
+    const cartElement = document.createElement("a");
+    cartElement.className = "nav-link";
+    cartElement.href = "/cart";
+    cartElement.innerText = "My Cart";
+
     if (parseToken != null) {
+      doc.appendChild(historyElement);
+      doc.appendChild(cartElement);
       doc.appendChild(userElement);
       doc.appendChild(logoutElement);
     } else {
