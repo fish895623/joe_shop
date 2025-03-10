@@ -18,7 +18,7 @@ public class UserHtmlController {
         return "login";
     }
 
-    @GetMapping("/signUp")
+    @GetMapping("/register")
     public String SignUp() {
         return "user/signUp";
     }
