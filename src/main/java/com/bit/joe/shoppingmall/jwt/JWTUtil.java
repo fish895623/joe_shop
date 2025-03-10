@@ -6,11 +6,13 @@ import java.util.Date;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Jwts;
 
+@Slf4j
 @Component
 public class JWTUtil {
 
@@ -55,6 +57,7 @@ public class JWTUtil {
     }
 
     public String createJwt(String username, String role, Long expiredMs) {
+        log.info("createJwt {}", new Date(System.currentTimeMillis()).toString());
 
         return Jwts.builder()
                 .claim("username", username)

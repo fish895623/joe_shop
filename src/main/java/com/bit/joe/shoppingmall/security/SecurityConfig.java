@@ -1,5 +1,12 @@
 package com.bit.joe.shoppingmall.security;
 
+import com.bit.joe.shoppingmall.enums.UserRole;
+import com.bit.joe.shoppingmall.jwt.JWTFilter;
+import com.bit.joe.shoppingmall.jwt.JWTUtil;
+import com.bit.joe.shoppingmall.jwt.LoginFilter;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,13 +18,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import com.bit.joe.shoppingmall.enums.UserRole;
-import com.bit.joe.shoppingmall.jwt.JWTFilter;
-import com.bit.joe.shoppingmall.jwt.JWTUtil;
-import com.bit.joe.shoppingmall.jwt.LoginFilter;
-
-import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
@@ -46,8 +46,10 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         request ->
-                                request.requestMatchers("/", "/join")
+                                request.requestMatchers("/")
                                         .permitAll()
+                                        .requestMatchers("/admin")
+                                        .hasAuthority(UserRole.ADMIN.name())
                                         .requestMatchers("/user/get-all")
                                         .hasAuthority(UserRole.ADMIN.name())
                                         .requestMatchers("/category/create")

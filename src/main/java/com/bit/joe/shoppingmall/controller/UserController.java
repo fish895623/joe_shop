@@ -34,11 +34,6 @@ public class UserController {
 
     @GetMapping("/info")
     public ResponseEntity<Response> getRole() {
-        //        // get Current User Information Authenticated by JWT
-        //        Authentication authentication =
-        // SecurityContextHolder.getContext().getAuthentication();
-        //        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        // get user details from authentication
         UserDto user = new UserDto();
         user.setEmail("admin");
         user.setRole(UserRole.valueOf("ADMIN"));
@@ -148,17 +143,11 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Response> login(HttpSession session, @RequestBody UserDto userDto) {
-        log.info("Login User: {}", session.getAttributeNames());
+    public ResponseEntity<Response> login(@RequestBody UserDto userDto) {
         log.info(userDto.toString());
-        session.removeAttribute("user");
-        // Set user to null -> logout user
 
         Response resp = userService.login(userDto.getEmail(), userDto.getPassword());
         // Login user with email and password and get response
-
-        session.setAttribute("user", resp.getUser());
-        // Set user to session
 
         return ResponseEntity.status(HttpStatus.OK).body(resp);
         // return success response with status code 200 (OK)
