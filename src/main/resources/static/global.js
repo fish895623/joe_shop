@@ -1,11 +1,3 @@
-// const getUserRole = () => {
-//     return fetch('/api/user/info')
-//         .then(response => response.json())
-//         .then(data => {
-//             return data.user.role;
-//         })
-// }
-
 function getTokenFromCookie() {
     const cookies = document.cookie.split(';');
     for (let cookie of cookies) {
@@ -15,6 +7,22 @@ function getTokenFromCookie() {
         }
     }
     return null;
+}
+
+function getTokenFromLocalStorage() {
+    const token = localStorage.getItem('token');
+    if (token) {
+        return token;
+    }
+    return null;
+}
+
+function setTokenInLocalStorage(token) {
+    // parse Bearer token and set it in local storage
+    if (token && token.startsWith('Bearer ')) {
+        token = token.substring(7);
+    }
+    localStorage.setItem('token', token);
 }
 
 function parseJwt(token) {

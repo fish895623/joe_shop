@@ -38,16 +38,6 @@ public class JWTFilter extends OncePerRequestFilter {
             log.info("Token found in Authorization header");
         }
 
-        //        if (token == null && request.getCookies() != null) {
-        //            for (Cookie cookie : request.getCookies()) {
-        //                if (cookie.getName().equals("token")) {
-        //                    token = cookie.getValue();
-        //                    log.info("Token found in cookie");
-        //                    break;
-        //                }
-        //            }
-        //        }
-
         if (token == null) {
             log.info("Token not found");
             filterChain.doFilter(request, response);

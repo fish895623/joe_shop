@@ -157,11 +157,6 @@ public class UserController {
     public ResponseEntity<Response> logout(
             HttpServletResponse response, HttpServletRequest request) {
 
-        Cookie cookie = new Cookie("token", null);
-        cookie.setPath("/");
-
-        response.addCookie(cookie);
-
         Response resp = Response.builder().status(200).message("Logout successfully").build();
         return ResponseEntity.status(HttpStatus.OK).body(resp);
     }

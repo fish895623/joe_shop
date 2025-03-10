@@ -18,17 +18,17 @@
 
       <!-- Navigation Links -->
       <div class="navbar-nav ms-auto" id="link-bar">
-        <a class="nav-link" href="/user/myPage">My Page</a>
         <a class="nav-link" href="/history">My Order</a>
         <a class="nav-link" href="/cart">My Cart</a>
       </div>
     </div>
   </nav>
   <script src="/global.js"></script>
-  <script>
-      const token = getTokenFromCookie()
+  <script >
+      const token = getTokenFromLocalStorage()
       const parseToken = parseJwt(token)
       const role = getUserRole(parseToken)
+      const username = parseToken?.username
 
       const doc = document.getElementById("link-bar")
 
@@ -41,18 +41,17 @@
       logoutElement.className = "nav-link"
       logoutElement.innerText = "Log Out"
       logoutElement.onclick = function() {
-          fetch('/api/user/logout', {
-              method: 'GET',
-          }).then(response => {
-              if (response.ok) {
-                  window.location.href = '/'
-              } else {
-                  alert('Logout failed')
-              }
-          })
+          localStorage.removeItem("token")
+          window.location.href = "/"
       }
 
+      const userElement = document.createElement('a')
+      userElement.className = "nav-link"
+      userElement.href = "/user/myPage"
+      userElement.innerText = username
+
       if (parseToken != null) {
+          doc.appendChild(userElement)
           doc.appendChild(logoutElement)
       } else {
           doc.appendChild(loginElement)
