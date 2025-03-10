@@ -16,16 +16,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.bit.joe.shoppingmall.dto.*;
 import com.bit.joe.shoppingmall.dto.request.CartRequest;
 import com.bit.joe.shoppingmall.dto.request.OrderRequest;
+import com.bit.joe.shoppingmall.entity.Cart;
+import com.bit.joe.shoppingmall.entity.Category;
 import com.bit.joe.shoppingmall.enums.OrderStatus;
 import com.bit.joe.shoppingmall.enums.RequestType;
 import com.bit.joe.shoppingmall.enums.UserGender;
 import com.bit.joe.shoppingmall.enums.UserRole;
+import com.bit.joe.shoppingmall.mapper.CartMapper;
 import com.bit.joe.shoppingmall.repository.CartRepository;
 import com.bit.joe.shoppingmall.repository.CategoryRepository;
 import com.bit.joe.shoppingmall.repository.ProductRepository;
@@ -44,6 +48,7 @@ import jakarta.transaction.Transactional;
 @TestPropertySource("classpath:application-test.properties")
 @AutoConfigureMockMvc
 @Transactional
+@Rollback
 public class OrderControllerTests {
     UserDto userDto =
             UserDto.builder()
@@ -61,6 +66,8 @@ public class OrderControllerTests {
                             .encodeToString(
                                     (userDto.getEmail() + ":" + userDto.getPassword()).getBytes());
 
+    Cart cart;
+
     @Autowired private MockMvc mockMvc;
     @Autowired private CategoryRepository categoryRepository;
     @Autowired private CategoryServiceImpl categoryService;
@@ -75,18 +82,27 @@ public class OrderControllerTests {
     void setUp() {
         userService.createUser(userDto);
 
-        var categoryDto1 = CategoryDto.builder().id(1L).categoryName("category1").build();
-        var categoryDto2 = CategoryDto.builder().id(2L).categoryName("category2").build();
-        var categoryDto3 = CategoryDto.builder().id(3L).categoryName("category3").build();
+        CategoryDto categoryDto1 = CategoryDto.builder().categoryName("category1").build();
+        CategoryDto categoryDto2 = CategoryDto.builder().categoryName("category2").build();
+        CategoryDto categoryDto3 = CategoryDto.builder().categoryName("category3").build();
+
         categoryService.createCategory(categoryDto1);
         categoryService.createCategory(categoryDto2);
         categoryService.createCategory(categoryDto3);
 
         categoryRepository.flush();
 
+        List<Category> categories = categoryRepository.findAll();
+        Long cartegoryId1 = categories.get(0).getId();
+        Long cartegoryId2 = categories.get(1).getId();
+        Long cartegoryId3 = categories.get(2).getId();
+
+        categoryDto1.setId(cartegoryId1);
+        categoryDto2.setId(cartegoryId2);
+        categoryDto3.setId(cartegoryId3);
+
         var productDto1 =
                 ProductDto.builder()
-                        .id(1L)
                         .name("product1")
                         .price(100)
                         .quantity(15)
@@ -95,7 +111,6 @@ public class OrderControllerTests {
                         .build();
         var productDto2 =
                 ProductDto.builder()
-                        .id(2L)
                         .name("product2")
                         .price(200)
                         .quantity(10)
@@ -104,7 +119,6 @@ public class OrderControllerTests {
                         .build();
         var productDto3 =
                 ProductDto.builder()
-                        .id(3L)
                         .name("product3")
                         .price(300)
                         .quantity(5)
@@ -138,7 +152,11 @@ public class OrderControllerTests {
                 new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        cartService.createCart();
+        // Create Cart
+        CartRequest cartRequest = CartRequest.builder().userId(userDto.getId()).build();
+        cart = CartMapper.toEntity(cartService.createCart(cartRequest).getCart());
+
+        assert cart != null;
 
         var cartRequest1 = CartRequest.builder().productId(1L).quantity(1).build();
         var cartRequest2 = CartRequest.builder().productId(2L).quantity(2).build();
@@ -157,6 +175,7 @@ public class OrderControllerTests {
      * @throws Exception if the test fails
      */
     @Test
+    @Rollback
     void orderApiTest() throws Exception {
         // prepare request data
         List<Long> cartItemIds = List.of(1L, 2L, 3L);
