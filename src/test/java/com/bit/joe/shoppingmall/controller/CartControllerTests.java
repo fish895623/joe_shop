@@ -146,4 +146,16 @@ class CartControllerTests {
         mockMvc.perform(get("/api/cart/get").contentType(MediaType.APPLICATION_JSON).cookie(cookie))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    @DisplayName("Get cart with invalid token")
+    void getCartWithInvalidToken() throws Exception {
+        // make cookie
+        var cookie = new Cookie("token", userJwtToken);
+        cookie.setPath("/");
+
+        // perform get cart
+        mockMvc.perform(get("/api/cart/get").contentType(MediaType.APPLICATION_JSON).cookie(cookie))
+                .andExpect(status().is4xxClientError());
+    }
 }
