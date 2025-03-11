@@ -69,8 +69,16 @@
         userElement.href = "/user/my-page";
         userElement.innerText = `My Page (${displayName}님)`;
 
+        const adminDashBoard = document.createElement("a");
+        adminDashBoard.className = "nav-link";
+        adminDashBoard.href = "/admin/insight";
+        adminDashBoard.innerText = `Admin DashBoard`;
+
         if (parseToken != null) {
           doc.appendChild(userElement);
+          if (parseToken?.role === "ADMIN") {
+            doc.appendChild(adminDashBoard);
+          }
           doc.appendChild(logoutElement);
         } else {
           doc.appendChild(loginElement);
