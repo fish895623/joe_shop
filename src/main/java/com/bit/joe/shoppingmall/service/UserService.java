@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpSession;
 public interface UserService {
     Response createUser(UserDto userRequest);
 
-    Response updateUser(Long userId, UserDto userRequest);
+    Response updateUser(String token, UserDto userRequest);
 
     Response getAllUsers();
 

@@ -1,7 +1,5 @@
 package com.bit.joe.shoppingmall.controller;
 
-import java.util.Objects;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bit.joe.shoppingmall.dto.UserDto;
-import com.bit.joe.shoppingmall.dto.request.UpdateUserInfoRequest;
 import com.bit.joe.shoppingmall.dto.response.Response;
 import com.bit.joe.shoppingmall.enums.UserRole;
 import com.bit.joe.shoppingmall.service.UserService;
@@ -53,7 +50,10 @@ public class UserController {
     @GetMapping("/get-all")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Response> getAllUsers() {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getAllUsers());
+        // get all users
+        Response resp = userService.getAllUsers();
+
+        return ResponseEntity.status(resp.getStatus()).body(resp);
         // return success response with status code 200 (OK)
     }
 
@@ -80,63 +80,12 @@ public class UserController {
         // return success response with status code 201 (CREATED)
     }
 
-    @PutMapping("/update/{userId}")
-    public ResponseEntity<Response> updateUser(
-            HttpSession session, @PathVariable Long userId, @RequestBody UserDto userDto) {
-
-        UserDto user = (UserDto) session.getAttribute("user");
-        // Get user from session
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(
-                            Response.builder()
-                                    .status(401)
-                                    .message("Unauthorized(in controller): User is not logged in")
-                                    .build());
-            // return unauthorized response with status code 401 -> user is not logged in
-        }
-
-        Long sessionUserId = user.getId();
-        // Get user's id
-        if (!sessionUserId.equals(userId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Response.builder().status(403).message("Forbidden").build());
-            // return forbidden response with status code 403 -> user is not allowed to
-            // update other
-            // user's data
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(userId, userDto));
-        // return success response with status code 200 (OK)
-    }
-
     @PutMapping("/update")
-    public ResponseEntity<Response> updateUser(@RequestBody UpdateUserInfoRequest userDto) {
+    public ResponseEntity<Response> updateUser(
+            @CookieValue("token") String token, @RequestBody UserDto userDto) {
+        Response resp = userService.updateUser(token, userDto);
 
-        UserDto user = userService.getUserByEmail(userDto.getEmail()).getUser();
-
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(
-                            Response.builder()
-                                    .status(401)
-                                    .message("Unauthorized(in controller): User is not logged in")
-                                    .build());
-            // return unauthorized response with status code 401 -> user is not logged in
-        }
-
-        Long userId = user.getId();
-
-        user.setName(userDto.getName());
-        user.setBirth(userDto.getBirth());
-        user.setPhone(userDto.getPhone());
-        user.setAddress(userDto.getAddress());
-        user.setGender(userDto.getGender());
-        if (Objects.equals(userDto.getConfirmPassword(), userDto.getNewPassword())) {
-            user.setPassword(userDto.getNewPassword());
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(userId, user));
+        return ResponseEntity.status(resp.getStatus()).body(resp);
         // return success response with status code 200 (OK)
     }
 
