@@ -4,7 +4,6 @@ import static com.bit.joe.shoppingmall.enums.OrderStatus.*;
 
 import java.util.List;
 
-import com.bit.joe.shoppingmall.jwt.JWTUtil;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,6 +14,7 @@ import com.bit.joe.shoppingmall.dto.UserDto;
 import com.bit.joe.shoppingmall.dto.response.Response;
 import com.bit.joe.shoppingmall.entity.User;
 import com.bit.joe.shoppingmall.exception.NotFoundException;
+import com.bit.joe.shoppingmall.jwt.JWTUtil;
 import com.bit.joe.shoppingmall.mapper.UserMapper;
 import com.bit.joe.shoppingmall.repository.UserRepository;
 import com.bit.joe.shoppingmall.service.UserService;
@@ -49,10 +49,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public Response updateUser(String token, UserDto userRequest) {
 
-        User userRequestedToUpdate = userRepository
-                .findById(userRequest.getId())
-                .orElseThrow(
-                        () -> new NotFoundException("User data going to update does not found"));
+        User userRequestedToUpdate =
+                userRepository
+                        .findById(userRequest.getId())
+                        .orElseThrow(
+                                () ->
+                                        new NotFoundException(
+                                                "User data going to update does not found"));
         // Check if user exists and throw exception if not
 
         // decrypt token and get user email
@@ -205,7 +208,10 @@ public class UserServiceImpl implements UserService {
         // if not, return a response with status code 401 (UNAUTHORIZED)
         // if yes, continue to the next step
         if (!user.getEmail().equals(emailInToken)) {
-            return Response.builder().status(401).message("Can not withdraw other's account").build();
+            return Response.builder()
+                    .status(401)
+                    .message("Can not withdraw other's account")
+                    .build();
         }
 
         // check if the user has any order that is not completed

@@ -5,9 +5,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.bit.joe.shoppingmall.entity.User;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -18,13 +15,16 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.bit.joe.shoppingmall.dto.UserDto;
+import com.bit.joe.shoppingmall.entity.User;
 import com.bit.joe.shoppingmall.enums.UserGender;
 import com.bit.joe.shoppingmall.enums.UserRole;
 import com.bit.joe.shoppingmall.jwt.JWTUtil;
 import com.bit.joe.shoppingmall.mapper.UserMapper;
 import com.bit.joe.shoppingmall.repository.*;
 import com.bit.joe.shoppingmall.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
@@ -74,8 +74,7 @@ public class UserControllerTests {
 
         adminJwtToken =
                 jwtUtil.createJwt(adminDto.getEmail(), adminDto.getRole().name(), 36000000L);
-        userJwtToken =
-                jwtUtil.createJwt(userDto.getEmail(), userDto.getRole().name(), 36000000L);
+        userJwtToken = jwtUtil.createJwt(userDto.getEmail(), userDto.getRole().name(), 36000000L);
 
         adminCookie = new Cookie("token", adminJwtToken);
         userCookie = new Cookie("token", userJwtToken);
@@ -165,15 +164,10 @@ public class UserControllerTests {
     public void getAllUsers() throws Exception {
 
         // Test if admin can get all users
-        mockMvc.perform(
-                        get("/api/user/get-all")
-                            .cookie(adminCookie))
-                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/user/get-all").cookie(adminCookie)).andExpect(status().isOk());
 
         // Test if user can get all users
-        mockMvc.perform(
-                        get("/api/user/get-all")
-                            .cookie(userCookie))
+        mockMvc.perform(get("/api/user/get-all").cookie(userCookie))
                 .andExpect(
                         result -> {
                             var status = result.getResponse().getStatus();
@@ -218,7 +212,7 @@ public class UserControllerTests {
                         put("/api/user/update")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(userDtoJson)
-            .cookie(userCookie))
+                                .cookie(userCookie))
                 .andExpect(status().isOk());
     }
 
@@ -226,7 +220,6 @@ public class UserControllerTests {
     @Test
     @DisplayName("Withdraw user")
     public void withdrawUser() throws Exception {
-
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
@@ -243,7 +236,7 @@ public class UserControllerTests {
         mockMvc.perform(
                         get("/api/user/withdraw")
                                 .contentType(MediaType.APPLICATION_JSON)
-                            .cookie(userCookie)
+                                .cookie(userCookie)
                                 .content(userDtoJson))
                 .andExpect(status().isOk());
     }
