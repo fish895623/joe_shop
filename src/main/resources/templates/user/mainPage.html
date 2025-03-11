@@ -77,19 +77,19 @@
     </ul>
 
     <th:block th:replace="~{common/footer :: footer}" />
-    <script>
-      // JavaScript to handle image click events
-      const images = document.querySelectorAll(".clothes img");
-      const mainImage = document.getElementById("mainImage");
-
-      images.forEach((image) => {
-        image.addEventListener("click", () => {
-          // split image-0 to 0
-          const imageId = image.id.split("-")[1];
-          console.log(imageId);
-          window.location.href = `/product?id=${imageId}`;
-        });
-      });
-    </script>
   </body>
+  <script>
+    // JavaScript to handle image click events
+    const images = document.querySelectorAll(".clothes img");
+    const mainImage = document.getElementById("mainImage");
+
+    images.forEach((image) => {
+      image.addEventListener("click", () => {
+        // split image-0 to 0
+        const imageId = image.id.split("-")[1];
+        console.log(imageId);
+        window.location.href = `/product?id=${imageId}`;
+      });
+    });
+  </script>
 </html>
