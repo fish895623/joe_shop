@@ -20,29 +20,29 @@
       <table border="1">
         <thead>
           <tr>
-            <th>
-              category
-              <select id="categoryDropdown"></select>
-            </th>
-            <th>
-              imageurl
-              <select id="imgDropdown"></select>
-            </th>
+            <th>category<select id="categoryDropdown"></select></th>
+            <th>imageurl<select id="imgDropdown"></select></th>
             <th>product<select id="productDropdown"></select></th>
-            <th>quentity<select id="quantityDropdown"></select></th>
+            <th>quantity<select id="quantityDropdown"></select></th>
             <th>price<select id="priceDropdown"></select></th>
-            <th>
-              <button id="addRowButton">담기</button>
-            </th>
+            <th><button id="addRowButton">담기</button></th>
           </tr>
         </thead>
         <tbody id="tableBody"></tbody>
+        <tfoot>
+          <!-- Single cell for Grand Total -->
+          <tr>
+            <td colspan="6" id="grandTotalCell">
+              총 합계 금액: <span id="grandTotal">0</span>원
+            </td>
+          </tr>
+        </tfoot>
       </table>
     </div>
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        const tableBody = document.querySelector("tableBody");
+        const tableBody = document.querySelector("#tableBody");
 
         // 데이터를 불러와 드롭다운에 채우는 함수
         function loadData() {
@@ -64,7 +64,10 @@
               quantityDropdown.innerHTML = "";
               priceDropdown.innerHTML = "";
 
-              data.productList.forEach((product) => {
+              // Reverse the array to display in descending order
+              const reversedData = [...data.productList].reverse();
+
+              reversedData.forEach((product) => {
                 // Category dropdown
                 const categoryOption = document.createElement("option");
                 categoryOption.value = product.category.categoryName;
@@ -92,7 +95,7 @@
                 // Price dropdown
                 const priceOption = document.createElement("option");
                 priceOption.value = product.price;
-                priceOption.textContent = `$${product.price}`;
+                priceOption.textContent = `${product.price}원`;
                 priceDropdown.appendChild(priceOption);
               });
             })
@@ -107,25 +110,60 @@
             document.getElementById("categoryDropdown").value;
           const imageValue = document.getElementById("imgDropdown").value;
           const productValue = document.getElementById("productDropdown").value;
-          const quantityValue =
-            document.getElementById("quantityDropdown").value;
-          const priceValue = document.getElementById("priceDropdown").value;
+          const quantityValue = parseInt(
+            document.getElementById("quantityDropdown").value,
+            10,
+          );
+          const priceValue = parseInt(
+            document.getElementById("priceDropdown").value,
+            10,
+          );
 
-          // 새로운 행 생성 및 추가
+          // Calculate row total
+          const total = quantityValue * priceValue;
+
+          // Add new row
           const row = document.createElement("tr");
           row.innerHTML = `
-            <td>${categoryValue}</td>
-            <td>${imageValue}</td>
-            <td>${productValue}</td>
-            <td>${quantityValue}</td>
-            <td>${priceValue}</td>`;
+          <td>${categoryValue}</td>
+          <td>${imageValue}</td>
+          <td>${productValue}</td>
+          <td>${quantityValue}</td>
+          <td>${priceValue}원</td>
+          <td>${total}원</td>`;
           tableBody.appendChild(row);
+
+          // Update grand total
+          updateGrandTotal();
+        }
+
+        // Grand total update function
+        function updateGrandTotal() {
+          const rows = tableBody.children;
+          let grandTotal = 0;
+
+          for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const totalCell = row.cells[5]; // Total column (6th column)
+            if (totalCell) {
+              const total = parseInt(
+                totalCell.textContent.replace("원", ""),
+                10,
+              );
+              grandTotal += total;
+            }
+          }
+
+          // Update Grand Total Cell
+          const grandTotalSpan = document.getElementById("grandTotal");
+          grandTotalSpan.textContent = `${grandTotal}`;
         }
 
         // 이벤트 리스너 등록
         document
           .getElementById("addRowButton")
           .addEventListener("click", addRow);
+
         // 초기 데이터 로드
         loadData();
       });
