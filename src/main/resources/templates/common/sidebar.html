@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <style>
+      /* Main Layout */
+      body {
+        overflow-x: hidden;
+      }
+
+      .wrapper {
+        display: flex;
+        width: 100%;
+      }
+
+      #content {
+        width: 100%;
+        padding: 20px;
+        min-height: 100vh;
+        transition: all 0.3s;
+        margin-left: 250px;
+      }
+
+      #content.active {
+        margin-left: 0;
+      }
+
+      /* Sidebar Styling */
+      #sidebar {
+        width: 250px;
+        background: #222;
+        color: #fff;
+        position: fixed;
+        height: 100%;
+        transition: all 0.3s ease;
+        z-index: 999;
+      }
+
+      #sidebar .sidebar-header {
+        padding: 20px;
+        background: #343a40;
+      }
+
+      #sidebar ul.components {
+        padding: 20px;
+      }
+
+      #sidebar ul li a {
+        color: #ddd;
+        text-decoration: none;
+        display: block;
+        padding: 10px;
+      }
+
+      #sidebar ul li a:hover {
+        background: #007bff;
+        color: #fff;
+      }
+
+      #sidebar.active {
+        margin-left: -250px; /* Collapsed state */
+      }
+
+      /* Sidebar Footer */
+      .sidebar-footer {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        text-align: center;
+        padding: 10px 0;
+        background: #1a1a1a;
+      }
+
+      /* Sidebar Toggle Button */
+      #sidebarCollapse {
+        width: 40px;
+        height: 40px;
+        background: #343a40;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        position: fixed;
+        top: 15px;
+        left: 260px;
+        z-index: 999;
+        transition: all 0.3s;
+      }
+
+      #sidebarCollapse.active {
+        left: 10px;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        #sidebar {
+          margin-left: -250px;
+        }
+
+        #sidebar.active {
+          margin-left: 0;
+        }
+
+        #content {
+          margin-left: 0;
+        }
+
+        #content.active {
+          margin-left: 250px;
+        }
+
+        #sidebarCollapse {
+          left: 10px;
+        }
+
+        #sidebarCollapse.active {
+          left: 260px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <th:block th:fragment="sidebarFragment">
+      <div class="wrapper">
+        <!-- Sidebar Toggle Button -->
+        <button type="button" id="sidebarCollapse" class="btn">
+          <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Sidebar -->
+        <nav id="sidebar" class="bg-dark">
+          <div class="sidebar-header">
+            <h3>Admin Dashboard</h3>
+          </div>
+
+          <ul class="list-unstyled components">
+            <li class="active">
+              <a href="/admin/insight"> <i class="fas fa-home"></i> Insight </a>
+            </li>
+            <li>
+              <a href="/admin/member">
+                <i class="fas fa-users"></i> User Management
+              </a>
+            </li>
+            <li>
+              <a href="/admin/inventory">
+                <i class="fas fa-tags"></i> Product Management
+              </a>
+            </li>
+            <li>
+              <a href="/admin/orders">
+                <i class="fas fa-shopping-cart"></i> Order Management
+              </a>
+            </li>
+            <li>
+              <a href="/" target="_blank">
+                <i class="fas fa-store"></i> Visit Store
+              </a>
+            </li>
+          </ul>
+
+          <!-- Footer -->
+          <div class="sidebar-footer">
+            <p>© 2025 Analytics Portal</p>
+          </div>
+        </nav>
+      </div>
+
+      <!-- JavaScript for sidebar toggle -->
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          const sidebar = document.getElementById("sidebar");
+          const content = document.querySelector(".content");
+          const toggleBtn = document.getElementById("sidebarCollapse");
+
+          toggleBtn.addEventListener("click", function () {
+            sidebar.classList.toggle("active");
+            content.classList.toggle("active");
+            toggleBtn.classList.toggle("active");
+          });
+
+          // Close sidebar by default on mobile
+          if (window.innerWidth <= 768) {
+            sidebar.classList.add("active");
+            content.classList.remove("active");
+            toggleBtn.classList.remove("active");
+          }
+        });
+      </script>
+    </th:block>
+  </body>
+</html>

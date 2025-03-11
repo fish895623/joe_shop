@@ -69,6 +69,19 @@
     </style>
   </head>
   <body>
+    <div th:fragment="adminnavbar">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3">
+        <div class="container">
+          <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="/admin/insight" id="myInsight">Insight</a>
+            <a class="nav-link" href="/admin/inventory" id="myInventory">
+              Inventory
+            </a>
+            <a class="nav-link" href="/admin/member" id="myMember"> Member </a>
+          </div>
+        </div>
+      </nav>
+    </div>
     <div th:fragment="navbar">
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3">
         <div class="container">
