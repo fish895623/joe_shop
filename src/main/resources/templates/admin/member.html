@@ -5,31 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Member</title>
     <th:block th:replace="~{common/head :: library}" />
+    <style>
+      /* Sidebar Styling */
+      #sidebar {
+        width: 250px;
+        background: #222;
+        color: #fff;
+        position: fixed;
+        height: 100%;
+        transition: all 0.3s ease;
+        z-index: 999;
+      }
+
+      /* Main Content */
+      .main-content {
+        margin-left: 250px; /* 사이드바 너비만큼 여백 추가 */
+        padding: 20px;
+      }
+    </style>
   </head>
   <body>
-    <th:block th:replace="~{common/navigation :: adminnavbar}" />
-    <main class="flex-grow-1">
-      <div class="container">
-        <table id="dataTable" border="1">
-          <caption>
-            <strong>회원정보</strong>
-          </caption>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Password</th>
-              <th>Birth</th>
-              <th>Gender</th>
-              <th>Role</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- JSON 데이터 추가되는 곳 -->
-          </tbody>
-        </table>
-      </div>
-    </main>
+    <!-- Sidebar -->
+    <th:block th:replace="~{common/sidebar :: sidebarFragment}" />
+    <!-- Main Content -->
+    <div class="main-content">
+      <th:block th:replace="~{common/navigation :: adminnavbar}" />
+      <main class="flex-grow-1">
+        <div class="container">
+          <table id="dataTable" border="1">
+            <caption>
+              <strong>회원정보</strong>
+            </caption>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Password</th>
+                <th>Birth</th>
+                <th>Gender</th>
+                <th>Role</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- JSON 데이터 추가되는 곳 -->
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
 
     <script>
       function loadTableData(data) {
