@@ -1,48 +1,43 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Inventory</title>
+    <th:block th:replace="~{common/head :: library}"></th:block>
   </head>
   <body>
-    <nav>
-      <ul>
-        <li><a href="/admin/insight"> 관리 홈</a></li>
-        <li><a href="/admin/member"> 회원관리</a></li>
-        <li><a href="/admin/inventory"> 재고관리</a></li>
-      </ul>
-    </nav>
-
-    <div>
-      <!-- 드롭다운 클릭해서 밑에 테이블에 들어갈 수 있도록 -->
-      <h3>상품(재고)관리</h3>
-      <table border="1">
-        <thead>
-          <tr>
-            <th>category<select id="categoryDropdown"></select></th>
-            <th>imageurl<select id="imgDropdown"></select></th>
-            <th>product<select id="productDropdown"></select></th>
-            <th>quantity<select id="quantityDropdown"></select></th>
-            <th>price<select id="priceDropdown"></select></th>
-            <th><button id="addRowButton">담기</button></th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-        <tfoot>
-          <!-- Single cell for Grand Total -->
-          <tr>
-            <td
-              colspan="6"
-              id="grandTotalCell"
-              style="text-align: center; vertical-align: middle"
-            >
-              총 합계 금액 : <span id="grandTotal">0</span>원
-            </td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
+    <th:block th:replace="~{common/navigation :: adminnavbar}" />
+    <main class="flex-grow-1">
+      <div class="container">
+        <h3>상품(재고)관리</h3>
+        <table border="1">
+          <thead>
+            <tr>
+              <th>category<select id="categoryDropdown"></select></th>
+              <th>imageurl<select id="imgDropdown"></select></th>
+              <th>product<select id="productDropdown"></select></th>
+              <th>quantity<select id="quantityDropdown"></select></th>
+              <th>price<select id="priceDropdown"></select></th>
+              <th><button id="addRowButton">담기</button></th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+          <tfoot>
+            <!-- Single cell for Grand Total -->
+            <tr>
+              <td
+                colspan="6"
+                id="grandTotalCell"
+                style="text-align: center; vertical-align: middle"
+              >
+                총 합계 금액 : <span id="grandTotal">0</span>원
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </main>
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
