@@ -214,7 +214,7 @@ public class CartService {
         Cart cart =
                 cartRepository
                         .findCartByUser(user)
-                        .orElseThrow(() -> new NotFoundException("Cart not found"));
+                        .orElseThrow(() -> new NotFoundException("Cart not found (in getCart method)"));
 
         // return success response with status code 200 -> cart retrieved successfully
         return Response.builder()
