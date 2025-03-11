@@ -13,6 +13,6 @@ public class CartHtmlController {
     @GetMapping()
     public String getCartPage() {
 
-        return "product/cart"; // product/cart.html 페이지를 반환
+        return "product/cart";
     }
 }
