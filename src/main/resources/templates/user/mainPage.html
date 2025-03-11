@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -184,16 +184,7 @@
           if (event.target.id === "detail") {
             const productId = event.target.getAttribute("data-id");
 
-            fetch(`/product/get-by-product-id/${productId}`)
-              .then((response) => response.json())
-              .then((data) => {
-                console.log(data);
-                window.location.href = `/product/product-detail/${productId}`;
-              })
-
-              .catch((error) => {
-                console.error("디테일 에러", error);
-              });
+           window.location.href = `/product?id=${productId}`;
           }
         });
     </script>
