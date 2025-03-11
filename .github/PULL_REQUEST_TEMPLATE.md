@@ -1,20 +1,21 @@
-# 설명
+# Description
 
-- 이 글을 지우고 추가한 기능을 넣어주세요
+- Please delete this text and add your feature description here
 
-## 변경 타입
+## Type of Change
 
-이 글을 지우고 관계 없는 아래 항목중 관계 없는 내용은 지워주세요
+Please delete items below that are not relevant
 
-- [ ] 버그 수정
-- [ ] 기능 추가
-- [ ] 문서 업데이트
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Add Test Code
+- [ ] Documentation update
 
-## 테스트 방법
+## How Has This Been Tested?
 
-- [ ] 이 글을 지우고 체크하세요
+- [ ] Delete this text and check this box
 
-**테스트 환경**:
+**Test Environment**:
 
 (Optional)
 
@@ -25,8 +26,8 @@
 
 ## Checklist:
 
-- [ ] 코드 스타일 npx prettier -w **/*.html **/*.css **/*.js; gradle spotlessApply 를 적용하였습니다.
-- [ ] 올리기 전에 코드 리뷰 작업을 하였습니다.
-- [ ] 어려운 부분에 대해 주석을 추가했습니다
-- [ ] 문서에 해당 변경 사항을 반영했습니다
-- [ ] 변경 사항으로 인한 치명적인 경고가 없습니다
+- [ ] I have applied code style formatting using `npx prettier -w **/*.html **/*.css **/*.js; gradle spotlessApply`
+- [ ] I have performed a code review before submission
+- [ ] I have added comments to difficult-to-understand areas
+- [ ] I have updated the documentation to reflect these changes
+- [ ] There are no critical warnings due to these changes
