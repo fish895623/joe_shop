@@ -47,26 +47,35 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Response updateUser(Long userId, UserDto userRequest) {
+    public Response updateUser(String token, UserDto userRequest) {
 
-        userRepository
-                .findById(userId)
+        User userRequestedToUpdate = userRepository
+                .findById(userRequest.getId())
                 .orElseThrow(
                         () -> new NotFoundException("User data going to update does not found"));
         // Check if user exists and throw exception if not
 
-        User user = UserMapper.toEntity(userRequest);
+        // decrypt token and get user email
+        String emailInToken = jwtUtil.getUsername(token);
+
+        // check if the user email in the token is the same as the user email in the request
+        // if not, return a response with status code 401 (UNAUTHORIZED)
+        // if yes, continue to the next step
+        if (!userRequestedToUpdate.getEmail().equals(emailInToken)) {
+            return Response.builder().status(401).message("Can not update other's account").build();
+        }
+
         // Convert UserDto to User
-        user.setId(userId);
-        // Set target user's id
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        User user = UserMapper.toEntity(userRequest);
+
         // Encode password
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 
-        userRepository.save(user);
         // Save user
+        userRepository.save(user);
 
-        return Response.builder().status(200).message("User updated successfully").build();
         // return success response
+        return Response.builder().status(200).message("User updated successfully").build();
     }
 
     @Override
