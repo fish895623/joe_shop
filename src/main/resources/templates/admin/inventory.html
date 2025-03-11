@@ -46,7 +46,7 @@
 
         // 데이터를 불러와 드롭다운에 채우는 함수
         function loadData() {
-          fetch("http://localhost:8080/product/get-all")
+          fetch("/product/get-all")
             .then((response) => response.json())
             .then((data) => {
               const categoryDropdown =
