@@ -8,6 +8,65 @@
     />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Document</title>
+    <style>
+      .navbar-nav {
+        display: flex;
+        justify-content: flex-end;
+        width: 100%;
+      }
+
+      /* Hide the navbar links by default on small screens */
+      @media (max-width: 768px) {
+        .navbar-nav {
+          display: none;
+          flex-direction: column;
+          align-items: center;
+          width: 100%;
+        }
+
+        .navbar-nav.active {
+          display: flex;
+        }
+
+        .navbar-toggler {
+          display: block;
+          background-color: transparent;
+          border: none;
+          cursor: pointer;
+        }
+
+        .navbar-toggler-icon {
+          width: 30px;
+          height: 3px;
+          background-color: white;
+          position: relative;
+        }
+
+        .navbar-toggler-icon::before,
+        .navbar-toggler-icon::after {
+          content: "";
+          position: absolute;
+          width: 30px;
+          height: 3px;
+          background-color: white;
+        }
+
+        .navbar-toggler-icon::before {
+          top: -8px;
+        }
+
+        .navbar-toggler-icon::after {
+          bottom: -8px;
+        }
+      }
+
+      /* For large screens (above 768px), hide the hamburger button */
+      @media (min-width: 768px) {
+        .navbar-toggler {
+          display: none;
+        }
+      }
+    </style>
   </head>
   <body>
     <div th:fragment="navbar">
@@ -27,6 +86,11 @@
             />
             <button class="btn btn-outline-light" type="submit">Search</button>
           </form>
+
+          <!--          &lt;!&ndash; Hamburger Menu Button for mobile &ndash;&gt;-->
+          <!--          <button class="navbar-toggler" type="button" id="hamburger" aria-label="Toggle navigation">-->
+          <!--            <span class="navbar-toggler-icon"></span>-->
+          <!--          </button>-->
 
           <!-- Navigation Links -->
           <div class="navbar-nav ms-auto" id="link-bar">
