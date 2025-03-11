@@ -37,9 +37,10 @@ public class CartController {
      * @return ResponseEntity<Response>
      */
     @PostMapping("/append")
-    public ResponseEntity<Response> appendProductToCart(@RequestBody CartRequest cartRequest) {
+    public ResponseEntity<Response> appendProductToCart(
+            @CookieValue("token") String token, @RequestBody CartRequest cartRequest) {
 
-        return ResponseEntity.ok(cartService.appendProductToCart(cartRequest));
+        return ResponseEntity.ok(cartService.appendProductToCart(token, cartRequest));
         // return success response with status code 200 (OK)
     }
 
