@@ -4,93 +4,112 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MainPage</title>
-    <style>
-      .nav-tabs {
-        display: flex;
-        justify-content: center;
-        list-style-type: none;
-        padding: 0;
-      }
-      .nav-item {
-        margin: 0 10px;
-      }
-    </style>
     <th:block th:replace="~{common/head :: library}"></th:block>
-    <style>
-      .container {
-        padding-top: 1rem;
-      }
-    </style>
   </head>
   <body>
+    <style></style>
     <!-- Corrected th:replace to properly include the navbar fragment -->
     <th:block th:replace="~{common/navigation :: navbar}" />
-    <div class="container">
-      <div id="mainImage">
-        <h1>이미지(이벤트로 넘기기)</h1>
-      </div>
-      <br />
-      <div class="flex-box clothes">
-        <div class="wear">
-          <div class="wear-title"></div>
-          <img
-            src="https://www.w3schools.com/images/lamp.jpg"
-            alt="이미지0"
-            id="image-1"
-          />
-          <div class="wear-tag"></div>
-        </div>
-        <div class="wear">
-          <div class="wear-title"></div>
-          <img
-            src="https://www.w3schools.com/images/lamp.jpg"
-            alt="이미지1"
-            id="image-2"
-          />
-          <div class="wear-tag"></div>
-        </div>
-        <div class="wear">
-          <div class="wear-title"></div>
-          <img
-            src="https://www.w3schools.com/images/lamp.jpg"
-            alt="이미지2"
-            id="image-3"
-          />
-          <div class="wear-tag"></div>
-        </div>
-      </div>
-    </div>
 
-    <ul class="nav nav-tabs">
-      <li class="nav-item">
-        <a class="nav-link" aria-current="page" href="#">Men</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Women</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Kids</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Accessories</a>
-      </li>
+    <ul class="nav nav-tabs" id="categoryTabs">
+      <!-- Categories will be dynamically inserted here -->
     </ul>
 
-    <script>
-      // JavaScript to handle image click events
-      const images = document.querySelectorAll(".clothes img");
-      const mainImage = document.getElementById("mainImage");
-
-      images.forEach((image) => {
-        image.addEventListener("click", () => {
-          // split image-0 to 0
-          const imageId = image.id.split("-")[1];
-          console.log(imageId);
-          window.location.href = `/product?id=${imageId}`;
-        });
-      });
-    </script>
+    <div id="productContainer"></div>
 
     <th:block th:replace="~{common/footer :: footer}" />
+
+    <script>
+      // Fetch all categories and dynamically generate the category tabs
+      fetch("/category/get-all")
+        .then((response) => response.json())
+        .then((data) => {
+          const categoryTabs = document.getElementById("categoryTabs");
+
+          // Add the "All" tab first
+          let allTab = `<li class="nav-item">
+                      <a class="nav-link active" href="#" data-category="all">All</a>
+                    </li>`;
+          categoryTabs.innerHTML = allTab;
+
+          // Define the required tab order
+          const categoryOrder = ["Women", "Men", "Kids", "Accessories"];
+          const categories = data.categoryList;
+
+          // Filter and reorder the categories based on the predefined order
+          categoryOrder.forEach((categoryName) => {
+            const category = categories.find(
+              (cat) => cat.categoryName === categoryName,
+            );
+            if (category) {
+              const categoryTab = `<li class="nav-item">
+                                 <a class="nav-link" href="#" data-category="${category.id}">${category.categoryName}</a>
+                               </li>`;
+              categoryTabs.insertAdjacentHTML("beforeend", categoryTab);
+            }
+          });
+
+          // Fetch products for the "All" category initially
+          loadProducts("all");
+        })
+        .catch((error) => {
+          console.error("Error fetching categories:", error);
+        });
+
+      // Event listener to handle category click and load corresponding products
+      document
+        .getElementById("categoryTabs")
+        .addEventListener("click", (event) => {
+          event.preventDefault();
+
+          if (event.target.tagName === "A") {
+            const categoryId = event.target.getAttribute("data-category");
+            loadProducts(categoryId);
+
+            // Highlight the active tab
+            const tabs = document.querySelectorAll(".nav-link");
+            tabs.forEach((tab) => tab.classList.remove("active"));
+            event.target.classList.add("active");
+          }
+        });
+
+      // Function to load products based on the selected category
+      function loadProducts(categoryId) {
+        fetch(
+          categoryId === "all"
+            ? "/product/get-all"
+            : `/product/get-by-category-id/${categoryId}`,
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            const productList = data.productList;
+            const container = document.getElementById("productContainer");
+            container.innerHTML = ""; // Clear the previous products
+
+            productList.forEach((product) => {
+              const productCard = `
+            <div class="card" style="width: 18rem">
+              <img class="card-img-top" src="${product.image || "dress.jpg"}" alt="Card image cap" />
+              <div class="card-body">
+                <h5 class="card-title">${product.name}</h5>
+                <span>${product.price}</span>
+              </div>
+              <div class="card-body">
+                <a href="#" class="card-link">
+                  <input type="button" value="자세히 보기" />
+                </a>
+              </div>
+            </div>
+          `;
+              container.insertAdjacentHTML("beforeend", productCard);
+            });
+          })
+          .catch((error) => {
+            console.error("Error fetching products:", error);
+          });
+      }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
