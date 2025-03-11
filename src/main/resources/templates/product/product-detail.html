@@ -39,7 +39,9 @@
                   placeholder="1"
                 />
               </p>
-              <button id="add-to-cart-btn" class="btn btn-primary btn-lg">장바구니 추가</button>
+              <button id="add-to-cart-btn" class="btn btn-primary btn-lg">
+                장바구니 추가
+              </button>
             </div>
           </div>
         </div>
@@ -99,36 +101,38 @@
           console.error("Error fetching product data:", error);
         });
       //===================================
-      document.getElementById('add-to-cart-btn').addEventListener('click', function () {
-        const userId = 3;  // 현재 로그인한 사용자 ID (임시 값)
-        const productId = 3;  // 상품 ID (임시 값)
-        const quantity = 5;  // 수량 (기본값 1)
+      document
+        .getElementById("add-to-cart-btn")
+        .addEventListener("click", function () {
+          const cartId = 3;
+          const productId = getProductIdFromURL();
+          const quantity = document.getElementById("quantity").value;
 
-        const requestData = {
-          cartId: 2,
-          productId: productId,
-          quantity: quantity
-        };
+          const requestData = {
+            cartId: cartId,
+            productId: productId,
+            quantity: quantity,
+          };
 
-        // fetch로 장바구니에 상품을 추가하는 API 호출
-        fetch('/api/cart-item/create', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(requestData)
-        })
-                .then(response => response.json())
-                .then(data => {
-                  console.log(data)
-                  alert('장바구니에 추가되었습니다!');
-                  window.location.href = "/cart";  // 카트 페이지로 이동
-                })
-                .catch(error => {
-                  console.error('Error:', error);
-                  alert('장바구니 추가에 실패했습니다.');
-                });
-      });
+          // fetch로 장바구니에 상품을 추가하는 API 호출
+          fetch("/api/cart-item/create", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestData),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(data);
+              alert("장바구니에 추가되었습니다!");
+              window.location.href = "/cart"; // 카트 페이지로 이동
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert("장바구니 추가에 실패했습니다.");
+            });
+        });
       //추후 작업
       //userid,productId,quantity 값 동적으로 변경하기
     </script>
