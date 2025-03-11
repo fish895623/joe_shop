@@ -1,6 +1,7 @@
 package com.bit.joe.shoppingmall.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,16 +25,23 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/create")
-    public ResponseEntity<Response> createOrder(@RequestBody OrderRequest orderRequest) {
-        Response resp = orderService.createOrder(orderRequest);
+    public ResponseEntity<Response> createOrder(
+            @CookieValue("token") String token, @RequestBody OrderRequest orderRequest) {
+        Response resp = orderService.createOrder(token, orderRequest);
 
         return ResponseEntity.status(resp.getStatus()).body(resp);
     }
 
-    @GetMapping("/get/{userId}/{orderId}")
-    public ResponseEntity<Response> getOrder(
-            @PathVariable Long userId, @PathVariable Long orderId) {
-        Response resp = orderService.getOrder(userId, orderId);
+    @GetMapping("/get/{orderId}")
+    public ResponseEntity<Response> getOrder(@PathVariable Long orderId) {
+        Response resp = orderService.getOrder(orderId);
+
+        return ResponseEntity.status(resp.getStatus()).body(resp);
+    }
+
+    @GetMapping("/get-all")
+    public ResponseEntity<Response> getAllOrders(@CookieValue("token") String token) {
+        Response resp = orderService.getOrderListByUser(token);
 
         return ResponseEntity.status(resp.getStatus()).body(resp);
     }

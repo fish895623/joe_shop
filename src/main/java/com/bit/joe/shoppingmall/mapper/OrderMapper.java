@@ -14,7 +14,12 @@ public class OrderMapper {
                 .user(UserMapper.toDto(data.getUser()))
                 .orderDate(data.getOrderDate())
                 .status(data.getStatus())
-                .orderItems(data.getOrderItems().stream().map(OrderItemMapper::toDto).toList())
+                .orderItems(
+                        data.getOrderItems() == null
+                                ? null
+                                : data.getOrderItems().stream()
+                                        .map(OrderItemMapper::toDto)
+                                        .toList())
                 .build();
     }
 

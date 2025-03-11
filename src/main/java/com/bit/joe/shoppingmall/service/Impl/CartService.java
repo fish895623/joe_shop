@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.bit.joe.shoppingmall.dto.UserDto;
 import com.bit.joe.shoppingmall.dto.request.CartRequest;
 import com.bit.joe.shoppingmall.dto.response.Response;
 import com.bit.joe.shoppingmall.entity.Cart;
@@ -12,7 +13,9 @@ import com.bit.joe.shoppingmall.entity.CartItem;
 import com.bit.joe.shoppingmall.entity.Product;
 import com.bit.joe.shoppingmall.entity.User;
 import com.bit.joe.shoppingmall.exception.NotFoundException;
+import com.bit.joe.shoppingmall.jwt.JWTUtil;
 import com.bit.joe.shoppingmall.mapper.CartMapper;
+import com.bit.joe.shoppingmall.mapper.UserMapper;
 import com.bit.joe.shoppingmall.repository.CartItemRepository;
 import com.bit.joe.shoppingmall.repository.CartRepository;
 import com.bit.joe.shoppingmall.repository.ProductRepository;
@@ -31,6 +34,7 @@ public class CartService {
     private final CartItemRepository cartItemRepository;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final JWTUtil jwtUtil;
 
     /**
      * Create a cart initially (when user registers)
@@ -70,23 +74,26 @@ public class CartService {
      * @param cartRequest CartRequest
      * @return Response
      */
-    public Response appendProductToCart(CartRequest cartRequest) {
+    public Response appendProductToCart(String token, CartRequest cartRequest) {
         // Create Cart if there is no not ordered cart, otherwise use the existing one
 
         Long productIdToAppend = cartRequest.getProductId();
         int quantityToAppend = cartRequest.getQuantity();
         // get parms from the request
 
-        User user = userService.getLoginUser();
+        String loggedInUserEmail = jwtUtil.getUsername(token);
         // get user from the context holder (logged-in user)
+
+        UserDto loggedInUserDto = userService.getUserByEmail(loggedInUserEmail).getUser();
+        User loggedInUserEntity = UserMapper.toEntity(loggedInUserDto);
 
         Cart cart =
                 cartRepository
-                        .findCartByUser(user)
+                        .findCartByUser(loggedInUserEntity)
                         .orElseGet(
                                 () -> {
                                     Cart newCart = new Cart();
-                                    newCart.setUser(user);
+                                    newCart.setUser(loggedInUserEntity);
                                     newCart.setCartItems(new ArrayList<>(List.of()));
                                     return newCart;
                                 });
@@ -121,7 +128,10 @@ public class CartService {
         cartItem.setTotalPrice();
         // Create a new cart item with the found product, quantity and price
 
-        cart.appendCartItemToCart(cartItem);
+        // save the cart item
+        cartItem = cartItemRepository.save(cartItem);
+
+        cart.getCartItems().add(cartItem);
         // Add the cart item to the cart
 
         cartRepository.save(cart);

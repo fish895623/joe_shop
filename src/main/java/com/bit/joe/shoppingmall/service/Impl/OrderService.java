@@ -10,6 +10,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.bit.joe.shoppingmall.dto.OrderDto;
+import com.bit.joe.shoppingmall.dto.UserDto;
 import com.bit.joe.shoppingmall.dto.request.OrderRequest;
 import com.bit.joe.shoppingmall.dto.response.Response;
 import com.bit.joe.shoppingmall.entity.CartItem;
@@ -18,9 +19,12 @@ import com.bit.joe.shoppingmall.entity.OrderItem;
 import com.bit.joe.shoppingmall.entity.User;
 import com.bit.joe.shoppingmall.enums.OrderStatus;
 import com.bit.joe.shoppingmall.enums.RequestType;
+import com.bit.joe.shoppingmall.enums.UserRole;
 import com.bit.joe.shoppingmall.exception.NotFoundException;
+import com.bit.joe.shoppingmall.jwt.JWTUtil;
 import com.bit.joe.shoppingmall.mapper.OrderItemMapper;
 import com.bit.joe.shoppingmall.mapper.OrderMapper;
+import com.bit.joe.shoppingmall.mapper.UserMapper;
 import com.bit.joe.shoppingmall.repository.CartItemRepository;
 import com.bit.joe.shoppingmall.repository.OrderItemRepository;
 import com.bit.joe.shoppingmall.repository.OrderRepository;
@@ -38,6 +42,7 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final CartItemRepository cartItemRepository;
     private final UserService userService;
+    private final JWTUtil jwtUtil;
 
     /**
      * {@summary} Create an order
@@ -45,12 +50,21 @@ public class OrderService {
      * @param orderRequest 주문 요청 객체
      * @return Response
      */
-    public Response createOrder(OrderRequest orderRequest) {
+    public Response createOrder(String token, OrderRequest orderRequest) {
+
+        // get user email from token
+        String userEmailFromToken = jwtUtil.getUsername(token);
+
+        // get userDto object
+        UserDto user = userService.getUserByEmail(userEmailFromToken).getUser();
+
+        // get user object
+        User userEntity = UserMapper.toEntity(user);
 
         // make order entity and save it
         Order order =
                 Order.builder()
-                        .user(userService.getLoginUser()) // get logged-in user
+                        .user(userEntity) // get logged-in user
                         .status(OrderStatus.ORDER) // set order status to ORDER
                         .orderDate(orderRequest.getOrderDate()) // set order date to now
                         .build();
@@ -81,7 +95,11 @@ public class OrderService {
         orderItemRepository.saveAll(orderItems);
 
         // return success message
-        return Response.builder().status(200).message("Order created successfully").build();
+        return Response.builder()
+                .status(200)
+                .message("Order created successfully")
+                .order(OrderMapper.toDto(orderSaved))
+                .build();
     }
 
     /**
@@ -100,10 +118,14 @@ public class OrderService {
         order.setStatus(orderRequest.getStatus());
         // change order status
 
-        orderRepository.save(order);
+        order = orderRepository.save(order);
         // save order object
 
-        return Response.builder().status(200).message("Order status changed").build();
+        return Response.builder()
+                .status(200)
+                .message("Order status changed")
+                .order(OrderMapper.toDto(order))
+                .build();
         // return success message
     }
 
@@ -174,18 +196,10 @@ public class OrderService {
     /**
      * {@summary} Get order
      *
-     * @param userId 유저 아이디
      * @param orderId 주문 아이디
      * @return Response
      */
-    public Response getOrder(Long userId, Long orderId) {
-        User loginUser = userService.getLoginUser();
-        // get authentication from the context holder
-
-        // compare userId from the context holder and userId from the request
-        if (!userId.equals(loginUser.getId())) {
-            return Response.builder().status(405).message("Can not get other user's order").build();
-        }
+    public Response getOrder(Long orderId) {
 
         // get order object
         Order order = orderRepository.findById(orderId).orElse(null);
@@ -207,6 +221,52 @@ public class OrderService {
                 .status(200)
                 .message("Get order successfully")
                 .order(orderDto)
+                .build();
+    }
+
+    /**
+     * {@summary} Get all orders
+     *
+     * @param token 토큰
+     * @return Response
+     */
+    public Response getOrderListByUser(String token) {
+
+        // get user email from token
+        String userEmailFromToken = jwtUtil.getUsername(token);
+
+        // get user role from token
+        String userRoleInToken = jwtUtil.getRole(token);
+
+        // get userDto object
+        User user = UserMapper.toEntity(userService.getUserByEmail(userEmailFromToken).getUser());
+
+        // get all orders
+        List<Order> orders;
+
+        // 유저 권한에 따라 다르게 동작
+        // work different according to user role
+        if (userRoleInToken.equals(UserRole.ADMIN.name())) {
+            orders = orderRepository.findAll();
+        } else {
+            orders = orderRepository.findByUser(user);
+        }
+
+        // Order Items setting
+        orders.forEach(
+                order -> {
+                    List<OrderItem> orderItems = orderItemRepository.findByOrder(order);
+                    order.setOrderItems(orderItems);
+                });
+
+        // Convert orders to OrderDto
+        List<OrderDto> orderDtos = orders.stream().map(OrderMapper::toDto).toList();
+
+        // return success message
+        return Response.builder()
+                .status(200)
+                .message("Get all orders successfully")
+                .orderList(orderDtos)
                 .build();
     }
 }
