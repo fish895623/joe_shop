@@ -11,6 +11,7 @@
         list-style-type: none;
         padding: 0;
       }
+
       .nav-item {
         margin: 0 10px;
       }
@@ -25,56 +26,60 @@
   <body>
     <!-- Corrected th:replace to properly include the navbar fragment -->
     <th:block th:replace="~{common/navigation :: navbar}" />
-    <div class="container">
-      <div id="mainImage">
-        <h1>이미지(이벤트로 넘기기)</h1>
+    <main class="flex-grow-1">
+      <div class="container">
+        <div id="mainImage">
+          <h1>이미지(이벤트로 넘기기)</h1>
+        </div>
+        <br />
+        <div class="flex-box clothes">
+          <div class="wear">
+            <div class="wear-title"></div>
+            <img
+              src="https://www.w3schools.com/images/lamp.jpg"
+              alt="이미지0"
+              id="image-1"
+            />
+            <div class="wear-tag"></div>
+          </div>
+          <div class="wear">
+            <div class="wear-title"></div>
+            <img
+              src="https://www.w3schools.com/images/lamp.jpg"
+              alt="이미지1"
+              id="image-2"
+            />
+            <div class="wear-tag"></div>
+          </div>
+          <div class="wear">
+            <div class="wear-title"></div>
+            <img
+              src="https://www.w3schools.com/images/lamp.jpg"
+              alt="이미지2"
+              id="image-3"
+            />
+            <div class="wear-tag"></div>
+          </div>
+        </div>
       </div>
-      <br />
-      <div class="flex-box clothes">
-        <div class="wear">
-          <div class="wear-title"></div>
-          <img
-            src="https://www.w3schools.com/images/lamp.jpg"
-            alt="이미지0"
-            id="image-1"
-          />
-          <div class="wear-tag"></div>
-        </div>
-        <div class="wear">
-          <div class="wear-title"></div>
-          <img
-            src="https://www.w3schools.com/images/lamp.jpg"
-            alt="이미지1"
-            id="image-2"
-          />
-          <div class="wear-tag"></div>
-        </div>
-        <div class="wear">
-          <div class="wear-title"></div>
-          <img
-            src="https://www.w3schools.com/images/lamp.jpg"
-            alt="이미지2"
-            id="image-3"
-          />
-          <div class="wear-tag"></div>
-        </div>
-      </div>
-    </div>
 
-    <ul class="nav nav-tabs">
-      <li class="nav-item">
-        <a class="nav-link" aria-current="page" href="#">Men</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Women</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Kids</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Accessories</a>
-      </li>
-    </ul>
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="#">Men</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Women</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Kids</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Accessories</a>
+        </li>
+      </ul>
+    </main>
+
+    <th:block th:replace="~{common/footer :: footer}" />
 
     <script>
       // JavaScript to handle image click events
@@ -90,7 +95,5 @@
         });
       });
     </script>
-
-    <th:block th:replace="~{common/footer :: footer}" />
   </body>
 </html>
