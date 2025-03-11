@@ -76,6 +76,7 @@
       </li>
     </ul>
 
+    <th:block th:replace="~{common/footer :: footer}" />
     <script>
       // JavaScript to handle image click events
       const images = document.querySelectorAll(".clothes img");
@@ -90,7 +91,5 @@
         });
       });
     </script>
-
-    <th:block th:replace="~{common/footer :: footer}" />
   </body>
 </html>
