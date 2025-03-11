@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Category Lists</title>
+    <th:block th:replace="~{common/head :: library}"></th:block>
+  </head>
+  <body>
+    <th:block th:replace="~{common/navigation :: navbar}" />
+    <main class="flex-grow-1">
+      <div class="container">
+        <ul class="list-group">
+          <li class="list-group-item">
+            <a class="nav-link" aria-current="page" href="">Category Name1</a>
+          </li>
+          <li class="list-group-item">
+            <a class="nav-link" aria-current="page" href="">Category Name2</a>
+          </li>
+          <li class="list-group-item">
+            <a class="nav-link" aria-current="page" href="">Category Name3</a>
+          </li>
+        </ul>
+      </div>
+    </main>
+    <th:block th:replace="~{common/footer :: footer}" />
+  </body>
+</html>

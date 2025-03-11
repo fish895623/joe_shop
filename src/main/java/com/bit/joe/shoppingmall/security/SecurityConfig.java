@@ -50,8 +50,6 @@ public class SecurityConfig {
                                         .permitAll()
                                         .requestMatchers("/admin/**")
                                         .hasAuthority(UserRole.ADMIN.name())
-                                        .requestMatchers("/user/get-all")
-                                        .hasAuthority(UserRole.ADMIN.name())
                                         .requestMatchers("/category/create")
                                         .hasAuthority(UserRole.ADMIN.name())
                                         .requestMatchers("/product/create")

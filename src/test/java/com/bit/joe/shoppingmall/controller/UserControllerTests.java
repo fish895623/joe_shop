@@ -5,14 +5,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Base64;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,7 +22,9 @@ import com.bit.joe.shoppingmall.jwt.JWTUtil;
 import com.bit.joe.shoppingmall.mapper.UserMapper;
 import com.bit.joe.shoppingmall.repository.*;
 import com.bit.joe.shoppingmall.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
@@ -37,63 +36,60 @@ import jakarta.transaction.Transactional;
 @Transactional
 @Rollback
 public class UserControllerTests {
-    User adminEntity, userEntity;
-    String adminBasicAuth, userBasicAuth;
-    MockHttpSession mockHttpSession = new MockHttpSession();
+
     @Autowired private MockMvc mockMvc;
     @Autowired private UserRepository userRepository;
     @Autowired private UserService userService;
-    // Inject JWTUtil to verify token contents
-    @Autowired JWTUtil jwtUtil;
+    @Autowired private JWTUtil jwtUtil;
+
+    UserDto adminDto =
+            UserDto.builder()
+                    .name("admin")
+                    .gender(UserGender.MALE)
+                    .role(UserRole.ADMIN)
+                    .birth("2021-01-01")
+                    .email("admin for User Controller Test")
+                    .password("admin")
+                    .active(true)
+                    .build();
+
+    UserDto userDto =
+            UserDto.builder()
+                    .name("user")
+                    .gender(UserGender.MALE)
+                    .role(UserRole.USER)
+                    .birth("2021-01-01")
+                    .email("user for User Controller Test")
+                    .password("user")
+                    .active(true)
+                    .build();
+    String adminJwtToken, userJwtToken;
+    Cookie adminCookie, userCookie;
 
     @BeforeEach
     public void setUp() {
-        adminEntity =
-                User.builder()
-                        .name("admin")
-                        .gender(UserGender.MALE)
-                        .role(UserRole.ADMIN)
-                        .birth("2021-01-01")
-                        .email("admin@example.com")
-                        .password("admin")
-                        .active(true)
-                        .build();
-        userEntity =
-                User.builder()
-                        .name("user")
-                        .password("user")
-                        .email("user@example.com")
-                        .role(UserRole.USER)
-                        .gender(UserGender.MALE)
-                        .birth("2021-01-01")
-                        .active(true)
-                        .build();
-        adminBasicAuth =
-                "Basic "
-                        + Base64.getEncoder()
-                                .encodeToString(
-                                        (adminEntity.getEmail() + ":" + adminEntity.getPassword())
-                                                .getBytes());
-        userBasicAuth =
-                "Basic "
-                        + Base64.getEncoder()
-                                .encodeToString(
-                                        (userEntity.getEmail() + ":" + userEntity.getPassword())
-                                                .getBytes());
+
+        userService.createUser(adminDto);
+        userService.createUser(userDto);
+
+        adminJwtToken =
+                jwtUtil.createJwt(adminDto.getEmail(), adminDto.getRole().name(), 36000000L);
+        userJwtToken = jwtUtil.createJwt(userDto.getEmail(), userDto.getRole().name(), 36000000L);
+
+        adminCookie = new Cookie("token", adminJwtToken);
+        userCookie = new Cookie("token", userJwtToken);
     }
 
     @Test
     @DisplayName("Test form login and JWT cookie creation")
     public void testFormLoginAndJwtCookie() throws Exception {
-        // Save the test user
-        userService.createUser(UserMapper.toDto(adminEntity));
 
         // Perform form-based login
         mockMvc.perform(
                         post("/login")
                                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                                .param("username", adminEntity.getEmail())
-                                .param("password", adminEntity.getPassword()))
+                                .param("username", adminDto.getEmail())
+                                .param("password", adminDto.getPassword()))
                 .andExpect(status().isOk())
                 .andExpect(
                         result -> {
@@ -119,11 +115,11 @@ public class UserControllerTests {
                             Assertions.assertFalse(
                                     jwtUtil.isExpired(token), "Token should not be expired");
                             Assertions.assertEquals(
-                                    adminEntity.getEmail(),
+                                    adminDto.getEmail(),
                                     jwtUtil.getUsername(token),
                                     "Token should contain " + "correct username");
                             Assertions.assertEquals(
-                                    adminEntity.getRole().name(),
+                                    adminDto.getRole().name(),
                                     jwtUtil.getRole(token),
                                     "Token should contain " + "correct role");
                         });
@@ -133,33 +129,45 @@ public class UserControllerTests {
     @DisplayName("Register admin user")
     public void registerAdminUser() throws Exception {
         // prepare data
-        String userDtoJson = new ObjectMapper().writeValueAsString(UserMapper.toDto(adminEntity));
+        UserDto adminDtoToSave = adminDto;
+        adminDtoToSave.setEmail("admin for test register admin user");
+        adminDtoToSave.setRole(UserRole.ADMIN);
+
+        String userDtoJson = new ObjectMapper().writeValueAsString(adminDtoToSave);
 
         // test
         mockMvc.perform(
-                        post("/user/register")
+                        post("/api/user/register")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(userDtoJson))
                 .andExpect(status().isCreated());
+
+        // check if the user is saved
+        UserDto savedAdmin = userService.getUserByEmail(adminDtoToSave.getEmail()).getUser();
+        Assertions.assertNotNull(savedAdmin, "Admin user should be saved");
+        Assertions.assertEquals(
+                adminDtoToSave.getName(), savedAdmin.getName(), "Admin name should be saved");
+        Assertions.assertEquals(
+                adminDtoToSave.getGender(), savedAdmin.getGender(), "Admin gender should be saved");
+        Assertions.assertEquals(
+                adminDtoToSave.getRole(), savedAdmin.getRole(), "Admin role should be saved");
+        Assertions.assertEquals(
+                adminDtoToSave.getBirth(), savedAdmin.getBirth(), "Admin birth should be saved");
+        Assertions.assertEquals(
+                adminDtoToSave.getEmail(), savedAdmin.getEmail(), "Admin email should be saved");
+        Assertions.assertEquals(
+                adminDtoToSave.isActive(), savedAdmin.isActive(), "Admin active should be saved");
     }
 
     @Test
     @DisplayName("Get all users")
     public void getAllUsers() throws Exception {
-        userService.createUser(UserMapper.toDto(adminEntity));
 
-        MockHttpSession mockHttpSession = new MockHttpSession();
+        // Test if admin can get all users
+        mockMvc.perform(get("/api/user/get-all").cookie(adminCookie)).andExpect(status().isOk());
 
-        mockMvc.perform(
-                        get("/user/get-all")
-                                .header("Authorization", adminBasicAuth)
-                                .session(mockHttpSession))
-                .andExpect(status().isOk());
-
-        mockMvc.perform(
-                        get("/user/get-all")
-                                .header("Authorization", userBasicAuth)
-                                .session(mockHttpSession))
+        // Test if user can get all users
+        mockMvc.perform(get("/api/user/get-all").cookie(userCookie))
                 .andExpect(
                         result -> {
                             var status = result.getResponse().getStatus();
@@ -177,55 +185,34 @@ public class UserControllerTests {
         String userDtoJson = objectMapper.writeValueAsString(userDto);
 
         mockMvc.perform(
-                        post("/user/register")
+                        post("/api/user/register")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(userDtoJson))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    @DisplayName("Login user")
-    public void loginUser() throws Exception {
-        userService.createUser(UserMapper.toDto(userEntity));
-
-        MockHttpSession mockHttpSession = new MockHttpSession();
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String userDtoJson = objectMapper.writeValueAsString(UserMapper.toDto(userEntity));
-
-        mockMvc.perform(
-                        post("/user/login")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", userBasicAuth)
-                                .content(userDtoJson)
-                                .session(mockHttpSession))
-                .andExpect(status().isOk());
-    }
-
-    @Test
     @DisplayName("Update user")
     public void updateUser() throws Exception {
-        // Save the user entity to the repository
-        userEntity = userRepository.save(userEntity);
 
-        // Create a mock HTTP session and set the user attribute
-        MockHttpSession mockHttpSession = new MockHttpSession();
-        mockHttpSession.setAttribute("user", UserMapper.toDto(userEntity));
+        User userToUpdate = userRepository.findByEmail(userDto.getEmail()).orElse(null);
+        assert userToUpdate != null;
 
         // Create a UserDto from the saved user entity and modify it
-        UserDto userDto = UserMapper.toDto(userEntity);
-        userDto.setActive(false);
+        userToUpdate.setName("updated name");
+        userToUpdate.setPhone("010-1234-5678");
+
+        UserDto userDtoToUpdate = UserMapper.toDto(userToUpdate);
 
         // Convert the UserDto to JSON
-        String userDtoJson = new ObjectMapper().writeValueAsString(userDto);
+        String userDtoJson = new ObjectMapper().writeValueAsString(userDtoToUpdate);
 
         // Perform the PUT request to update the user
         mockMvc.perform(
-                        put("/user/update/" + userEntity.getId())
+                        put("/api/user/update")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(userDtoJson)
-                                .header("Authorization", userBasicAuth)
-                                .session(mockHttpSession))
+                                .cookie(userCookie))
                 .andExpect(status().isOk());
     }
 
@@ -233,19 +220,24 @@ public class UserControllerTests {
     @Test
     @DisplayName("Withdraw user")
     public void withdrawUser() throws Exception {
-        userRepository.save(userEntity);
 
-        MockHttpSession mockHttpSession = new MockHttpSession();
-        mockHttpSession.setAttribute("user", UserMapper.toDto(userEntity));
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
 
-        String userDtoJson = new ObjectMapper().writeValueAsString(UserMapper.toDto(userEntity));
+        var insertData = userService.getUserByEmail(userDto.getEmail()).getUser();
+        String userDtoJson;
+
+        try {
+            userDtoJson = objectMapper.writeValueAsString(insertData);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to convert user data to JSON", e);
+        }
 
         mockMvc.perform(
-                        get("/user/withdraw")
+                        get("/api/user/withdraw")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(userDtoJson)
-                                .header("Authorization", userBasicAuth)
-                                .session(mockHttpSession))
+                                .cookie(userCookie)
+                                .content(userDtoJson))
                 .andExpect(status().isOk());
     }
 }

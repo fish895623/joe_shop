@@ -13,8 +13,10 @@ import com.bit.joe.shoppingmall.enums.UserRole;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,7 +28,9 @@ public class JWTFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
-            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
         String token = null;
@@ -52,6 +56,13 @@ public class JWTFilter extends OncePerRequestFilter {
 
         if (jwtUtil.isExpired(token)) {
             log.info("Token expired");
+
+            var cookie = new Cookie("token", null);
+            cookie.setPath("/");
+            cookie.setMaxAge(0);
+            cookie.setHttpOnly(true);
+
+            response.addCookie(cookie);
 
             filterChain.doFilter(request, response);
             return;

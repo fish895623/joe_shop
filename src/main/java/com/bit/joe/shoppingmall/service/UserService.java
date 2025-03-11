@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpSession;
 public interface UserService {
     Response createUser(UserDto userRequest);
 
-    Response updateUser(Long userId, UserDto userRequest);
+    Response updateUser(String token, UserDto userRequest);
 
     Response getAllUsers();
 
@@ -23,7 +23,7 @@ public interface UserService {
 
     Response logout(HttpSession session);
 
-    Response withdraw(HttpSession session, UserDto userDto);
+    Response withdraw(String token, UserDto userDto);
 
     User getLoginUser();
 }

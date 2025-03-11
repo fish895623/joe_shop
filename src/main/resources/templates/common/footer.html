@@ -1,68 +1,55 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
-    />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Footer</title>
-  </head>
-  <body>
-    <div th:fragment="footer">
-      <footer class="bg-dark text-white py-4">
-        <div class="container">
-          <!-- Top part of the footer with FAQ, Customer Service, Email, Phone -->
-          <div class="row">
-            <div class="col-md-3">
-              <h5>FAQ</h5>
-              <ul class="list-unstyled">
-                <li>
-                  <a href="/faq" class="text-white"
-                    >Frequently Asked Questions</a
-                  >
-                </li>
-              </ul>
-            </div>
-            <div class="col-md-3">
-              <h5>Customer Service</h5>
-              <ul class="list-unstyled">
-                <li>
-                  <a href="/customer-service" class="text-white"
-                    >Contact Support</a
-                  >
-                </li>
-              </ul>
-            </div>
-            <div class="col-md-3">
-              <h5>Email Address</h5>
-              <ul class="list-unstyled">
-                <li>
-                  <a href="mailto:support@joeshop.com" class="text-white"
-                    >support@joeshop.com</a
-                  >
-                </li>
-              </ul>
-            </div>
-            <div class="col-md-3">
-              <h5>Phone</h5>
-              <ul class="list-unstyled">
-                <li>
-                  <a href="tel:+1234567890" class="text-white"
-                    >+1 (234) 567-890</a
-                  >
-                </li>
-              </ul>
-            </div>
+  <div th:fragment="footer">
+    <footer class="bg-dark text-white py-4">
+      <div class="container">
+        <!-- Top part of the footer with FAQ, Customer Service, Email, Phone -->
+        <div class="row">
+          <div class="col-md-3">
+            <h5>FAQ</h5>
+            <ul class="list-unstyled">
+              <li>
+                <a href="/faq" class="text-white">Frequently Asked Questions</a>
+              </li>
+            </ul>
           </div>
-
-          <!-- Bottom part of the footer with copyright text -->
-          <div class="text-center mt-4">
-            <p>&copy; 2025 Joe Shop. All rights reserved.</p>
+          <div class="col-md-3">
+            <h5>Customer Service</h5>
+            <ul class="list-unstyled">
+              <li>
+                <a href="/customer-service" class="text-white"
+                  >Contact Support</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h5>Email Address</h5>
+            <ul class="list-unstyled">
+              <li>
+                <a href="mailto:support@joeshop.com" class="text-white"
+                  >support@joeshop.com</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <h5>Phone</h5>
+            <ul class="list-unstyled">
+              <li>
+                <a href="tel:+1234567890" class="text-white"
+                  >+1 (234) 567-890</a
+                >
+              </li>
+            </ul>
           </div>
         </div>
-      </footer>
-    </div>
-  </body>
+
+        <!-- Bottom part of the footer with copyright text -->
+        <div class="text-center mt-4">
+          <p>&copy; 2025 Joe Shop. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  </div>
 </html>
