@@ -23,7 +23,7 @@ public interface UserService {
 
     Response logout(HttpSession session);
 
-    Response withdraw(HttpSession session, UserDto userDto);
+    Response withdraw(String token, UserDto userDto);
 
     User getLoginUser();
 }
