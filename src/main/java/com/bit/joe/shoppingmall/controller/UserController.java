@@ -150,7 +150,8 @@ public class UserController {
     }
 
     @GetMapping("/withdraw")
-    public ResponseEntity<Response> withdraw(@CookieValue("token") String token, @RequestBody UserDto userDto) {
+    public ResponseEntity<Response> withdraw(
+            @CookieValue("token") String token, @RequestBody UserDto userDto) {
 
         return ResponseEntity.status(HttpStatus.OK).body(userService.withdraw(token, userDto));
         // return success response with status code 200 (OK)
