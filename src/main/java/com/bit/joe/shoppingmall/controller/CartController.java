@@ -59,4 +59,9 @@ public class CartController {
         return ResponseEntity.ok(resp);
         // return success response with status code 200 (OK)
     }
+
+    @GetMapping("/get")
+    public ResponseEntity<Response> getCart(@CookieValue("token") String token) {
+        return ResponseEntity.ok(cartService.getCart(token));
+    }
 }
