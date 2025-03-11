@@ -46,7 +46,7 @@ public class Cart {
      * @param cartItem
      */
     public void appendCartItemToCart(CartItem cartItem) {
-        cartItems.add(cartItem);
         cartItem.setCart(this);
+        cartItems.add(cartItem);
     }
 }
