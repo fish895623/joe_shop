@@ -4,6 +4,7 @@ import static com.bit.joe.shoppingmall.enums.OrderStatus.*;
 
 import java.util.List;
 
+import com.bit.joe.shoppingmall.jwt.JWTUtil;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -29,6 +30,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JWTUtil jwtUtil;
 
     @Override
     public Response createUser(UserDto userRequest) {
@@ -171,20 +173,31 @@ public class UserServiceImpl implements UserService {
         return Response.builder().status(200).message("Logout successfully").build();
     }
 
-    // Withdraw user account
-    /*
-    leave the data in the database, but mark the account as inactive
-    if the user logs in again, the account will be reactivated
-    if the user does not log in for a certain period of time, the account will be deleted
-    */
+    /**
+     * Withdraw account
+     *
+     * @param token the token
+     * @param userDto the user dto: it only contains the user id
+     * @return the response
+     */
     @Override
-    public Response withdraw(HttpSession session, UserDto userDto) {
+    public Response withdraw(String token, UserDto userDto) {
 
+        // get user from database by userId
         User user =
                 userRepository
                         .findById(userDto.getId())
                         .orElseThrow(() -> new NotFoundException("User not found"));
-        // get user from database by userId
+
+        // decrypt token and get user email
+        String emailInToken = jwtUtil.getUsername(token);
+
+        // check if the user email in the token is the same as the user email in the request
+        // if not, return a response with status code 401 (UNAUTHORIZED)
+        // if yes, continue to the next step
+        if (!user.getEmail().equals(emailInToken)) {
+            return Response.builder().status(401).message("Can not withdraw other's account").build();
+        }
 
         // check if the user has any order that is not completed
         // if there is, return a response with status code 400 (BAD_REQUEST)
@@ -198,15 +211,13 @@ public class UserServiceImpl implements UserService {
                     .build();
         }
 
-        user.setActive(false);
         // set user to inactive
+        user.setActive(false);
 
-        userRepository.save(user);
         // save user
+        userRepository.save(user);
 
-        session.invalidate();
-        // Invalidate session -> logout user
-
+        // return a response with status code 200 (OK)
         return Response.builder().status(200).message("Withdraw successfully").build();
     }
 
