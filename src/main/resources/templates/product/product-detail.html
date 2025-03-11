@@ -9,44 +9,44 @@
   </head>
   <body>
     <th:block th:replace="~{common/navigation :: navbar}" />
-    <main class="flex-grow-1">
-      <div class="container">
-        <h2>Product Detail Page</h2>
+    <div class="container">
+      <h2>Product Detail Page</h2>
 
-        <div class="card">
-          <div class="row no-gutters">
-            <div class="col-md-6">
-              <img
-                id="product-image"
-                class="card-img-left"
-                alt="Card image"
-                src=""
-              />
-            </div>
-            <div class="col-md-6">
-              <div class="card-body">
-                <h4 id="product-name" class="card-title"></h4>
-                <p id="product-category" class="card-text"></p>
-                <p id="product-price" class="card-text"></p>
-                <p id="product-quantity" class="card-text"></p>
-                <p id="product-select-quantity" class="card-text">
-                  <label for="quantity">수량:</label>
-                  <input
-                    type="number"
-                    id="quantity"
-                    name="quantity"
-                    min="1"
-                    value="1"
-                    placeholder="1"
-                  />
-                </p>
-                <p href="" class="btn btn-primary btn-lg">장바구니 추가</p>
-              </div>
+      <div class="card">
+        <div class="row no-gutters">
+          <div class="col-md-6">
+            <img
+              id="product-image"
+              class="card-img-left"
+              alt="Card image"
+              src=""
+            />
+          </div>
+          <div class="col-md-6">
+            <div class="card-body">
+              <h4 id="product-name" class="card-title"></h4>
+              <p id="product-category" class="card-text"></p>
+              <p id="product-price" class="card-text"></p>
+              <p id="product-quantity" class="card-text"></p>
+              <p id="product-select-quantity" class="card-text">
+                <label for="quantity">수량:</label>
+                <input
+                  type="number"
+                  id="quantity"
+                  name="quantity"
+                  min="1"
+                  value="1"
+                  placeholder="1"
+                />
+              </p>
+              <button id="add-to-cart-btn" class="btn btn-primary btn-lg">
+                장바구니 추가
+              </button>
             </div>
           </div>
         </div>
       </div>
-    </main>
+    </div>
 
     <th:block th:replace="~{common/footer :: footer}" />
 
@@ -100,6 +100,41 @@
         .catch((error) => {
           console.error("Error fetching product data:", error);
         });
+      //===================================
+      document
+        .getElementById("add-to-cart-btn")
+        .addEventListener("click", function () {
+          const cartId = 3;
+          const productId = getProductIdFromURL();
+          const quantity = document.getElementById("quantity").value;
+
+          const requestData = {
+            cartId: cartId,
+            productId: productId,
+            quantity: quantity,
+          };
+
+          // fetch로 장바구니에 상품을 추가하는 API 호출
+          fetch("/api/cart-item/create", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestData),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(data);
+              alert("장바구니에 추가되었습니다!");
+              window.location.href = "/cart"; // 카트 페이지로 이동
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert("장바구니 추가에 실패했습니다.");
+            });
+        });
+      //추후 작업
+      //userid,productId,quantity 값 동적으로 변경하기
     </script>
   </body>
 </html>
