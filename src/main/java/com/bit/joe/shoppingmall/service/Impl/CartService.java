@@ -196,4 +196,31 @@ public class CartService {
                 .build();
         // return not found response with status code 404 -> product not found in cart
     }
+
+    /**
+     * Get the cart
+     *
+     * @param token String
+     * @return Response
+     */
+    public Response getCart(String token) {
+        // get user email from the token
+        String loggedInUserEmail = jwtUtil.getUsername(token);
+        // get user from the context holder (logged-in user)
+        UserDto userDto = userService.getUserByEmail(loggedInUserEmail).getUser();
+        // Convert UserDto to User
+        User user = UserMapper.toEntity(userDto);
+        // Find cart by user
+        Cart cart =
+                cartRepository
+                        .findCartByUser(user)
+                        .orElseThrow(() -> new NotFoundException("Cart not found"));
+
+        // return success response with status code 200 -> cart retrieved successfully
+        return Response.builder()
+                .status(200)
+                .message("Cart retrieved successfully")
+                .cart(CartMapper.toDto(cart))
+                .build();
+    }
 }
