@@ -11,4 +11,9 @@ public class HomeController {
     public String index() {
         return "user/mainPage";
     }
+
+    @GetMapping("/category")
+    public String category() {
+        return "category-list";
+    }
 }

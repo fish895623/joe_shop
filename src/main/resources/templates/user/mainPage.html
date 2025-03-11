@@ -26,8 +26,28 @@
   <body>
     <!-- Corrected th:replace to properly include the navbar fragment -->
     <th:block th:replace="~{common/navigation :: navbar}" />
-    <main class="flex-grow-1">
-      <div class="container">
+    <div class="container">
+      <div class="category-bar">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="#">Men</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Women</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Kids</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Accessories</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/category">More-Categories</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="main-content">
         <div id="mainImage">
           <h1>이미지(이벤트로 넘기기)</h1>
         </div>
@@ -62,24 +82,6 @@
           </div>
         </div>
       </div>
-
-      <ul class="nav nav-tabs">
-        <li class="nav-item">
-          <a class="nav-link" aria-current="page" href="#">Men</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Women</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Kids</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Accessories</a>
-        </li>
-      </ul>
-    </main>
-
-    <th:block th:replace="~{common/footer :: footer}" />
 
     <script>
       // JavaScript to handle image click events

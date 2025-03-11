@@ -4,6 +4,10 @@ body {
   margin: 0;
 }
 
+.container {
+  padding-top: 1rem;
+}
+
 body {
   display: flex;
   flex-direction: column;
