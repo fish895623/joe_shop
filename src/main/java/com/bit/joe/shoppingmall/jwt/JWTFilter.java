@@ -39,8 +39,6 @@ public class JWTFilter extends OncePerRequestFilter {
                     token = cookie.getValue();
                     log.info("Token found in cookie");
                     break;
-                } else {
-                    log.info("No Token found");
                 }
             }
         }
