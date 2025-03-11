@@ -158,4 +158,19 @@ class CartControllerTests {
         mockMvc.perform(get("/api/cart/get").contentType(MediaType.APPLICATION_JSON).cookie(cookie))
                 .andExpect(status().is4xxClientError());
     }
+
+    @Test
+    @DisplayName("Create cart with invalid request(user id)")
+    void createCartWithInvalidRequest() throws Exception {
+        // prepare data
+        CartRequest cartRequest = CartRequest.builder().userId(0L).build();
+        var insertData = new ObjectMapper().writeValueAsString(cartRequest);
+
+        // perform login
+        mockMvc.perform(
+                        post("/api/cart/create")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(insertData))
+                .andExpect(status().is4xxClientError());
+    }
 }
