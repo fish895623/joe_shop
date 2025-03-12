@@ -1,21 +1,21 @@
 package com.bit.joe.shoppingmall.controller;
 
-import com.bit.joe.shoppingmall.dto.ProductDto;
-import com.bit.joe.shoppingmall.entity.Product;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import com.bit.joe.shoppingmall.dto.ProductDto;
 import com.bit.joe.shoppingmall.dto.request.ProductRequest;
 import com.bit.joe.shoppingmall.dto.response.Response;
+import com.bit.joe.shoppingmall.entity.Product;
 import com.bit.joe.shoppingmall.service.ProductService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/product")
@@ -108,34 +108,40 @@ public class ProductController {
             List<Product> products = productService.searchProductsByKeyword(keyword);
 
             if (products.isEmpty()) {
-                Response response = Response.builder()
-                        .status(HttpStatus.NOT_FOUND.value())
-                        .message("검색 결과가 없습니다.")
-                        .build();
+                Response response =
+                        Response.builder()
+                                .status(HttpStatus.NOT_FOUND.value())
+                                .message("검색 결과가 없습니다.")
+                                .build();
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
 
-            List<ProductDto> productDtos = products.stream()
-                    .map(product -> ProductDto.builder()
-                            .id(product.getId())
-                            .name(product.getName())
-                            .price(product.getPrice())
-                            .imageUrl(product.getImageURL())
-                            .build())
-                    .collect(Collectors.toList());
+            List<ProductDto> productDtos =
+                    products.stream()
+                            .map(
+                                    product ->
+                                            ProductDto.builder()
+                                                    .id(product.getId())
+                                                    .name(product.getName())
+                                                    .price(product.getPrice())
+                                                    .imageUrl(product.getImageURL())
+                                                    .build())
+                            .collect(Collectors.toList());
 
-            Response response = Response.builder()
-                    .status(HttpStatus.OK.value())
-                    .message("검색 결과")
-                    .productList(productDtos)
-                    .build();
+            Response response =
+                    Response.builder()
+                            .status(HttpStatus.OK.value())
+                            .message("검색 결과")
+                            .productList(productDtos)
+                            .build();
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            Response response = Response.builder()
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                    .message("internal server error!")
-                    .build();
+            Response response =
+                    Response.builder()
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .message("internal server error!")
+                            .build();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
@@ -105,7 +105,7 @@
           // Filter and reorder the categories based on the predefined order
           categoryOrder.forEach((categoryName) => {
             const category = categories.find(
-              (cat) => cat.categoryName === categoryName
+              (cat) => cat.categoryName === categoryName,
             );
             if (category) {
               const categoryTab = `<li class="nav-item">
@@ -144,7 +144,7 @@
         fetch(
           categoryId === "all"
             ? "/product/get-all"
-            : `/product/get-by-category-id/${categoryId}`
+            : `/product/get-by-category-id/${categoryId}`,
         )
           .then((response) => response.json())
           .then((data) => {
@@ -212,7 +212,7 @@
           .catch((error) => {
             console.error(
               "검색 결과를 가져오는 데 오류가 발생했습니다:",
-              error
+              error,
             );
           });
       }
