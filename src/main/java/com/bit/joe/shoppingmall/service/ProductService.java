@@ -1,6 +1,9 @@
 package com.bit.joe.shoppingmall.service;
 
 import com.bit.joe.shoppingmall.dto.response.Response;
+import com.bit.joe.shoppingmall.entity.Product;
+
+import java.util.List;
 
 public interface ProductService {
 
@@ -18,4 +21,6 @@ public interface ProductService {
     Response getProductsByCategory(Long categoryId);
 
     boolean existsByCategoryIdAndName(Long categoryId, String name);
+
+    List<Product> searchProductsByKeyword(String keyword);
 }

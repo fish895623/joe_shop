@@ -136,4 +136,10 @@ public class ProductServiceImpl implements ProductService {
     public boolean existsByCategoryIdAndName(Long categoryId, String name) {
         return productRepository.existsByCategoryIdAndName(categoryId, name);
     }
+
+    @Override
+    public List<Product> searchProductsByKeyword(String keyword) {
+        System.out.println("Searching for products with keyword: " + keyword);
+        return productRepository.findByNameContainingIgnoreCase(keyword);
+    }
 }
