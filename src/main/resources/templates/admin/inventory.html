@@ -102,12 +102,18 @@
 
             const originalContent = cell.textContent;
             console.log(cell.className);
+            /** Select the input type based on the cell class */
+            // const input =
+            //     cell.className === "category-name"
+            //         ? document.createElement("input")
+            //         : document.createElement("select");
             const input = document.createElement("input");
             switch (cell.className) {
               case "product-name":
                 input.type = "text";
                 break;
               case "category-name":
+                /** TODO Load data from categoryLists() */
                 input.type = "text";
                 break;
               case "quantity":
@@ -128,13 +134,7 @@
 
             // Handle saving when focus is lost
             input.addEventListener("blur", function () {
-              const newValue = this.value;
-              cell.textContent = newValue;
-
-              // Get row data for saving
-              const row = cell.parentElement;
-              const id = row.dataset.id;
-              const columnName = cell.dataset.field;
+              cell.textContent = this.value;
             });
 
             // Handle Enter key
@@ -145,6 +145,36 @@
             });
           });
       });
+      function updateProduct(productId, categoryId, name, quantity, price) {
+        const requestData = {
+          categoryId: categoryId,
+          name: name,
+          quantity: quantity,
+          price: price,
+        };
+
+        fetch(`/product/update/${productId}`, {
+          method: "POST",
+          include: "credentials",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestData),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log("Product updated successfully:", data);
+            // Optionally, refresh the product list or update the UI
+          })
+          .catch((error) => {
+            console.error("Error updating product:", error);
+          });
+      }
     </script>
   </body>
 </html>
