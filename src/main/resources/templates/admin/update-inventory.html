@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inventory</title>
+    <th:block th:replace="~{common/head :: library}"></th:block>
+    <style>
+      th {
+        text-transform: capitalize;
+      }
+    </style>
+    <script>
+      document
+        .getElementById("tableBody")
+        .addEventListener("click", function (e) {
+          const cell = e.target.closest("td");
+          if (!cell || cell.classList.contains("action-cell")) return;
+
+          const originalContent = cell.textContent;
+          const row = cell.parentElement;
+
+          if (cell.className === "category-name") {
+            // Create select element for category
+            const select = document.createElement("select");
+            select.className = "form-control";
+
+            // Add loading placeholder
+            select.innerHTML =
+              "<option disabled>Loading categories...</option>";
+            cell.textContent = "";
+            cell.appendChild(select);
+
+            // Load categories and populate dropdown
+            categoryLists().then((categories) => {
+              select.innerHTML = ""; // Clear placeholder
+
+              categories.forEach((category) => {
+                const option = document.createElement("option");
+                option.value = category.id;
+                option.textContent = category.categoryName;
+                option.selected = category.categoryName === originalContent;
+                select.appendChild(option);
+              });
+
+              select.focus();
+            });
+
+            // Handle blur
+            select.addEventListener("blur", function () {
+              const selectedOption = this.options[this.selectedIndex];
+              if (selectedOption) {
+                cell.textContent = selectedOption.textContent;
+                cell.dataset.categoryId = selectedOption.value; // Store category ID
+              } else {
+                cell.textContent = originalContent;
+              }
+              updateProductFromRow(row);
+            });
+          } else {
+            // For non-category cells use input elements
+            const input = document.createElement("input");
+
+            switch (cell.className) {
+              case "product-name":
+                input.type = "text";
+                break;
+              case "quantity":
+                input.type = "number";
+                break;
+              case "price":
+                input.type = "number";
+                break;
+              default:
+                return;
+            }
+
+            input.value = originalContent;
+            input.className = "form-control";
+
+            cell.textContent = "";
+            cell.appendChild(input);
+            input.focus();
+
+            // Handle saving when focus is lost
+            input.addEventListener("blur", function () {
+              cell.textContent = this.value;
+              updateProductFromRow(row);
+            });
+
+            // Handle Enter key
+            input.addEventListener("keypress", function (e) {
+              if (e.key === "Enter") {
+                this.blur();
+              }
+            });
+          }
+        });
+
+      // Replace the existing updateProduct function with this one
+      async function updateProductFromRow(row) {
+        const productId = row.id.split("=")[1];
+        const productName = row.querySelector(".product-name").textContent;
+        const categoryName = row.querySelector(".category-name").textContent;
+        const quantity = row.querySelector(".quantity").textContent;
+        const price = row.querySelector(".price").textContent;
+
+        try {
+          // Get category ID from name
+          const categoryResponse = await fetch("/category/get-product-id", {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              categoryName: categoryName,
+            }),
+          });
+
+          const categoryData = await categoryResponse.json();
+          const categoryId = categoryData.category.id;
+
+          // Update product
+          const productUpdate = {
+            name: productName,
+            quantity: parseInt(quantity),
+            price: parseInt(price),
+            categoryId: categoryId,
+          };
+
+          const updateResponse = await fetch(`/product/update/${productId}`, {
+            method: "PUT",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(productUpdate),
+          });
+
+          if (!updateResponse.ok) {
+            throw new Error("Failed to update product");
+          }
+
+          console.log("Product updated successfully");
+        } catch (error) {
+          console.error("Error updating product:", error);
+        }
+      }
+
+      // Keep existing updateProduct function for backward compatibility
+      function updateProduct() {
+        const row =
+          document.getElementsByClassName("product-name")[0].parentElement;
+        updateProductFromRow(row);
+      }
+      const updateProductFromRow = async (row) => {
+        const productId = row.id.split("=")[1];
+        const productName =
+          row.getElementsByClassName("product-name")[0].firstChild.text;
+        const categoryName =
+          row.getElementsByClassName("category-name")[0].firstChild.text;
+        const quantity =
+          row.getElementsByClassName("quantity")[0].firstChild.text;
+        const price = row.getElementsByClassName("price")[0].firstChild.text;
+
+        const requestData = {
+          productId: productId,
+          name: productName,
+          categoryName: categoryName,
+          quantity: quantity,
+          price: price,
+        };
+
+        console.log(requestData);
+
+        try {
+          const response = await fetch("/product/update", {
+            method: "PUT",
+            include: "credentials",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestData),
+          });
+
+          if (response.ok) {
+            console.log("Product updated successfully");
+            loadData();
+          } else {
+            console.error("Error updating product");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      };
+    </script>
+  </head>
+  <body>
+    <main class="flex-grow-1">
+      <div class="container"></div>
+    </main>
+  </body>
+</html>

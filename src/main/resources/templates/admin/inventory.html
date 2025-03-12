@@ -15,7 +15,16 @@
     <th:block th:replace="~{common/navigation :: adminnavbar}" />
     <main class="flex-grow-1">
       <div class="container">
-        <h3>상품(재고)관리</h3>
+        <div class="d-flex justify-content-between align-items-center">
+          <h3>상품(재고)관리</h3>
+          <button
+            id="update-product-btn"
+            class="btn btn-primary"
+            onclick="window.open('/admin/update-inventory', '_blank', 'toolbar=no,scrollbars=yes,resizable=yes,width=400,height=600')"
+          >
+            상품 수정
+          </button>
+        </div>
         <hr />
         <table>
           <thead>
