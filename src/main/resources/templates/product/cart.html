@@ -67,7 +67,7 @@
                         </td>
                         <td>${item.price}</td>
                         <td>
-                            <button class="btn btn-danger" onclick="removeItem(${item.product.id})">Remove</button>
+                            <button class="btn btn-danger" onclick="removeItem(${item.product.id},${cartData.id},${item.quantity})">Remove</button>
                         </td>
                     `;
           // 테이블에 행 추가
@@ -98,15 +98,22 @@
       }
 
       // 장바구니 아이템 삭제
-      function removeItem(productId) {
-        fetch(`/api/cart-item/delete/`, {
-          method: "DELETE",
+      function removeItem(productId,cartId,quantity) {
+        fetch(`/api/cart-item/delete`, {
+          method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
+            body: JSON.stringify({
+              productId: productId,
+              cartId: cartId,
+              quantity: quantity
+            }),
         })
-          .then((response) => response.json())
+
+                .then((response) => response.json())
           .then((data) => {
+            console.log(data)
             alert(data.message);
             getCartItems(); // 아이템 삭제 후 장바구니 아이템을 다시 로드
           })
