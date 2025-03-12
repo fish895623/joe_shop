@@ -54,4 +54,9 @@ public class AdminController {
     public String updateInventory() {
         return "admin/update-inventory";
     }
+
+    @GetMapping("/add-product")
+    public String addProduct() {
+        return "admin/add-inventory";
+    }
 }
