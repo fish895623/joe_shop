@@ -12,5 +12,7 @@ public interface CategoryService {
 
     Response getCategoryById(Long categoryId);
 
+    Response getCategoryByName(CategoryDto categoryDto);
+
     Response deleteCategory(Long categoryId);
 }
