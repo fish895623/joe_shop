@@ -4,36 +4,32 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Member</title>
+    <th:block th:replace="~{common/head :: library}" />
   </head>
   <body>
-    <nav>
-      <ul>
-        <li><a href="/admin"> 관리 홈</a></li>
-        <li><a href="/admin/member"> 회원관리</a></li>
-        <li><a href="/admin/inventory"> 재고관리</a></li>
-      </ul>
-    </nav>
-
-    <div>
-      <table id="dataTable" border="1">
-        <caption>
-          <strong>회원정보</strong>
-        </caption>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Password</th>
-            <th>Birth</th>
-            <th>Gender</th>
-            <th>Role</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- JSON 데이터 추가되는 곳 -->
-        </tbody>
-      </table>
-    </div>
+    <th:block th:replace="~{common/navigation :: adminnavbar}" />
+    <main class="flex-grow-1">
+      <div class="container">
+        <table id="dataTable" border="1">
+          <caption>
+            <strong>회원정보</strong>
+          </caption>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Password</th>
+              <th>Birth</th>
+              <th>Gender</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- JSON 데이터 추가되는 곳 -->
+          </tbody>
+        </table>
+      </div>
+    </main>
 
     <script>
       function loadTableData(data) {
@@ -53,7 +49,7 @@
         });
       }
 
-      fetch("/user/get-all", {
+      fetch("/api/user/get-all", {
         headers: {
           "Content-Type": "application/json",
         },

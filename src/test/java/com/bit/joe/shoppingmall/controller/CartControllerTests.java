@@ -1,16 +1,14 @@
 package com.bit.joe.shoppingmall.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.Base64;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -55,25 +53,12 @@ class CartControllerTests {
                     .gender(UserGender.MALE)
                     .birth("2021-01-01")
                     .build();
-    String adminBasicAuth =
-            "Basic "
-                    + Base64.getEncoder()
-                            .encodeToString(
-                                    (adminEntity.getEmail() + ":" + adminEntity.getPassword())
-                                            .getBytes());
-    String userBasicAuth =
-            "Basic "
-                    + Base64.getEncoder()
-                            .encodeToString(
-                                    (userEntity.getEmail() + ":" + userEntity.getPassword())
-                                            .getBytes());
 
     String adminJwtToken;
     String userJwtToken;
     User user;
     User admin;
 
-    MockHttpSession mockHttpSession = new MockHttpSession();
     @Autowired private MockMvc mockMvc;
     @Autowired private CategoryRepository categoryRepository;
     @Autowired private ProductRepository productRepository;
@@ -132,6 +117,10 @@ class CartControllerTests {
                                 .cookie(cookie)
                                 .content(insertData))
                 .andExpect(status().isOk());
+
+        // perform get cart
+        mockMvc.perform(get("/api/cart/get").contentType(MediaType.APPLICATION_JSON).cookie(cookie))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -152,5 +141,36 @@ class CartControllerTests {
                                 .cookie(cookie)
                                 .content(insertData))
                 .andExpect(status().isOk());
+
+        // perform get cart
+        mockMvc.perform(get("/api/cart/get").contentType(MediaType.APPLICATION_JSON).cookie(cookie))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Get cart with invalid token")
+    void getCartWithInvalidToken() throws Exception {
+        // make cookie
+        var cookie = new Cookie("token", userJwtToken);
+        cookie.setPath("/");
+
+        // perform get cart
+        mockMvc.perform(get("/api/cart/get").contentType(MediaType.APPLICATION_JSON).cookie(cookie))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    @DisplayName("Create cart with invalid request(user id)")
+    void createCartWithInvalidRequest() throws Exception {
+        // prepare data
+        CartRequest cartRequest = CartRequest.builder().userId(0L).build();
+        var insertData = new ObjectMapper().writeValueAsString(cartRequest);
+
+        // perform login
+        mockMvc.perform(
+                        post("/api/cart/create")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(insertData))
+                .andExpect(status().is4xxClientError());
     }
 }
