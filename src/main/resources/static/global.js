@@ -89,3 +89,24 @@ function redirectToViewWithValues(valueTitle, valueToSend, targetUrl) {
 function getValuesFromLocalStorage(valueTitle) {
   return JSON.parse(localStorage.getItem(valueTitle));
 }
+
+// 쿠키를 이용해서 카트 데이터 가져오기 ========================================================
+async function getCart() {
+  // 장바구니 데이터를 가져오기 위해 서버에 요청
+  const cartData = await fetch("/api/cart/get", {
+    method: "GET",
+    credentials: "include", // 쿠키 전달
+    headers: {
+      Authorization: "Content-Type: application/json",
+    },
+  }).then((response) => {
+    // 장바구니 데이터를 가져오는데 실패하면 에러 페이지로 이동
+    if (!response.ok) {
+      console.error("Error fetching cart data:", response);
+      window.location.href = "/error";
+    }
+    return response.json();
+  });
+
+  localStorage.setItem("cart", JSON.stringify(cartData.cart));
+}
