@@ -85,6 +85,65 @@
 
         // 초기 데이터 로드
         loadData();
+
+        /**
+         * Loading Category Lists
+         * @returns catoryList
+         */
+        const categoryLists = () => {
+          return null;
+        };
+
+        document
+          .getElementById("tableBody")
+          .addEventListener("click", function (e) {
+            const cell = e.target.closest("td");
+            if (!cell || cell.classList.contains("action-cell")) return; // Skip action cells
+
+            const originalContent = cell.textContent;
+            console.log(cell.className);
+            const input = document.createElement("input");
+            switch (cell.className) {
+              case "product-name":
+                input.type = "text";
+                break;
+              case "category-name":
+                input.type = "text";
+                break;
+              case "quantity":
+                input.type = "number";
+                break;
+              case "price":
+                input.type = "number";
+                break;
+              default:
+                return;
+            }
+            input.value = originalContent;
+            input.className = "form-control";
+
+            cell.textContent = "";
+            cell.appendChild(input);
+            input.focus();
+
+            // Handle saving when focus is lost
+            input.addEventListener("blur", function () {
+              const newValue = this.value;
+              cell.textContent = newValue;
+
+              // Get row data for saving
+              const row = cell.parentElement;
+              const id = row.dataset.id;
+              const columnName = cell.dataset.field;
+            });
+
+            // Handle Enter key
+            input.addEventListener("keypress", function (e) {
+              if (e.key === "Enter") {
+                this.blur();
+              }
+            });
+          });
       });
     </script>
   </body>
