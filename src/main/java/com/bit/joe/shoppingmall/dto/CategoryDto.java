@@ -23,4 +23,9 @@ public class CategoryDto {
     private Long id;
     private String categoryName;
     private List<ProductDto> productList;
+
+    public CategoryDto(Long id, String categoryName) {
+        this.id = id;
+        this.categoryName = categoryName;
+    }
 }

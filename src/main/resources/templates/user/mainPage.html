@@ -4,10 +4,76 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MainPage</title>
+    <link rel="stylesheet" href="/style.css" />
     <th:block th:replace="~{common/head :: library}"></th:block>
   </head>
   <body>
-    <style></style>
+    <style>
+      .nav-tabs {
+        display: flex;
+        justify-content: center;
+        list-style-type: none;
+        padding: 0;
+      }
+      .nav-item {
+        margin: 0 10px;
+      }
+
+      /* Flexbox layout for product container */
+      #productContainer {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        gap: 20px; /* Adjust gap between cards */
+        padding: 20px;
+      }
+
+      /* Flex properties for each card */
+      .card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 20rem;
+        margin: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+      }
+
+      .card:hover {
+        transform: translateY(-10px); /* Add hover effect */
+      }
+
+      .card-img-top {
+        width: 100%;
+        height: auto;
+      }
+
+      .card-body {
+        padding: 10px;
+        text-align: center;
+      }
+
+      .card-title {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+      }
+
+      .card-link input[type="button"] {
+        padding: 8px 16px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+
+      .card-link input[type="button"]:hover {
+        background-color: #0056b3;
+      }
+    </style>
     <!-- Corrected th:replace to properly include the navbar fragment -->
     <th:block th:replace="~{common/navigation :: navbar}" />
 
@@ -28,8 +94,8 @@
 
           // Add the "All" tab first
           let allTab = `<li class="nav-item">
-                      <a class="nav-link active" href="#" data-category="all">All</a>
-                    </li>`;
+                  <a class="nav-link active" href="#" data-category="all">All</a>
+                </li>`;
           categoryTabs.innerHTML = allTab;
 
           // Define the required tab order
@@ -43,8 +109,8 @@
             );
             if (category) {
               const categoryTab = `<li class="nav-item">
-                                 <a class="nav-link" href="#" data-category="${category.id}">${category.categoryName}</a>
-                               </li>`;
+                             <a class="nav-link" href="#" data-category="${category.id}">${category.categoryName}</a>
+                           </li>`;
               categoryTabs.insertAdjacentHTML("beforeend", categoryTab);
             }
           });
@@ -88,10 +154,44 @@
 
             productList.forEach((product) => {
               const productCard = `
+          <div class="card" style="width: 18rem">
+            <img class="card-img-top" src="${product.image || "dress.jpg"}" alt="Card image cap" />
+            <div class="card-body">
+              <h5 class="card-title">${product.name}</h5>
+              <span>${product.price}</span>
+              <p>Category: ${product.category ? product.category.categoryName : "N/A"}</p> <!-- Show category -->
+            </div>
+            <div class="card-body">
+              <a href="#" class="card-link">
+                <input type="button" value="자세히 보기" />
+              </a>
+            </div>
+          </div>
+        `;
+              container.insertAdjacentHTML("beforeend", productCard);
+            });
+          })
+          .catch((error) => {
+            console.error("Error fetching products:", error);
+          });
+      }
+
+      function loadProductsByKeyword(keyword) {
+        fetch("/product/search?keyword=" + encodeURIComponent(keyword))
+          .then((response) => response.json())
+          .then((data) => {
+            const productList = data.productList || [];
+            const container = document.getElementById("productContainer");
+            container.innerHTML = ""; // Clear the previous products
+
+            if (productList.length > 0) {
+              productList.forEach((product) => {
+                const productCard = `
             <div class="card" style="width: 18rem">
               <img class="card-img-top" src="${product.image || "dress.jpg"}" alt="Card image cap" />
               <div class="card-body">
                 <h5 class="card-title">${product.name}</h5>
+                <p>Category: ${product.category && product.category.categoryName ? product.category.categoryName : "N/A"}</p> <!-- Show category -->
                 <span>${product.price}</span>
               </div>
               <div class="card-body">
@@ -101,11 +201,17 @@
               </div>
             </div>
           `;
-              container.insertAdjacentHTML("beforeend", productCard);
-            });
+                container.insertAdjacentHTML("beforeend", productCard); // Add product card
+              });
+            } else {
+              container.innerHTML = "<p>검색 결과가 없습니다.</p>"; // Display message when no results
+            }
           })
           .catch((error) => {
-            console.error("Error fetching products:", error);
+            console.error(
+              "검색 결과를 가져오는 데 오류가 발생했습니다:",
+              error,
+            );
           });
       }
     </script>

@@ -114,13 +114,22 @@
           <a class="navbar-brand" href="/">Joe Shop</a>
 
           <!-- Search Bar and Button -->
-          <form class="d-flex ms-auto" role="search">
+          <form
+            class="d-flex ms-auto"
+            role="search"
+            id="searchForm"
+            th:action="@{/product/search}"
+            method="get"
+          >
             <input
               class="form-control me-2"
               type="search"
               placeholder="Search"
               aria-label="Search"
               style="width: 500px"
+              id="searchInput"
+              name="keyword"
+              th:value="${keyword}"
             />
             <button class="btn btn-outline-light" type="submit">Search</button>
           </form>
@@ -139,6 +148,18 @@
       </nav>
       <script src="/global.js"></script>
       <script>
+        document
+          .getElementById("searchForm")
+          .addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent page reload on form submission
+            const searchKeyword = document
+              .getElementById("searchInput")
+              .value.trim();
+            if (searchKeyword) {
+              loadProductsByKeyword(searchKeyword); // Function to load products based on the keyword
+            }
+          });
+
         const token = getTokenFromCookie("token");
         const parseToken = parseJwt(token);
         const role = getUserRole(parseToken);
