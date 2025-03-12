@@ -48,7 +48,6 @@
         const categorySelect = document.getElementById("categorySelect");
         categorySelect.innerHTML = "";
         categories.forEach((category) => {
-          console.log(category);
           const option = document.createElement("option");
           option.value = category.id;
           option.textContent = category.categoryName;
