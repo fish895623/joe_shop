@@ -53,7 +53,6 @@
           quantity: quantity,
           imageUrl: imageUrl,
         };
-        console.log(data);
         const response = await fetch("/product/update", {
           method: "PUT",
           include: "credentials",
@@ -69,12 +68,8 @@
             imageUrl: imageUrl,
           }),
         });
-        if (response.ok) {
-          alert("Product updated successfully!");
-          window.close();
-        } else {
-          alert("Failed to update product.");
-        }
+
+        return response;
       };
     </script>
     <script>
@@ -111,7 +106,7 @@
             const quantity = document.getElementById("quantity").value;
             const imageUrl = document.getElementById("imageUrl").value;
 
-            await updateProduct(
+            const response = await updateProduct(
               productId,
               name,
               categoryId,
@@ -119,6 +114,12 @@
               quantity,
               imageUrl,
             );
+            if (response.ok) {
+              alert("Product updated successfully!");
+              window.close();
+            } else {
+              alert("Failed to update product.");
+            }
           });
       });
     </script>
