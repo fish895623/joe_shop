@@ -7,13 +7,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ProductRequest {
-    @NotNull(message = "Product ID is required")
     private Long productId;
 
     @NotNull(message = "Category ID is required")
     private Long categoryId;
 
-    @NotEmpty(message = "Image is required")
     private String image;
 
     @NotEmpty(message = "Name is required")
