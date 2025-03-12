@@ -1,0 +1,23 @@
+table {
+    width: 100%;
+    border-collapse: collapse; /* Removes gaps between cells */
+    margin: 20px 0;
+    font-size: 16px;
+    text-align: left;
+  }
+
+  th,
+  td {
+    padding: 10px; /* Adds space inside cells */
+    border: 2px solid #ddd; /* Adds light borders */
+  }
+  th {
+    background-color: #333; /* Dark background for headers */
+    color: white; /* White text for headers */
+  }
+  tbody tr:nth-child(odd) {
+    background-color: #f9f9f9; /* Light gray for odd rows */
+  }
+  tbody tr:nth-child(even) {
+    background-color: #fff; /* White for even rows */
+  }
