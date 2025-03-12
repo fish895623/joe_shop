@@ -67,7 +67,7 @@
                         </td>
                         <td>${item.price}</td>
                         <td>
-                            <button class="btn btn-danger" onclick="removeItem(${item.product.id},${cartData.id},${item.quantity},this)">Remove</button>
+                            <button class="btn btn-danger" onclick="removeItem(${item.product.id},${cartData.id},${item.quantity})">Remove</button>
                         </td>
                     `;
           // 테이블에 행 추가
@@ -98,7 +98,7 @@
       }
 
       // 장바구니 아이템 삭제
-      function removeItem(productId, cartId, quantity, button) {
+      function removeItem(productId, cartId, quantity) {
         fetch(`/api/cart-item/delete`, {
           method: "DELETE",
           headers: {
@@ -111,11 +111,12 @@
           }),
         })
           .then((response) => response.json())
-          .then((data) => {
-            console.log(data);
+          .then(async (data) => {
             alert(data.message);
-            // 삭제된 항목을 UI에서 바로 제거
-            button.closest("tr").remove(); // button 클릭된 요소의 부모 tr 삭제
+            // 장바구니 아이템 삭제 후 장바구니 정보 다시 가져오기
+            await getCart();
+            // 장바구니 아이템 목록 다시 로드
+            await getCartItems();
           })
           .catch((error) => console.error("Error removing item:", error));
       }
@@ -140,7 +141,10 @@
         });
 
       // 페이지 로드 시 장바구니 아이템 목록 불러오기
-      document.addEventListener("DOMContentLoaded", getCartItems);
+      document.addEventListener("DOMContentLoaded", async () => {
+        await getCart();
+        await getCartItems();
+      });
     </script>
   </body>
 </html>
