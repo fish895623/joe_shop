@@ -67,7 +67,7 @@
                         </td>
                         <td>${item.price}</td>
                         <td>
-                            <button class="btn btn-danger" onclick="removeItem(${item.product.id},${cartData.id},${item.quantity})">Remove</button>
+                            <button class="btn btn-danger" onclick="removeItem(${item.product.id},${cartData.id},${item.quantity},this)">Remove</button>
                         </td>
                     `;
           // 테이블에 행 추가
@@ -98,26 +98,26 @@
       }
 
       // 장바구니 아이템 삭제
-      function removeItem(productId,cartId,quantity) {
+      function removeItem(productId, cartId, quantity, button) {
         fetch(`/api/cart-item/delete`, {
-          method: "GET",
+          method: "DELETE",
           headers: {
             "Content-Type": "application/json",
           },
-            body: JSON.stringify({
-              productId: productId,
-              cartId: cartId,
-              quantity: quantity
-            }),
+          body: JSON.stringify({
+            productId: productId,
+            cartId: cartId,
+            quantity: quantity,
+          }),
         })
-
                 .then((response) => response.json())
-          .then((data) => {
-            console.log(data)
-            alert(data.message);
-            getCartItems(); // 아이템 삭제 후 장바구니 아이템을 다시 로드
-          })
-          .catch((error) => console.error("Error removing item:", error));
+                .then((data) => {
+                  console.log(data);
+                  alert(data.message);
+                  // 삭제된 항목을 UI에서 바로 제거
+                  button.closest("tr").remove(); // button 클릭된 요소의 부모 tr 삭제
+                })
+                .catch((error) => console.error("Error removing item:", error));
       }
 
       // 장바구니 비우기
