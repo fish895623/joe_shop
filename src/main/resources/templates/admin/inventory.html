@@ -35,13 +35,14 @@
       document.addEventListener("DOMContentLoaded", function () {
         const tableBodyElement = document.getElementById("tableBody");
 
-        const createRow = (product, category, quantity, price) => {
+        const createRow = (id, product, category, quantity, price) => {
           const row = document.createElement("tr");
           const productElement = document.createElement("td");
           const categoryElement = document.createElement("td");
           const quantityElement = document.createElement("td");
           const priceElement = document.createElement("td");
 
+          row.id = `product-${id}`;
           productElement.textContent = product;
           productElement.classList.add("product-name");
           categoryElement.textContent = category;
@@ -70,6 +71,7 @@
               reversedData.forEach((element) => {
                 console.log(element);
                 const row = createRow(
+                  element.id,
                   element.name,
                   element.category.categoryName,
                   element.quantity,
@@ -85,96 +87,7 @@
 
         // 초기 데이터 로드
         loadData();
-
-        /**
-         * Loading Category Lists
-         * @returns catoryList
-         */
-        const categoryLists = () => {
-          return null;
-        };
-
-        document
-          .getElementById("tableBody")
-          .addEventListener("click", function (e) {
-            const cell = e.target.closest("td");
-            if (!cell || cell.classList.contains("action-cell")) return; // Skip action cells
-
-            const originalContent = cell.textContent;
-            console.log(cell.className);
-            /** Select the input type based on the cell class */
-            // const input =
-            //     cell.className === "category-name"
-            //         ? document.createElement("input")
-            //         : document.createElement("select");
-            const input = document.createElement("input");
-            switch (cell.className) {
-              case "product-name":
-                input.type = "text";
-                break;
-              case "category-name":
-                /** TODO Load data from categoryLists() */
-                input.type = "text";
-                break;
-              case "quantity":
-                input.type = "number";
-                break;
-              case "price":
-                input.type = "number";
-                break;
-              default:
-                return;
-            }
-            input.value = originalContent;
-            input.className = "form-control";
-
-            cell.textContent = "";
-            cell.appendChild(input);
-            input.focus();
-
-            // Handle saving when focus is lost
-            input.addEventListener("blur", function () {
-              cell.textContent = this.value;
-            });
-
-            // Handle Enter key
-            input.addEventListener("keypress", function (e) {
-              if (e.key === "Enter") {
-                this.blur();
-              }
-            });
-          });
       });
-      function updateProduct(productId, categoryId, name, quantity, price) {
-        const requestData = {
-          categoryId: categoryId,
-          name: name,
-          quantity: quantity,
-          price: price,
-        };
-
-        fetch(`/product/update/${productId}`, {
-          method: "POST",
-          include: "credentials",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestData),
-        })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Network response was not ok");
-            }
-            return response.json();
-          })
-          .then((data) => {
-            console.log("Product updated successfully:", data);
-            // Optionally, refresh the product list or update the UI
-          })
-          .catch((error) => {
-            console.error("Error updating product:", error);
-          });
-      }
     </script>
   </body>
 </html>
