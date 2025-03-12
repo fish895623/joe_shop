@@ -173,5 +173,20 @@ public class CategoryControllerTests {
     }
 
     @Test
+    public void getCategoryByName() throws Exception {
+        CategoryDto requestData =
+                CategoryDto.builder().categoryName("Test Category for get by name").build();
+        categoryService.createCategory(requestData);
+
+        String contentJson = new ObjectMapper().writeValueAsString(requestData);
+
+        mockMvc.perform(
+                        post("/category/get-by-name")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(contentJson))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void updateNonExistCategory() {}
 }

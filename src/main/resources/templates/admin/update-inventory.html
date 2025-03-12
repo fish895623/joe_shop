@@ -24,6 +24,7 @@
         });
         return await response.json();
       }
+
       async function fetchCategories() {
         // Fetch the categories from the server
         const response = await fetch("/category/get-all", {
@@ -35,15 +36,51 @@
         });
         return await response.json();
       }
+
+      const updateProduct = async (
+        productId,
+        name,
+        categoryId,
+        price,
+        quantity,
+        imageUrl,
+      ) => {
+        const data = {
+          id: productId,
+          name: name,
+          categoryId: categoryId,
+          price: price,
+          quantity: quantity,
+          imageUrl: imageUrl,
+        };
+        const response = await fetch("/product/update", {
+          method: "PUT",
+          include: "credentials",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            productId: productId,
+            name: name,
+            categoryId: categoryId,
+            price: price,
+            quantity: quantity,
+            imageUrl: imageUrl,
+          }),
+        });
+
+        return response;
+      };
     </script>
     <script>
       document.addEventListener("DOMContentLoaded", async () => {
-        const product = (await fetchCategoryInformation()).product;
+        const product = await fetchCategoryInformation();
         const categories = (await fetchCategories()).categoryList;
 
-        document.getElementById("productName").value = product.name;
-        document.getElementById("price").value = product.price;
-        document.getElementById("quantity").value = product.quantity;
+        document.getElementById("productName").value = product.product.name;
+        document.getElementById("price").value = product.product.price;
+        document.getElementById("quantity").value = product.product.quantity;
+        document.getElementById("imageUrl").value = product.product.imageUrl;
 
         const categorySelect = document.getElementById("categorySelect");
         categorySelect.innerHTML = "";
@@ -56,6 +93,34 @@
           }
           categorySelect.appendChild(option);
         });
+        document
+          .getElementById("updateButton")
+          .addEventListener("click", async (e) => {
+            e.preventDefault();
+            const productId = new URLSearchParams(window.location.search).get(
+              "id",
+            );
+            const name = document.getElementById("productName").value;
+            const categoryId = document.getElementById("categorySelect").value;
+            const price = document.getElementById("price").value;
+            const quantity = document.getElementById("quantity").value;
+            const imageUrl = document.getElementById("imageUrl").value;
+
+            const response = await updateProduct(
+              productId,
+              name,
+              categoryId,
+              price,
+              quantity,
+              imageUrl,
+            );
+            if (response.ok) {
+              alert("Product updated successfully!");
+              window.close();
+            } else {
+              alert("Failed to update product.");
+            }
+          });
       });
     </script>
   </head>
@@ -128,7 +193,7 @@
               </div>
 
               <div class="btn-container">
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary" id="updateButton">
                   Update Product
                 </button>
                 <button
