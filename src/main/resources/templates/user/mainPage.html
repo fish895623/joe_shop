@@ -94,8 +94,8 @@
 
           // Add the "All" tab first
           let allTab = `<li class="nav-item">
-                      <a class="nav-link active" href="#" data-category="all">All</a>
-                    </li>`;
+                  <a class="nav-link active" href="#" data-category="all">All</a>
+                </li>`;
           categoryTabs.innerHTML = allTab;
 
           // Define the required tab order
@@ -109,8 +109,8 @@
             );
             if (category) {
               const categoryTab = `<li class="nav-item">
-                                 <a class="nav-link" href="#" data-category="${category.id}">${category.categoryName}</a>
-                               </li>`;
+                             <a class="nav-link" href="#" data-category="${category.id}">${category.categoryName}</a>
+                           </li>`;
               categoryTabs.insertAdjacentHTML("beforeend", categoryTab);
             }
           });
@@ -154,21 +154,20 @@
 
             productList.forEach((product) => {
               const productCard = `
-            <div class="card" style="width: 18rem">
-              <img class="card-img-top" src="${
-                product.image || "dress.jpg"
-              }" alt="Card image cap" />
-              <div class="card-body">
-                <h5 class="card-title">${product.name}</h5>
-                <span>${product.price}</span>
-              </div>
-              <div class="card-body">
-                <a href="#" class="card-link">
-                  <input type="button" value="자세히 보기" />
-                </a>
-              </div>
+          <div class="card" style="width: 18rem">
+            <img class="card-img-top" src="${product.image || "dress.jpg"}" alt="Card image cap" />
+            <div class="card-body">
+              <h5 class="card-title">${product.name}</h5>
+              <span>${product.price}</span>
+              <p>Category: ${product.category ? product.category.categoryName : "N/A"}</p> <!-- Show category -->
             </div>
-          `;
+            <div class="card-body">
+              <a href="#" class="card-link">
+                <input type="button" value="자세히 보기" />
+              </a>
+            </div>
+          </div>
+        `;
               container.insertAdjacentHTML("beforeend", productCard);
             });
           })
@@ -183,17 +182,16 @@
           .then((data) => {
             const productList = data.productList || [];
             const container = document.getElementById("productContainer");
-            container.innerHTML = ""; // 이전 상품을 지움
+            container.innerHTML = ""; // Clear the previous products
 
             if (productList.length > 0) {
               productList.forEach((product) => {
                 const productCard = `
             <div class="card" style="width: 18rem">
-              <img class="card-img-top" src="${
-                product.image || "dress.jpg"
-              }" alt="Card image cap" />
+              <img class="card-img-top" src="${product.image || "dress.jpg"}" alt="Card image cap" />
               <div class="card-body">
                 <h5 class="card-title">${product.name}</h5>
+                <p>Category: ${product.category && product.category.categoryName ? product.category.categoryName : "N/A"}</p> <!-- Show category -->
                 <span>${product.price}</span>
               </div>
               <div class="card-body">
@@ -203,10 +201,10 @@
               </div>
             </div>
           `;
-                container.insertAdjacentHTML("beforeend", productCard); // 상품 카드 추가
+                container.insertAdjacentHTML("beforeend", productCard); // Add product card
               });
             } else {
-              container.innerHTML = "<p>검색 결과가 없습니다.</p>"; // 결과가 없을 때 메시지 표시
+              container.innerHTML = "<p>검색 결과가 없습니다.</p>"; // Display message when no results
             }
           })
           .catch((error) => {

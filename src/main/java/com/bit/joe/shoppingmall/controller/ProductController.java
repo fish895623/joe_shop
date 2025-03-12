@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import com.bit.joe.shoppingmall.dto.CategoryDto;
 import com.bit.joe.shoppingmall.dto.ProductDto;
 import com.bit.joe.shoppingmall.dto.request.ProductRequest;
 import com.bit.joe.shoppingmall.dto.response.Response;
@@ -105,8 +106,10 @@ public class ProductController {
     @GetMapping("/search")
     public ResponseEntity<?> searchProducts(@RequestParam String keyword) {
         try {
+            // 키워드로 제품 검색
             List<Product> products = productService.searchProductsByKeyword(keyword);
 
+            // 검색 결과가 없을 경우
             if (products.isEmpty()) {
                 Response response =
                         Response.builder()
@@ -116,6 +119,7 @@ public class ProductController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
 
+            // ProductDto에 카테고리 정보를 추가하여 변환
             List<ProductDto> productDtos =
                     products.stream()
                             .map(
@@ -125,9 +129,19 @@ public class ProductController {
                                                     .name(product.getName())
                                                     .price(product.getPrice())
                                                     .imageUrl(product.getImageURL())
+                                                    // 카테고리 정보를 CategoryDto로 변환해서 포함
+                                                    .category(
+                                                            product.getCategory() != null
+                                                                    ? new CategoryDto(
+                                                                            product.getCategory()
+                                                                                    .getId(),
+                                                                            product.getCategory()
+                                                                                    .getCategoryName())
+                                                                    : null)
                                                     .build())
                             .collect(Collectors.toList());
 
+            // 응답 준비
             Response response =
                     Response.builder()
                             .status(HttpStatus.OK.value())
