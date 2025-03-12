@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <th:block th:replace="~{common/head :: library}"></th:block>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
   </head>
   <body>
     <th:block th:replace="~{common/navigation :: navbar}" />
@@ -51,14 +52,65 @@
     <th:block th:replace="~{common/footer :: footer}" />
 
     <script>
+      let cartId; // 장바구니 ID
+      let productId = getProductIdFromURL(); // URL에서 상품 ID 가져오기
+
+      // URL에서 상품 ID를 가져오는 함수 ============================================================
       function getProductIdFromURL() {
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get("id");
         return id ? parseInt(id) : null;
       }
 
-      const productId = getProductIdFromURL() || 0;
+      // 쿠키에서 name에 해당하는 값을 가져오는 함수 ================================================
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(";").shift();
+      }
 
+      // 토큰에서 사용자 이름을 가져오는 함수 (jwt-decode 라이브러리 사용) ==============================
+      function getUsernameFromToken() {
+        const token = getCookie("token");
+        if (token) {
+          const decodedToken = jwt_decode(token);
+          return decodedToken.username;
+        }
+        return null;
+      }
+
+      // 페이지 로딩 완료 후 실행 될 함수 정의 (DOMContentLoaded) ====================================
+      document.addEventListener("DOMContentLoaded", () => {
+        // 장바구니 데이터를 가져오는 API 호출
+        fetch("/api/cart/get", {
+          method: "GET",
+          credentials: "include", // 쿠키 전달
+          headers: {
+            Authorization: "Content-Type: application/json",
+          },
+        })
+          .then((response) => {
+            // 장바구니 데이터를 가져오는데 실패하면 에러 페이지로 이동
+            if (!response.ok) {
+              console.error("Error fetching cart data:", response);
+              window.location.href = "/error";
+            }
+            return response.json();
+          })
+          .then((data) => {
+            // 장바구니 데이터에서 cartId를 가져오기
+            if (data && data.cart) {
+              cartId = data.cart.id;
+            } else {
+              console.error("No cart data found");
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      });
+
+      // 카테고리 HTML 요소를 생성하는 함수 ========================================================
       const createCategoryElement = (category) => {
         const categoryElement = document.createElement("span");
         categoryElement.className = "";
@@ -100,14 +152,12 @@
         .catch((error) => {
           console.error("Error fetching product data:", error);
         });
+
       //===================================
       document
         .getElementById("add-to-cart-btn")
         .addEventListener("click", function () {
-          const cartId = 3;
-          const productId = getProductIdFromURL();
-          const quantity = document.getElementById("quantity").value;
-
+          let quantity = document.getElementById("quantity").value;
           const requestData = {
             cartId: cartId,
             productId: productId,
