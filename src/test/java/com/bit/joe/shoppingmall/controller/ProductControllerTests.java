@@ -55,16 +55,14 @@ public class ProductControllerTests {
                     .gender(UserGender.MALE)
                     .birth("2021-01-01")
                     .build();
-
+    String adminJwtToken;
+    String userJwtToken;
     @Autowired private MockMvc mockMvc;
     @Autowired private CategoryServiceImpl categoryService;
     @Autowired private UserService userService;
     @Autowired private ProductServiceImpl productService;
     @Autowired private JWTUtil jwtUtil;
-
     private Long savedCategoryId;
-    String adminJwtToken;
-    String userJwtToken;
 
     @BeforeEach
     void setUp() {
