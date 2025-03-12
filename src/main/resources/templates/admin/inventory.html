@@ -5,163 +5,79 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Inventory</title>
     <th:block th:replace="~{common/head :: library}"></th:block>
+    <style>
+      th {
+        text-transform: capitalize;
+      }
+    </style>
   </head>
   <body>
     <th:block th:replace="~{common/navigation :: adminnavbar}" />
     <main class="flex-grow-1">
       <div class="container">
         <h3>상품(재고)관리</h3>
-        <table border="1">
+        <hr />
+        <table>
           <thead>
             <tr>
-              <th>category<select id="categoryDropdown"></select></th>
-              <th>imageurl<select id="imgDropdown"></select></th>
-              <th>product<select id="productDropdown"></select></th>
-              <th>quantity<select id="quantityDropdown"></select></th>
-              <th>price<select id="priceDropdown"></select></th>
-              <th><button id="addRowButton">담기</button></th>
+              <th>product</th>
+              <th>category</th>
+              <th>quantity</th>
+              <th>price</th>
             </tr>
           </thead>
           <tbody id="tableBody"></tbody>
-          <tfoot>
-            <!-- Single cell for Grand Total -->
-            <tr>
-              <td
-                colspan="6"
-                id="grandTotalCell"
-                style="text-align: center; vertical-align: middle"
-              >
-                총 합계 금액 : <span id="grandTotal">0</span>원
-              </td>
-            </tr>
-          </tfoot>
         </table>
       </div>
     </main>
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        const tableBody = document.querySelector("#tableBody");
+        const tableBodyElement = document.getElementById("tableBody");
 
-        // 데이터를 불러와 드롭다운에 채우는 함수
+        const createRow = (product, category, quantity, price) => {
+          const row = document.createElement("tr");
+          const productElement = document.createElement("td");
+          const categoryElement = document.createElement("td");
+          const quantityElement = document.createElement("td");
+          const priceElement = document.createElement("td");
+
+          productElement.textContent = product;
+          categoryElement.textContent = category;
+          quantityElement.textContent = quantity;
+          priceElement.textContent = `${price}원`;
+
+          row.appendChild(productElement);
+          row.appendChild(categoryElement);
+          row.appendChild(quantityElement);
+          row.appendChild(priceElement);
+
+          return row;
+        };
+
+        // Fetch all products from the server
         function loadData() {
-          fetch("/product/get-all")
+          fetch("/product/get-all", {
+            include: "credentials",
+          })
             .then((response) => response.json())
             .then((data) => {
-              const categoryDropdown =
-                document.getElementById("categoryDropdown");
-              const imageDropdown = document.getElementById("imgDropdown");
-              const productDropdown =
-                document.getElementById("productDropdown");
-              const quantityDropdown =
-                document.getElementById("quantityDropdown");
-              const priceDropdown = document.getElementById("priceDropdown");
-
-              categoryDropdown.innerHTML = "";
-              imageDropdown.innerHTML = "";
-              productDropdown.innerHTML = "";
-              quantityDropdown.innerHTML = "";
-              priceDropdown.innerHTML = "";
-
-              // Reverse the array to display in descending order
               const reversedData = [...data.productList].reverse();
-
-              reversedData.forEach((product) => {
-                // Category dropdown
-                const categoryOption = document.createElement("option");
-                categoryOption.value = product.category.categoryName;
-                categoryOption.textContent = product.category.categoryName;
-                categoryDropdown.appendChild(categoryOption);
-
-                // Image dropdown
-                const imageOption = document.createElement("option");
-                imageOption.value = product.imageUrl;
-                imageOption.textContent = product.imageUrl;
-                imageDropdown.appendChild(imageOption);
-
-                // Product dropdown
-                const productOption = document.createElement("option");
-                productOption.value = product.name;
-                productOption.textContent = product.name;
-                productDropdown.appendChild(productOption);
-
-                // Quantity dropdown
-                const quantityOption = document.createElement("option");
-                quantityOption.value = product.quantity;
-                quantityOption.textContent = product.quantity;
-                quantityDropdown.appendChild(quantityOption);
-
-                // Price dropdown
-                const priceOption = document.createElement("option");
-                priceOption.value = product.price;
-                priceOption.textContent = `${product.price}원`;
-                priceDropdown.appendChild(priceOption);
+              reversedData.forEach((element) => {
+                console.log(element);
+                const row = createRow(
+                  element.name,
+                  element.category.categoryName,
+                  element.quantity,
+                  element.price,
+                );
+                tableBodyElement.appendChild(row);
               });
             })
             .catch((error) =>
               console.error("Error loading categories:", error),
             );
         }
-
-        // 버튼 클릭 시 선택된 값을 기반으로 행 추가
-        function addRow() {
-          const categoryValue =
-            document.getElementById("categoryDropdown").value;
-          const imageValue = document.getElementById("imgDropdown").value;
-          const productValue = document.getElementById("productDropdown").value;
-          const quantityValue = parseInt(
-            document.getElementById("quantityDropdown").value,
-            10,
-          );
-          const priceValue = parseInt(
-            document.getElementById("priceDropdown").value,
-            10,
-          );
-
-          // Calculate row total
-          const total = quantityValue * priceValue;
-
-          // Add new row
-          const row = document.createElement("tr");
-          row.innerHTML = `
-          <td>${categoryValue}</td>
-          <td>${imageValue}</td>
-          <td>${productValue}</td>
-          <td>${quantityValue}</td>
-          <td>${priceValue}원</td>
-          <td>${total}원</td>`;
-          tableBody.appendChild(row);
-
-          // Update grand total
-          updateGrandTotal();
-        }
-
-        // Grand total update function
-        function updateGrandTotal() {
-          const rows = tableBody.children;
-          let grandTotal = 0;
-
-          for (let i = 0; i < rows.length; i++) {
-            const row = rows[i];
-            const totalCell = row.cells[5]; // Total column (6th column)
-            if (totalCell) {
-              const total = parseInt(
-                totalCell.textContent.replace("원", ""),
-                10,
-              );
-              grandTotal += total;
-            }
-          }
-
-          // Update Grand Total Cell
-          const grandTotalSpan = document.getElementById("grandTotal");
-          grandTotalSpan.textContent = `${grandTotal}`;
-        }
-
-        // 이벤트 리스너 등록
-        document
-          .getElementById("addRowButton")
-          .addEventListener("click", addRow);
 
         // 초기 데이터 로드
         loadData();
