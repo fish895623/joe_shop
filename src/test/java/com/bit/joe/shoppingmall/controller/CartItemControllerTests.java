@@ -1,18 +1,16 @@
 package com.bit.joe.shoppingmall.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.Base64;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,11 +29,6 @@ import com.bit.joe.shoppingmall.mapper.CartMapper;
 import com.bit.joe.shoppingmall.mapper.CategoryMapper;
 import com.bit.joe.shoppingmall.mapper.ProductMapper;
 import com.bit.joe.shoppingmall.mapper.UserMapper;
-import com.bit.joe.shoppingmall.repository.CartRepository;
-import com.bit.joe.shoppingmall.repository.CategoryRepository;
-import com.bit.joe.shoppingmall.repository.ProductRepository;
-import com.bit.joe.shoppingmall.repository.UserRepository;
-import com.bit.joe.shoppingmall.service.Impl.CartItemServiceImpl;
 import com.bit.joe.shoppingmall.service.Impl.CartService;
 import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
 import com.bit.joe.shoppingmall.service.Impl.ProductServiceImpl;
@@ -68,27 +61,10 @@ public class CartItemControllerTests {
                     .gender(UserGender.MALE)
                     .birth("2021-01-01")
                     .build();
-    String adminBasicAuth =
-            "Basic "
-                    + Base64.getEncoder()
-                            .encodeToString(
-                                    (adminDto.getEmail() + ":" + adminDto.getPassword())
-                                            .getBytes());
-    String userBasicAuth =
-            "Basic "
-                    + Base64.getEncoder()
-                            .encodeToString(
-                                    (userDto.getEmail() + ":" + userDto.getPassword()).getBytes());
-    MockHttpSession mockHttpSession = new MockHttpSession();
+
     @Autowired private MockMvc mockMvc;
-    @Autowired private UserRepository userRepository;
-    @Autowired private CategoryRepository categoryRepository;
     @Autowired private CategoryServiceImpl categoryService;
-    @Autowired private ProductRepository productRepository;
     @Autowired private ProductServiceImpl productService;
-    @Autowired private CartItemController cartItemController;
-    @Autowired private CartItemServiceImpl cartItemService;
-    @Autowired private CartRepository cartRepository;
     @Autowired private CartService cartService;
     @Autowired private UserService userService;
 
@@ -219,7 +195,7 @@ public class CartItemControllerTests {
         var deleteData = new ObjectMapper().writeValueAsString(deleteCartItemRequest);
 
         mockMvc.perform(
-                        get("/api/cart-item/delete")
+                        delete("/api/cart-item/delete")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(deleteData))
                 .andExpect(status().isOk());

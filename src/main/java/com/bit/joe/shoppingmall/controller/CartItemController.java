@@ -27,7 +27,7 @@ public class CartItemController {
     }
 
     // delete cart item
-    @GetMapping("/delete")
+    @DeleteMapping("/delete")
     public ResponseEntity<Response> deleteCartItem(@RequestBody CartItemRequest cartItemRequest) {
         log.info("delete cart item");
 
