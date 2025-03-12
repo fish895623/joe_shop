@@ -1,39 +1,42 @@
 <!doctype html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>User Insights Dashboard</title>
-    <link
-      rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-    />
+
+    <th:block th:replace="~{common/head :: library}"></th:block>
   </head>
   <body>
-    <div class="container mt-5">
-      <h1>User Insights Dashboard</h1>
-      <h3>Average Sales by Gender and Category</h3>
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th>Gender</th>
-            <th>Category</th>
-            <th>Average Sales</th>
-            <th>Total Sales</th>
-          </tr>
-        </thead>
-        <tbody>
-          <th:block th:each="item : ${salesData}">
-            <tr>
-              <td th:text="${item.gender}"></td>
-              <td th:text="${item.categoryName}"></td>
-              <td th:text="${item.averageSales}"></td>
-              <td th:text="${item.totalSales}"></td>
-            </tr>
-          </th:block>
-        </tbody>
-      </table>
-    </div>
+    <th:block th:replace="~{common/navigation :: adminnavbar}" />
+    <main class="flex-grow-1">
+      <div class="container">
+        <div class="container mt-5">
+          <h1>User Insights Dashboard</h1>
+          <h3>Average Sales by Gender and Category</h3>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Gender</th>
+                <th>Category</th>
+                <th>Average Sales</th>
+                <th>Total Sales</th>
+              </tr>
+            </thead>
+            <tbody>
+              <th:block th:each="item : ${salesData}">
+                <tr>
+                  <td th:text="${item.gender}"></td>
+                  <td th:text="${item.categoryName}"></td>
+                  <td th:text="${item.averageSales}"></td>
+                  <td th:text="${item.totalSales}"></td>
+                </tr>
+              </th:block>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
   </body>
 </html>
 

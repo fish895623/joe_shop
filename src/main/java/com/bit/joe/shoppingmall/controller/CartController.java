@@ -37,9 +37,10 @@ public class CartController {
      * @return ResponseEntity<Response>
      */
     @PostMapping("/append")
-    public ResponseEntity<Response> appendProductToCart(@RequestBody CartRequest cartRequest) {
+    public ResponseEntity<Response> appendProductToCart(
+            @CookieValue("token") String token, @RequestBody CartRequest cartRequest) {
 
-        return ResponseEntity.ok(cartService.appendProductToCart(cartRequest));
+        return ResponseEntity.ok(cartService.appendProductToCart(token, cartRequest));
         // return success response with status code 200 (OK)
     }
 
@@ -57,5 +58,10 @@ public class CartController {
 
         return ResponseEntity.ok(resp);
         // return success response with status code 200 (OK)
+    }
+
+    @GetMapping("/get")
+    public ResponseEntity<Response> getCart(@CookieValue("token") String token) {
+        return ResponseEntity.ok(cartService.getCart(token));
     }
 }
