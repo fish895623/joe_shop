@@ -75,3 +75,17 @@ function getUserRole(token) {
 
   return null;
 }
+
+// 로컬 스토리지에 값을 저장하고 다른 페이지로 이동하는 함수 ====================================
+function redirectToViewWithValues(valueTitle, valueToSend, targetUrl) {
+  // Store values in localStorage
+  localStorage.setItem(valueTitle, JSON.stringify(valueToSend));
+
+  // Redirect to the new URL
+  window.location.href = targetUrl;
+}
+
+// 로컬 스토리지에서 값을 가져오는 함수 =======================================================
+function getValuesFromLocalStorage(valueTitle) {
+  return JSON.parse(localStorage.getItem(valueTitle));
+}
