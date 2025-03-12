@@ -47,6 +47,7 @@
 
         const createRow = (id, product, category, quantity, price) => {
           const row = document.createElement("tr");
+          // Create other cells
           const productElement = document.createElement("td");
           const categoryElement = document.createElement("td");
           const quantityElement = document.createElement("td");
@@ -61,6 +62,12 @@
           quantityElement.classList.add("quantity");
           priceElement.textContent = `${price}`;
           priceElement.classList.add("price");
+
+          // Create checkbox column
+          const checkboxCell = document.createElement("td");
+          checkboxCell.style.textAlign = "center"; // Horizontal centering
+          checkboxCell.style.verticalAlign = "middle"; // Vertical centering
+
           // create checkbox for selection
           const checkbox = document.createElement("input");
           checkbox.type = "checkbox";
@@ -74,7 +81,9 @@
             });
           };
 
-          row.appendChild(checkbox);
+          checkboxCell.appendChild(checkbox);
+
+          row.appendChild(checkboxCell); // Add the checkbox cell first
           row.appendChild(productElement);
           row.appendChild(categoryElement);
           row.appendChild(quantityElement);
