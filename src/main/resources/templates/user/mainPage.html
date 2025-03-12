@@ -82,7 +82,7 @@
 
     <div id="productContainer"></div>
 
-    <div id="paginationContainer" class="pagination"></div>
+    <div class="buttons"></div>
 
     <th:block th:replace="~{common/footer :: footer}" />
 
@@ -141,11 +141,7 @@
         });
 
       // Function to load products based on the selected category
-      const currentPage = 1;
-      const itemsPerpage = 10;
-
-      function loadProducts(categoryId, page = 1) {
-        const offset = (page - 1) * itemsPerpage;
+      function loadProducts(categoryId) {
         const url =
           categoryId === "all"
             ? "/product/get-all"
@@ -153,7 +149,7 @@
         fetch(url)
           .then((response) => response.json())
           .then((data) => {
-            console.log("API response", data);
+            console.log("Total count:", data.totalCount);
             const productList = data.productList;
             const container = document.getElementById("productContainer");
             container.innerHTML = ""; // Clear the previous products
@@ -179,8 +175,6 @@
           `;
               container.insertAdjacentHTML("beforeend", productCard);
             });
-
-            updatePagination(data.totalCount, page, categoryId);
           })
           .catch((error) => {
             console.error("Error fetching products:", error);
@@ -202,7 +196,7 @@
         );
         paginationContainer.innerHTML = "";
 
-        const totalPages = Math.ceil(totalItems / itemsPerpage);
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
 
         for (let i = 1; i <= totalPages; i++) {
           const button = document.createElement("button");
@@ -224,6 +218,54 @@
           paginationContainer.appendChild(button);
         }
       }
+      const currentPage = 1;
+      const totalCount = maxCount;
+      const limit = 10;
+      const pageCount = 5;
+      let totalPage = Math.ceil(totalCount / limit);
+
+      let pageGroup = Math.ceil(currentPage / pageCount);
+
+      let lastNumber = pageGroup * pageCount;
+      if (lastNumber > totalPage) {
+        lastNumber = totalPage;
+      }
+
+      let firstNumber = lastNumber - (pageCount - 1);
+      if (firstNumber < 1) firstNumber = 1;
+
+      const next = lastNumber + 1;
+      const prev = firstNumber - 1;
+
+      let paginationHTML = "";
+      for (let i = firstNumber; i <= lastNumber; i++) {
+        paginationHTML += `<button class="pageNumber" id="page_${i}" ${
+          i === currentPage ? "class='active'" : ""
+        }>${i}</button>`;
+      }
+
+      if (prev > 0) {
+        paginationHTML =
+          `<button class="prev" data-page="${prev}">이전</button>` +
+          paginationHTML;
+      }
+
+      if (next <= totalPage) {
+        paginationHTML += `<button class="next" data-page="${next}">다음</button>`;
+      }
+
+      document.getElementById("paginationContainer").innerHTML = paginationHTML;
+
+      document
+        .getElementById("paginationContainer")
+        .addEventListener("click", (event) => {
+          if (event.target.tagName === "BUTTON") {
+            const page = parseInt(
+              event.target.getAttribute("data-page") || event.target.textContent
+            );
+            loadProducts(currentCategory, page);
+          }
+        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
