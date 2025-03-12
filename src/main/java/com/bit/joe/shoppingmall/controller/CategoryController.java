@@ -29,7 +29,7 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.createCategory(categoryDto));
     }
 
-    @PostMapping("/get-product-id")
+    @PostMapping("/get-by-name")
     public ResponseEntity<Response> getProductId(@RequestBody CategoryDto categoryDto) {
         return ResponseEntity.ok(categoryService.getCategoryByName(categoryDto));
     }
