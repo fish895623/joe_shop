@@ -7,6 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ProductRequest {
+    @NotNull(message = "Product ID is required")
+    private Long productId;
 
     @NotNull(message = "Category ID is required")
     private Long categoryId;
@@ -20,7 +22,7 @@ public class ProductRequest {
     @Min(value = 1, message = "Quantity must be greater than 0")
     private int quantity;
 
+    // TODO: Need to change to float? -> fine for Korean Won, also can be fixed later
     @Min(value = 1, message = "Price must be greater than 0")
-    private int
-            price; // TODO: Need to change to float? -> fine for Korean Won, also can be fixed later
+    private int price;
 }

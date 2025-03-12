@@ -67,6 +67,18 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public Response getCategoryByName(CategoryDto categoryNameDto) {
+        String categoryName = categoryNameDto.getCategoryName();
+        Category category =
+                categoryRepository
+                        .findByCategoryName(categoryName)
+                        .orElseThrow(() -> new NotFoundException("Category Not Found"));
+        CategoryDto categoryDto = CategoryMapper.categoryToDto(category);
+
+        return Response.builder().status(200).category(categoryDto).build();
+    }
+
+    @Override
     public Response deleteCategory(Long categoryId) {
         Category category =
                 categoryRepository

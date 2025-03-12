@@ -53,12 +53,14 @@ public class ProductController {
                         productRequest.getPrice()));
     }
 
-    @PutMapping("/update/{productId}")
+    @PutMapping("/update")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Response> updateProduct(
-            @PathVariable Long productId, @Valid @RequestBody ProductRequest productRequest) {
+            @Valid @RequestBody ProductRequest productRequest) {
         // Check if the product name is unique within the same category, excluding the current
         // product
+        Long productId = productRequest.getProductId();
+
         boolean productExistsInCategory =
                 productService.existsByCategoryIdAndName(
                         productRequest.getCategoryId(), productRequest.getName());

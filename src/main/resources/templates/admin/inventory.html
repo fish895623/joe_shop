@@ -15,18 +15,27 @@
     <th:block th:replace="~{common/navigation :: adminnavbar}" />
     <main class="flex-grow-1">
       <div class="container">
-        <h3>상품(재고)관리</h3>
+        <div class="d-flex justify-content-between align-items-center">
+          <h3>상품(재고)관리</h3>
+          <button id="add-product-btn" class="btn btn-primary">
+            상품 추가
+          </button>
+          <button id="update-product-btn" class="btn btn-primary">
+            상품 수정
+          </button>
+        </div>
         <hr />
         <table>
           <thead>
             <tr>
+              <th>#</th>
               <th>product</th>
               <th>category</th>
               <th>quantity</th>
               <th>price</th>
             </tr>
           </thead>
-          <tbody id="tableBody"></tbody>
+          <tbody id="tableBody" class="editable-table"></tbody>
         </table>
       </div>
     </main>
@@ -35,18 +44,36 @@
       document.addEventListener("DOMContentLoaded", function () {
         const tableBodyElement = document.getElementById("tableBody");
 
-        const createRow = (product, category, quantity, price) => {
+        const createRow = (id, product, category, quantity, price) => {
           const row = document.createElement("tr");
           const productElement = document.createElement("td");
           const categoryElement = document.createElement("td");
           const quantityElement = document.createElement("td");
           const priceElement = document.createElement("td");
 
+          row.id = `product-${id}`;
           productElement.textContent = product;
+          productElement.classList.add("product-name");
           categoryElement.textContent = category;
+          categoryElement.classList.add("category-name");
           quantityElement.textContent = quantity;
-          priceElement.textContent = `${price}원`;
+          quantityElement.classList.add("quantity");
+          priceElement.textContent = `${price}`;
+          priceElement.classList.add("price");
+          // create checkbox for selection
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.classList.add("select-checkbox");
+          checkbox.name = "option";
 
+          checkbox.onclick = (event) => {
+            let checkboxes = document.getElementsByName("option");
+            checkboxes.forEach((item) => {
+              if (item !== checkbox) item.checked = false;
+            });
+          };
+
+          row.appendChild(checkbox);
           row.appendChild(productElement);
           row.appendChild(categoryElement);
           row.appendChild(quantityElement);
@@ -66,6 +93,7 @@
               reversedData.forEach((element) => {
                 console.log(element);
                 const row = createRow(
+                  element.id,
                   element.name,
                   element.category.categoryName,
                   element.quantity,
@@ -82,6 +110,37 @@
         // 초기 데이터 로드
         loadData();
       });
+      document
+        .getElementById("update-product-btn")
+        .addEventListener("click", () => {
+          // DOTHIS!!! Get checked box id to productId
+          const selectedCheckbox = document.querySelector(
+            'input[name="option"]:checked',
+          );
+
+          if (selectedCheckbox) {
+            const row = selectedCheckbox.closest("tr");
+            const productId = row.id.replace("product-", "");
+
+            window.open(
+              `/admin/update-inventory?id=${productId}`,
+              "_blank",
+              "toolbar=no,scrollbars=yes,resizable=yes,width=400,height=600",
+            );
+          } else {
+            alert("Please select a product to update.");
+          }
+        });
+      document
+        .getElementById("add-product-btn")
+        .addEventListener("click", () => {
+          // Get checked id
+          window.open(
+            "/admin/add-product",
+            "_blank",
+            "toolbar=no,scrollbars=yes,resizable=yes,width=400,height=600",
+          );
+        });
     </script>
   </body>
 </html>

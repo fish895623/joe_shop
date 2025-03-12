@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inventory</title>
+    <th:block th:replace="~{common/head :: library}"></th:block>
+    <style>
+      th {
+        text-transform: capitalize;
+      }
+    </style>
+    <script>
+      async function fetchCategoryInformation() {
+        // Fetch the category information from the server
+        const ID = new URLSearchParams(window.location.search).get("id");
+
+        const response = await fetch(`/product/get-by-product-id/${ID}`, {
+          method: "GET",
+          include: "credentials",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        return await response.json();
+      }
+      async function fetchCategories() {
+        // Fetch the categories from the server
+        const response = await fetch("/category/get-all", {
+          method: "GET",
+          include: "credentials",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        return await response.json();
+      }
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+        const product = (await fetchCategoryInformation()).product;
+        const categories = (await fetchCategories()).categoryList;
+
+        document.getElementById("productName").value = product.name;
+        document.getElementById("price").value = product.price;
+        document.getElementById("quantity").value = product.quantity;
+
+        const categorySelect = document.getElementById("categorySelect");
+        categorySelect.innerHTML = "";
+        categories.forEach((category) => {
+          const option = document.createElement("option");
+          option.value = category.id;
+          option.textContent = category.categoryName;
+          if (category.id === product.categoryId) {
+            option.selected = true;
+          }
+          categorySelect.appendChild(option);
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <main class="flex-grow-1">
+      <div class="container">
+        <div class="card shadow mb-4">
+          <div class="card-body form-container">
+            <form id="updateProductForm">
+              <input type="hidden" id="productId" name="productId" />
+              <div class="mb-3">
+                <label for="productName" class="form-label">Product Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="productName"
+                  name="name"
+                  required
+                />
+              </div>
+
+              <div class="mb-3">
+                <label for="categorySelect" class="form-label">Category</label>
+                <select
+                  class="form-select"
+                  id="categorySelect"
+                  name="categoryId"
+                  required
+                >
+                  <option value="" disabled selected>
+                    Loading categories...
+                  </option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label for="price" class="form-label">Price</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="price"
+                  name="price"
+                  min="0"
+                  placeholder="0"
+                  required
+                />
+              </div>
+
+              <div class="mb-3">
+                <label for="quantity" class="form-label">Quantity</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="quantity"
+                  name="quantity"
+                  min="0"
+                  placeholder="0"
+                  required
+                />
+              </div>
+
+              <div class="mb-3">
+                <label for="imageUrl" class="form-label">Image URL</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="imageUrl"
+                  name="imageUrl"
+                />
+              </div>
+
+              <div class="btn-container">
+                <button type="submit" class="btn btn-primary">
+                  Update Product
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  onclick="window.close()"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

@@ -49,4 +49,9 @@ public class AdminController {
     public String member() {
         return "admin/member";
     }
+
+    @GetMapping("/update-inventory")
+    public String updateInventory() {
+        return "admin/update-inventory";
+    }
 }
