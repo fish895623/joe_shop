@@ -5,36 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Inventory</title>
     <th:block th:replace="~{common/head :: library}"></th:block>
+    <style>
+      th {
+        text-transform: capitalize;
+      }
+    </style>
   </head>
   <body>
     <th:block th:replace="~{common/navigation :: adminnavbar}" />
     <main class="flex-grow-1">
       <div class="container">
         <h3>상품(재고)관리</h3>
-        <table border="1">
+        <hr />
+        <table>
           <thead>
             <tr>
-              <th>category<select id="categoryDropdown"></select></th>
-              <th>imageurl<select id="imgDropdown"></select></th>
-              <th>product<select id="productDropdown"></select></th>
-              <th>quantity<select id="quantityDropdown"></select></th>
-              <th>price<select id="priceDropdown"></select></th>
-              <th><button id="addRowButton">담기</button></th>
+              <th>product</th>
+              <th>category</th>
+              <th>quantity</th>
+              <th>price</th>
             </tr>
           </thead>
           <tbody id="tableBody"></tbody>
-          <tfoot>
-            <!-- Single cell for Grand Total -->
-            <tr>
-              <td
-                colspan="6"
-                id="grandTotalCell"
-                style="text-align: center; vertical-align: middle"
-              >
-                총 합계 금액 : <span id="grandTotal">0</span>원
-              </td>
-            </tr>
-          </tfoot>
         </table>
       </div>
     </main>
