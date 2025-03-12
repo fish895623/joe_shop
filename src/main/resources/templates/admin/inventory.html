@@ -47,6 +47,27 @@
 
         const createRow = (id, product, category, quantity, price) => {
           const row = document.createElement("tr");
+
+          // Create checkbox column
+          const checkboxCell = document.createElement("td");
+          checkboxCell.style.textAlign = "center"; // Horizontal centering
+          checkboxCell.style.verticalAlign = "middle"; // Vertical centering
+
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.classList.add("select-checkbox");
+          checkbox.name = "option";
+
+          checkbox.onclick = (event) => {
+            let checkboxes = document.getElementsByName("option");
+            checkboxes.forEach((item) => {
+              if (item !== checkbox) item.checked = false;
+            });
+          };
+
+          checkboxCell.appendChild(checkbox);
+
+          // Create other cells
           const productElement = document.createElement("td");
           const categoryElement = document.createElement("td");
           const quantityElement = document.createElement("td");
@@ -61,20 +82,8 @@
           quantityElement.classList.add("quantity");
           priceElement.textContent = `${price}`;
           priceElement.classList.add("price");
-          // create checkbox for selection
-          const checkbox = document.createElement("input");
-          checkbox.type = "checkbox";
-          checkbox.classList.add("select-checkbox");
-          checkbox.name = "option";
 
-          checkbox.onclick = (event) => {
-            let checkboxes = document.getElementsByName("option");
-            checkboxes.forEach((item) => {
-              if (item !== checkbox) item.checked = false;
-            });
-          };
-
-          row.appendChild(checkbox);
+          row.appendChild(checkboxCell); // Add the checkbox cell first
           row.appendChild(productElement);
           row.appendChild(categoryElement);
           row.appendChild(quantityElement);
