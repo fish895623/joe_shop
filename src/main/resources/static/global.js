@@ -77,7 +77,7 @@ function getUserRole(token) {
 }
 
 // 로컬 스토리지에 값을 저장하고 다른 페이지로 이동하는 함수 ====================================
-function redirectToViewWithValues(valueTitle, valueToSend, targetUrl) {
+async function redirectToViewWithValues(valueTitle, valueToSend, targetUrl) {
   // Store values in localStorage
   localStorage.setItem(valueTitle, JSON.stringify(valueToSend));
 
