@@ -23,6 +23,30 @@
         const data = await response.json();
         return data.categoryList || [];
       }
+
+      async function addProduct(
+        product_name,
+        category_id,
+        price,
+        quantity,
+        image_url,
+      ) {
+        const response = await fetch("/product/create", {
+          method: "POST",
+          include: "credentials",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: product_name,
+            categoryId: category_id,
+            price: price,
+            quantity: quantity,
+            imageUrl: image_url,
+          }),
+        });
+        await response.json();
+      }
     </script>
     <script>
       document.addEventListener("DOMContentLoaded", async () => {
@@ -37,6 +61,21 @@
           categorySelect.appendChild(option);
         });
       });
+      document
+        .getElementById("submitBtn")
+        .addEventListener("click", async (event) => {
+          event.preventDefault();
+          const productName = document.getElementById("productName").value;
+          const categoryId = document.getElementById("categorySelect").value;
+          const price = document.getElementById("price").value;
+          const quantity = document.getElementById("quantity").value;
+          const imageUrl = document.getElementById("imageUrl").value;
+
+          // Add new product
+          await addProduct(productName, categoryId, price, quantity, imageUrl);
+
+          window.close();
+        });
     </script>
   </head>
   <body>
@@ -108,7 +147,7 @@
               </div>
 
               <div class="btn-container">
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary" id="submitBtn">
                   Update Product
                 </button>
                 <button
