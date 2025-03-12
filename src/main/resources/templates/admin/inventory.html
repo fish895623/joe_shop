@@ -17,11 +17,10 @@
       <div class="container">
         <div class="d-flex justify-content-between align-items-center">
           <h3>상품(재고)관리</h3>
-          <button
-            id="update-product-btn"
-            class="btn btn-primary"
-            onclick="window.open('/admin/update-inventory', '_blank', 'toolbar=no,scrollbars=yes,resizable=yes,width=400,height=600')"
-          >
+          <button id="add-product-btn" class="btn btn-primary">
+            상품 추가
+          </button>
+          <button id="update-product-btn" class="btn btn-primary">
             상품 수정
           </button>
         </div>
@@ -29,6 +28,7 @@
         <table>
           <thead>
             <tr>
+              <th>#</th>
               <th>product</th>
               <th>category</th>
               <th>quantity</th>
@@ -60,7 +60,20 @@
           quantityElement.classList.add("quantity");
           priceElement.textContent = `${price}`;
           priceElement.classList.add("price");
+          // create checkbox for selection
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.classList.add("select-checkbox");
+          checkbox.name = "option";
 
+          checkbox.onclick = (event) => {
+            let checkboxes = document.getElementsByName("option");
+            checkboxes.forEach((item) => {
+              if (item !== checkbox) item.checked = false;
+            });
+          };
+
+          row.appendChild(checkbox);
           row.appendChild(productElement);
           row.appendChild(categoryElement);
           row.appendChild(quantityElement);
@@ -97,6 +110,37 @@
         // 초기 데이터 로드
         loadData();
       });
+      document
+        .getElementById("update-product-btn")
+        .addEventListener("click", () => {
+          // DOTHIS!!! Get checked box id to productId
+          const selectedCheckbox = document.querySelector(
+            'input[name="option"]:checked',
+          );
+
+          if (selectedCheckbox) {
+            const row = selectedCheckbox.closest("tr");
+            const productId = row.id.replace("product-", "");
+
+            window.open(
+              `/admin/update-inventory?id=${productId}`,
+              "_blank",
+              "toolbar=no,scrollbars=yes,resizable=yes,width=400,height=600",
+            );
+          } else {
+            alert("Please select a product to update.");
+          }
+        });
+      document
+        .getElementById("add-product-btn")
+        .addEventListener("click", () => {
+          // Get checked id
+          window.open(
+            "/admin/add-product",
+            "_blank",
+            "toolbar=no,scrollbars=yes,resizable=yes,width=400,height=600",
+          );
+        });
     </script>
   </body>
 </html>
