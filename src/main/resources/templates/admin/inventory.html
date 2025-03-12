@@ -26,7 +26,7 @@
               <th>price</th>
             </tr>
           </thead>
-          <tbody id="tableBody"></tbody>
+          <tbody id="tableBody" class="editable-table"></tbody>
         </table>
       </div>
     </main>
@@ -43,9 +43,13 @@
           const priceElement = document.createElement("td");
 
           productElement.textContent = product;
+          productElement.classList.add("product-name");
           categoryElement.textContent = category;
+          categoryElement.classList.add("category-name");
           quantityElement.textContent = quantity;
-          priceElement.textContent = `${price}원`;
+          quantityElement.classList.add("quantity");
+          priceElement.textContent = `${price}`;
+          priceElement.classList.add("price");
 
           row.appendChild(productElement);
           row.appendChild(categoryElement);
