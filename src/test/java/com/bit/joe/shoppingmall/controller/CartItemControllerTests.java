@@ -171,6 +171,15 @@ public class CartItemControllerTests {
                 .andExpect(status().isOk());
 
         // =================================================================================================
+        // test createCartItem (duplicated cart item)
+
+        mockMvc.perform(
+                post("/api/cart-item/create")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(insertData))
+            .andExpect(status().isOk());
+
+        // =================================================================================================
         // test updateCartItem
 
         // prepare request data
@@ -265,7 +274,7 @@ public class CartItemControllerTests {
         insertData = new ObjectMapper().writeValueAsString(cartItemRequest);
 
         mockMvc.perform(
-                        get("/api/cart-item/get-all")
+                        get("/api/cart-item/get-all-by-user")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(insertData))
                 .andExpect(status().isOk())
@@ -311,7 +320,7 @@ public class CartItemControllerTests {
         insertData = new ObjectMapper().writeValueAsString(cartItemRequest);
 
         mockMvc.perform(
-                        get("/api/cart-item/get-all")
+                        get("/api/cart-item/get-all-by-user")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(insertData))
                 .andExpect(status().isOk())
