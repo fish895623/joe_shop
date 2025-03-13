@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
@@ -134,7 +134,7 @@
           // Filter and reorder the categories based on the predefined order
           categoryOrder.forEach((categoryName) => {
             const category = categories.find(
-              (cat) => cat.categoryName === categoryName
+              (cat) => cat.categoryName === categoryName,
             );
             if (category) {
               const categoryTab = `<li class="nav-item">
@@ -176,7 +176,7 @@
           const response = await fetch(
             categoryId === "all"
               ? `/product/get-all?page=${page}&size=10`
-              : `/product/get-by-category-id/${categoryId}?page=${page}&size=10`
+              : `/product/get-by-category-id/${categoryId}?page=${page}&size=10`,
           );
           const data = await response.json();
 
@@ -223,7 +223,7 @@
       // Function to create pagination buttons
       function createPaginationButtons() {
         const paginationContainer = document.getElementById(
-          "paginationContainer"
+          "paginationContainer",
         );
         paginationContainer.innerHTML = ""; // Clear existing buttons
 
@@ -252,8 +252,8 @@
         try {
           const response = await fetch(
             `/product/search?keyword=${encodeURIComponent(
-              keyword
-            )}&page=${page}&size=10`
+              keyword,
+            )}&page=${page}&size=10`,
           );
           const data = await response.json();
 
