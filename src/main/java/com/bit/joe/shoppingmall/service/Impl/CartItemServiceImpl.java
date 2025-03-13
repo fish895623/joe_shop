@@ -234,6 +234,9 @@ public class CartItemServiceImpl implements CartItemService {
                         .orElseThrow(() -> new NotFoundException("Cart not found"));
         // Get cart
 
+        cart.getCartItems().clear();
+        // Clear cart items
+
         cart = cartRepository.save(cart);
         // Save cart
 
