@@ -1,5 +1,6 @@
 package com.bit.joe.shoppingmall.view;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -18,25 +19,124 @@ public class AdminController {
 
     @GetMapping("/insight")
     public String showDashboard(Model model) {
-        String sql =
-                "SELECT u.gender, c.category_name AS categoryName, "
+        // SQL for average and total sales by category
+        String salesSql =
+                "SELECT c.category_name AS categoryName, "
                         + "ROUND(AVG(COALESCE(oi.price * oi.quantity, 0))) AS averageSales, "
-                        + // Round average sales
-                        "ROUND(SUM(COALESCE(oi.price * oi.quantity, 0))) AS totalSales "
-                        + // Round total sales
-                        "FROM users u "
+                        + "ROUND(SUM(COALESCE(oi.price * oi.quantity, 0))) AS totalSales "
+                        + "FROM users u "
                         + "JOIN orders o ON u.id = o.user_id "
                         + "JOIN order_items oi ON o.id = oi.order_id "
                         + "JOIN products p ON oi.product_id = p.product_id "
                         + "JOIN categories c ON p.category_id = c.category_id "
-                        + "GROUP BY u.gender, c.category_name"; // Group by gender and category
+                        + "GROUP BY c.category_name "
+                        + "ORDER BY totalSales DESC";
 
-        List<Map<String, Object>> salesData = jdbcTemplate.queryForList(sql);
+        // SQL for top sales products by category
+        String topSalesSql =
+                "SELECT "
+                        + "c.category_name AS categoryName, "
+                        + "(SELECT p1.name "
+                        + " FROM products p1 "
+                        + " LEFT JOIN order_items oi1 ON oi1.product_id = p1.product_id "
+                        + " WHERE p1.category_id = c.category_id "
+                        + " GROUP BY p1.product_id "
+                        + " ORDER BY SUM(oi1.price * oi1.quantity) DESC "
+                        + " LIMIT 1) AS firstProduct, "
+                        + "(SELECT ROUND(SUM(oi1.price * oi1.quantity)) "
+                        + " FROM order_items oi1 "
+                        + " JOIN products p1 ON oi1.product_id = p1.product_id "
+                        + " WHERE p1.category_id = c.category_id "
+                        + " GROUP BY p1.product_id "
+                        + " ORDER BY SUM(oi1.price * oi1.quantity) DESC "
+                        + " LIMIT 1) AS firstProductSales, "
+                        + "(SELECT p2.name "
+                        + " FROM products p2 "
+                        + " LEFT JOIN order_items oi2 ON oi2.product_id = p2.product_id "
+                        + " WHERE p2.category_id = c.category_id "
+                        + " GROUP BY p2.product_id "
+                        + " ORDER BY SUM(oi2.price * oi2.quantity) DESC "
+                        + " LIMIT 1 OFFSET 1) AS secondProduct, "
+                        + "(SELECT ROUND(SUM(oi2.price * oi2.quantity)) "
+                        + " FROM order_items oi2 "
+                        + " JOIN products p2 ON oi2.product_id = p2.product_id "
+                        + " WHERE p2.category_id = c.category_id "
+                        + " GROUP BY p2.product_id "
+                        + " ORDER BY SUM(oi2.price * oi2.quantity) DESC "
+                        + " LIMIT 1 OFFSET 1) AS secondProductSales, "
+                        + "(SELECT p3.name "
+                        + " FROM products p3 "
+                        + " LEFT JOIN order_items oi3 ON oi3.product_id = p3.product_id "
+                        + " WHERE p3.category_id = c.category_id "
+                        + " GROUP BY p3.product_id "
+                        + " ORDER BY SUM(oi3.price * oi3.quantity) DESC "
+                        + " LIMIT 1 OFFSET 2) AS thirdProduct, "
+                        + "(SELECT ROUND(SUM(oi3.price * oi3.quantity)) "
+                        + " FROM order_items oi3 "
+                        + " JOIN products p3 ON oi3.product_id = p3.product_id "
+                        + " WHERE p3.category_id = c.category_id "
+                        + " GROUP BY p3.product_id "
+                        + " ORDER BY SUM(oi3.price * oi3.quantity) DESC "
+                        + " LIMIT 1 OFFSET 2) AS thirdProductSales "
+                        + "FROM categories c "
+                        + "ORDER BY (SELECT SUM(oi1.price * oi1.quantity) FROM order_items oi1 "
+                        + "JOIN products p1 ON oi1.product_id = p1.product_id WHERE p1.category_id = c.category_id "
+                        + "GROUP BY p1.product_id ORDER BY SUM(oi1.price * oi1.quantity) DESC LIMIT 1) DESC";
 
-        // Log the result to verify the data
-        System.out.println("Sales by Gender and Category (Avg and Total): " + salesData);
+        // Fetching both sales data and top products data
+        List<Map<String, Object>> salesData = jdbcTemplate.queryForList(salesSql);
+        List<Map<String, Object>> topSalesData = jdbcTemplate.queryForList(topSalesSql);
 
+        // format with commas
+        DecimalFormat df = new DecimalFormat("#,###");
+
+        for (Map<String, Object> row : salesData) {
+            row.put("averageSales", df.format(row.get("averageSales")) + " 원");
+            row.put("totalSales", df.format(row.get("totalSales")) + " 원");
+        }
+
+        for (Map<String, Object> row : topSalesData) {
+            row.put("firstProductSales", df.format(row.get("firstProductSales")) + " 원");
+            row.put("secondProductSales", df.format(row.get("secondProductSales")) + " 원");
+            row.put("thirdProductSales", df.format(row.get("thirdProductSales")) + " 원");
+        }
+        //        System.out.println("Sales by Category (Avg and Total): " + salesData);
+        //        System.out.println("Top Sales Products by Category: " + topSalesData);
+
+        // SQL for total sales by gender and category (total sales for Female and Male)
+        String genderSalesSql =
+                "SELECT c.category_name AS categoryName, "
+                        + "SUM(CASE WHEN u.gender = 'FEMALE' THEN oi.price * oi.quantity ELSE 0 END) AS femaleSales, "
+                        + "SUM(CASE WHEN u.gender = 'MALE' THEN oi.price * oi.quantity ELSE 0 END) AS maleSales "
+                        + "FROM users u "
+                        + "JOIN orders o ON u.id = o.user_id "
+                        + "JOIN order_items oi ON o.id = oi.order_id "
+                        + "JOIN products p ON oi.product_id = p.product_id "
+                        + "JOIN categories c ON p.category_id = c.category_id "
+                        + "GROUP BY c.category_name";
+
+        // SQL for sales by date for each category
+        String salesTrendSql =
+                "SELECT DATE(o.order_date) AS orderDate, "
+                        + "c.category_name AS categoryName, "
+                        + "SUM(oi.price * oi.quantity) AS totalSales "
+                        + "FROM order_items oi "
+                        + "JOIN orders o ON oi.order_id = o.id "
+                        + "JOIN products p ON oi.product_id = p.product_id "
+                        + "JOIN categories c ON p.category_id = c.category_id "
+                        + "GROUP BY orderDate, c.category_name "
+                        + "ORDER BY orderDate ASC";
+
+        // Fetching both gender-based sales data and sales trend data
+        List<Map<String, Object>> genderSalesData = jdbcTemplate.queryForList(genderSalesSql);
+        List<Map<String, Object>> salesTrendData = jdbcTemplate.queryForList(salesTrendSql);
+
+        // Add Four datasets to the model
         model.addAttribute("salesData", salesData);
+        model.addAttribute("topSalesData", topSalesData);
+        model.addAttribute("genderSalesData", genderSalesData);
+        model.addAttribute("salesTrendData", salesTrendData);
+
         return "admin/insight"; // Display the results in the dashboard view
     }
 
