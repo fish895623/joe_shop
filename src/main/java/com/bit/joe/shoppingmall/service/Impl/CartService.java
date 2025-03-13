@@ -54,7 +54,7 @@ public class CartService {
         cart.setUser(user);
         // set the user of the cart
 
-        cart.setCartItems(List.<CartItem>of());
+        cart.setCartItems(new ArrayList<>(List.of()));
         // set empty cart items
 
         var createdCart = cartRepository.save(cart);
@@ -147,20 +147,24 @@ public class CartService {
     /**
      * Remove a product from the cart
      *
+     * @param token token have user email
      * @param cartRequest CartRequest
      * @return Response
      */
-    public Response removeProductFromCart(CartRequest cartRequest) {
+    public Response removeProductFromCart(String token, CartRequest cartRequest) {
 
         Long productIdToRemove = cartRequest.getProductId();
         int quantityToRemove = cartRequest.getQuantity();
 
-        User user = userService.getLoginUser();
+        String loggedInUserEmail = jwtUtil.getUsername(token);
         // get user from the context holder (logged-in user)
+
+        UserDto loggedInUserDto = userService.getUserByEmail(loggedInUserEmail).getUser();
+        User loggedInUserEntity = UserMapper.toEntity(loggedInUserDto);
 
         Cart cart =
                 cartRepository
-                        .findCartByUser(user)
+                        .findCartByUser(loggedInUserEntity)
                         .orElseThrow(() -> new NotFoundException("Cart not found"));
         // find cart by user (found by id)
 
