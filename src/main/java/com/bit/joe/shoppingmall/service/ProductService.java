@@ -1,9 +1,6 @@
 package com.bit.joe.shoppingmall.service;
 
-import java.util.List;
-
 import com.bit.joe.shoppingmall.dto.response.Response;
-import com.bit.joe.shoppingmall.entity.Product;
 
 public interface ProductService {
 
@@ -18,9 +15,13 @@ public interface ProductService {
 
     Response getAllProducts();
 
+    Response getAllProducts(int page, long size);
+
     Response getProductsByCategory(Long categoryId);
 
     boolean existsByCategoryIdAndName(Long categoryId, String name);
 
-    List<Product> searchProductsByKeyword(String keyword);
+    Response searchProductsByKeyword(String keyword);
+
+    Response searchProductsByKeyword(String keyword, int page, long size);
 }

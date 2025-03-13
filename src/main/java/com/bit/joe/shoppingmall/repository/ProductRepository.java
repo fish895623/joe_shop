@@ -1,10 +1,12 @@
 package com.bit.joe.shoppingmall.repository;
 
-import java.util.List;
+import com.bit.joe.shoppingmall.entity.Product;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.bit.joe.shoppingmall.entity.Product;
+import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategoryId(Long categoryId);
@@ -12,4 +14,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     boolean existsByCategoryIdAndName(Long categoryId, String name);
 
     List<Product> findByNameContainingIgnoreCase(String keyword);
+
+    Page<Product> findByNameContainingIgnoreCase(String keyword, Pageable pageable);
 }

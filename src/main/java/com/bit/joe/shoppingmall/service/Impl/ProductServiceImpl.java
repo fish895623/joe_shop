@@ -1,11 +1,5 @@
 package com.bit.joe.shoppingmall.service.Impl;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-
 import com.bit.joe.shoppingmall.dto.ProductDto;
 import com.bit.joe.shoppingmall.dto.response.Response;
 import com.bit.joe.shoppingmall.entity.Category;
@@ -18,6 +12,15 @@ import com.bit.joe.shoppingmall.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -116,6 +119,24 @@ public class ProductServiceImpl implements ProductService {
                 .build();
     }
 
+    public Response getAllProducts(int page, long size) {
+        Pageable pageable = PageRequest.of(page, (int) size, Sort.by(Sort.Direction.DESC, "id"));
+        Page<Product> productPage = productRepository.findAll(pageable);
+
+        List<ProductDto> productList =
+                productPage.getContent().stream()
+                        .map(ProductMapper::toDto)
+                        .collect(Collectors.toList());
+
+        return Response.builder()
+                .status(200)
+                .message("Products retrieved successfully")
+                .productList(productList)
+                .totalPages(productPage.getTotalPages())
+                .totalElements(productPage.getTotalElements())
+                .build();
+    }
+
     @Override
     public Response getProductsByCategory(Long categoryId) {
         List<Product> products = productRepository.findByCategoryId(categoryId);
@@ -138,8 +159,31 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> searchProductsByKeyword(String keyword) {
-        System.out.println("Searching for products with keyword: " + keyword);
-        return productRepository.findByNameContainingIgnoreCase(keyword);
+    public Response searchProductsByKeyword(String keyword) {
+        log.info("Searching for products with keyword: {}", keyword);
+
+        List<Product> products = productRepository.findByNameContainingIgnoreCase(keyword);
+
+        List<ProductDto> productDtoList = products.stream().map(ProductMapper::toDto).toList();
+        return Response.builder().status(200).productList(productDtoList).build();
+    }
+
+    @Override
+    public Response searchProductsByKeyword(String keyword, int page, long size) {
+        log.info("Searching for products with keyword: {} {} {}", keyword, page, size);
+
+        Pageable pageable = PageRequest.of(page, (int) size, Sort.by(Sort.Direction.DESC, "id"));
+        Page<Product> productPage =
+                productRepository.findByNameContainingIgnoreCase(keyword, pageable);
+
+        List<ProductDto> productList =
+                productPage.getContent().stream().map(ProductMapper::toDto).toList();
+
+        return Response.builder()
+                .status(200)
+                .productList(productList)
+                .totalPages(productPage.getTotalPages())
+                .totalElements(productPage.getTotalElements())
+                .build();
     }
 }

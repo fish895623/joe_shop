@@ -1,22 +1,17 @@
 package com.bit.joe.shoppingmall.controller;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import com.bit.joe.shoppingmall.dto.request.ProductRequest;
+import com.bit.joe.shoppingmall.dto.response.Response;
+import com.bit.joe.shoppingmall.service.ProductService;
+
+import jakarta.validation.Valid;
+
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import com.bit.joe.shoppingmall.dto.CategoryDto;
-import com.bit.joe.shoppingmall.dto.ProductDto;
-import com.bit.joe.shoppingmall.dto.request.ProductRequest;
-import com.bit.joe.shoppingmall.dto.response.Response;
-import com.bit.joe.shoppingmall.entity.Product;
-import com.bit.joe.shoppingmall.service.ProductService;
-
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/product")
@@ -96,8 +91,10 @@ public class ProductController {
     }
 
     @GetMapping("/get-all")
-    public ResponseEntity<Response> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts());
+    public ResponseEntity<Response> getAllProducts(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") long size) {
+        return ResponseEntity.ok(productService.getAllProducts(page, size));
     }
 
     @GetMapping("/get-by-category-id/{categoryId}")
@@ -106,59 +103,13 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchProducts(@RequestParam String keyword) {
-        try {
-            // 키워드로 제품 검색
-            List<Product> products = productService.searchProductsByKeyword(keyword);
+    public ResponseEntity<?> searchProducts(
+            @RequestParam(name = "keyword") String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") long size) {
 
-            // 검색 결과가 없을 경우
-            if (products.isEmpty()) {
-                Response response =
-                        Response.builder()
-                                .status(HttpStatus.NOT_FOUND.value())
-                                .message("검색 결과가 없습니다.")
-                                .build();
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-            }
+        Response response = productService.searchProductsByKeyword(keyword, page, size);
 
-            // ProductDto에 카테고리 정보를 추가하여 변환
-            List<ProductDto> productDtos =
-                    products.stream()
-                            .map(
-                                    product ->
-                                            ProductDto.builder()
-                                                    .id(product.getId())
-                                                    .name(product.getName())
-                                                    .price(product.getPrice())
-                                                    .imageUrl(product.getImageURL())
-                                                    // 카테고리 정보를 CategoryDto로 변환해서 포함
-                                                    .category(
-                                                            product.getCategory() != null
-                                                                    ? new CategoryDto(
-                                                                            product.getCategory()
-                                                                                    .getId(),
-                                                                            product.getCategory()
-                                                                                    .getCategoryName())
-                                                                    : null)
-                                                    .build())
-                            .collect(Collectors.toList());
-
-            // 응답 준비
-            Response response =
-                    Response.builder()
-                            .status(HttpStatus.OK.value())
-                            .message("검색 결과")
-                            .productList(productDtos)
-                            .build();
-
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            Response response =
-                    Response.builder()
-                            .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                            .message("internal server error!")
-                            .build();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
+        return ResponseEntity.ok(response);
     }
 }

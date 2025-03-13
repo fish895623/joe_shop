@@ -45,4 +45,7 @@ public class Response {
 
     private CartItemDto cartItem;
     private List<CartItemDto> cartItemList;
+
+    private int totalPages;
+    private long totalElements;
 }
