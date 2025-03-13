@@ -100,8 +100,8 @@ public class AdminController {
             row.put("secondProductSales", df.format(row.get("secondProductSales")) + " 원");
             row.put("thirdProductSales", df.format(row.get("thirdProductSales")) + " 원");
         }
-//        System.out.println("Sales by Category (Avg and Total): " + salesData);
-//        System.out.println("Top Sales Products by Category: " + topSalesData);
+        //        System.out.println("Sales by Category (Avg and Total): " + salesData);
+        //        System.out.println("Top Sales Products by Category: " + topSalesData);
 
         // SQL for total sales by gender and category (total sales for Female and Male)
         String genderSalesSql =
