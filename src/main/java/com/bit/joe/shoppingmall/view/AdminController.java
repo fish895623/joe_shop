@@ -18,7 +18,7 @@ public class AdminController {
 
     @GetMapping("/insight")
     public String showDashboard(Model model) {
-        // SQL for average and total sales by category (your existing query)
+        // SQL for average and total sales by category
         String salesSql =
                 "SELECT c.category_name AS categoryName, "
                         + "ROUND(AVG(COALESCE(oi.price * oi.quantity, 0))) AS averageSales, "
@@ -31,7 +31,7 @@ public class AdminController {
                         + "GROUP BY c.category_name "
                         + "ORDER BY totalSales DESC";
 
-        // SQL for top sales products by category (without rank column)
+        // SQL for top sales products by category
         String topSalesSql =
                 "SELECT "
                         + "c.category_name AS categoryName, "
@@ -78,8 +78,10 @@ public class AdminController {
                         + " ORDER BY SUM(oi3.price * oi3.quantity) DESC "
                         + " LIMIT 1 OFFSET 2) AS thirdProductSales "
                         + "FROM categories c "
-                        + "ORDER BY c.category_name";
-
+//                        + "ORDER BY c.category_name";
+                        + "ORDER BY (SELECT SUM(oi1.price * oi1.quantity) FROM order_items oi1 "
+                        + "JOIN products p1 ON oi1.product_id = p1.product_id WHERE p1.category_id = c.category_id "
+                        + "GROUP BY p1.product_id ORDER BY SUM(oi1.price * oi1.quantity) DESC LIMIT 1) DESC";
         // Fetching both sales data and top products data
         List<Map<String, Object>> salesData = jdbcTemplate.queryForList(salesSql);
         List<Map<String, Object>> topSalesData = jdbcTemplate.queryForList(topSalesSql);
