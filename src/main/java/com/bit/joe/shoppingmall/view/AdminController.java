@@ -1,5 +1,6 @@
 package com.bit.joe.shoppingmall.view;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -78,13 +79,27 @@ public class AdminController {
                         + " ORDER BY SUM(oi3.price * oi3.quantity) DESC "
                         + " LIMIT 1 OFFSET 2) AS thirdProductSales "
                         + "FROM categories c "
-//                        + "ORDER BY c.category_name";
                         + "ORDER BY (SELECT SUM(oi1.price * oi1.quantity) FROM order_items oi1 "
                         + "JOIN products p1 ON oi1.product_id = p1.product_id WHERE p1.category_id = c.category_id "
                         + "GROUP BY p1.product_id ORDER BY SUM(oi1.price * oi1.quantity) DESC LIMIT 1) DESC";
+
         // Fetching both sales data and top products data
         List<Map<String, Object>> salesData = jdbcTemplate.queryForList(salesSql);
         List<Map<String, Object>> topSalesData = jdbcTemplate.queryForList(topSalesSql);
+
+        // format with commas
+        DecimalFormat df = new DecimalFormat("#,###");
+
+        for (Map<String, Object> row : salesData) {
+            row.put("averageSales", df.format(row.get("averageSales")) + " 원");
+            row.put("totalSales", df.format(row.get("totalSales")) + " 원");
+        }
+
+        for (Map<String, Object> row : topSalesData) {
+            row.put("firstProductSales", df.format(row.get("firstProductSales")) + " 원");
+            row.put("secondProductSales", df.format(row.get("secondProductSales")) + " 원");
+            row.put("thirdProductSales", df.format(row.get("thirdProductSales")) + " 원");
+        }
 
         // Log to verify the results
         System.out.println("Sales by Category (Avg and Total): " + salesData);
@@ -96,6 +111,7 @@ public class AdminController {
 
         return "admin/insight"; // Display the results in the dashboard view
     }
+
 
     @GetMapping("/inventory")
     public String inventory() {
