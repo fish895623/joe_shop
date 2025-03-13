@@ -243,33 +243,30 @@ public class OrderControllerTests {
                                 .content(insertData))
                 .andExpect(status().isOk());
 
-
         // bad request test (invalid request type) ========================================
         // prepare request data
         orderRequest =
-            OrderRequest.builder()
-                .orderId(orderDto.getId())
-                .requestType(RequestType.COMPLETE_RETURN)
-                .build();
+                OrderRequest.builder()
+                        .orderId(orderDto.getId())
+                        .requestType(RequestType.COMPLETE_RETURN)
+                        .build();
         objectMapper.registerModule(new JavaTimeModule());
         insertData = objectMapper.writeValueAsString(orderRequest);
 
         // perform request
         mockMvc.perform(
-                get("/api/order/request")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .cookie(cookie)
-                    .content(insertData))
-            .andExpect(status().is4xxClientError());
+                        get("/api/order/request")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .cookie(cookie)
+                                .content(insertData))
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
     @DisplayName("Order Get Test")
     void getOrderTest() throws Exception {
         // perform request
-        mockMvc.perform(
-                        get("/api/order/get/" + orderDto.getId()))
-                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/order/get/" + orderDto.getId())).andExpect(status().isOk());
     }
 
     @Test

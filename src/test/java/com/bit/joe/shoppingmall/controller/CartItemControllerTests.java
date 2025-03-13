@@ -174,10 +174,10 @@ public class CartItemControllerTests {
         // test createCartItem (duplicated cart item)
 
         mockMvc.perform(
-                post("/api/cart-item/create")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(insertData))
-            .andExpect(status().isOk());
+                        post("/api/cart-item/create")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(insertData))
+                .andExpect(status().isOk());
 
         // =================================================================================================
         // test updateCartItem
