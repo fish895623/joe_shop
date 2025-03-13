@@ -23,36 +23,36 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProductController {
 
-    private final ProductService productService;
+        private final ProductService productService;
 
-    @PostMapping("/create")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Response> createProduct(
-            @Valid @RequestBody ProductRequest productRequest) {
+        @PostMapping("/create")
+        @PreAuthorize("hasAuthority('ADMIN')")
+        public ResponseEntity<Response> createProduct(
+                        @Valid @RequestBody ProductRequest productRequest) {
 
-        boolean productExistsInCategory =
-                productService.existsByCategoryIdAndName(
-                        productRequest.getCategoryId(), productRequest.getName());
+                boolean productExistsInCategory = productService.existsByCategoryIdAndName(
+                                productRequest.getCategoryId(), productRequest.getName());
 
-        if (productExistsInCategory) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(
-                            Response.builder()
-                                    .status(400)
-                                    .message(
-                                            "Product name must be unique within the same category.")
-                                    .build());
+                if (productExistsInCategory) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                        .body(
+                                                        Response.builder()
+                                                                        .status(400)
+                                                                        .message(
+                                                                                        "Product name must be unique within the same category.")
+                                                                        .build());
+                }
+                // If everything is fine, proceed with product creation
+                return ResponseEntity.ok(
+                                productService.createProduct(
+                                                productRequest.getCategoryId(),
+                                                productRequest.getImage(),
+                                                productRequest.getName(),
+                                                productRequest.getQuantity(),
+                                                productRequest.getPrice()));
         }
-        // If everything is fine, proceed with product creation
-        return ResponseEntity.ok(
-                productService.createProduct(
-                        productRequest.getCategoryId(),
-                        productRequest.getImage(),
-                        productRequest.getName(),
-                        productRequest.getQuantity(),
-                        productRequest.getPrice()));
-    }
 
+<<<<<<< Updated upstream
     @PutMapping("/update/{productId}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Response> updateProduct(
@@ -62,32 +62,46 @@ public class ProductController {
         boolean productExistsInCategory =
                 productService.existsByCategoryIdAndName(
                         productRequest.getCategoryId(), productRequest.getName());
+=======
+        @PutMapping("/update")
+        @PreAuthorize("hasAuthority('ADMIN')")
+        public ResponseEntity<Response> updateProduct(
+                        @Valid @RequestBody ProductRequest productRequest) {
+                // Check if the product name is unique within the same category, excluding the
+                // current
+                // product
+                Long productId = productRequest.getProductId();
 
-        if (productExistsInCategory && !productRequest.getName().equals(productRequest.getName())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(
-                            Response.builder()
-                                    .status(400)
-                                    .message(
-                                            "Product name must be unique within the same category.")
-                                    .build());
+                boolean productExistsInCategory = productService.existsByCategoryIdAndName(
+                                productRequest.getCategoryId(), productRequest.getName());
+>>>>>>> Stashed changes
+
+                if (productExistsInCategory && !productRequest.getName().equals(productRequest.getName())) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                        .body(
+                                                        Response.builder()
+                                                                        .status(400)
+                                                                        .message(
+                                                                                        "Product name must be unique within the same category.")
+                                                                        .build());
+                }
+                return ResponseEntity.ok(
+                                productService.updateProduct(
+                                                productId,
+                                                productRequest.getCategoryId(),
+                                                productRequest.getImage(),
+                                                productRequest.getName(),
+                                                productRequest.getQuantity(),
+                                                productRequest.getPrice()));
         }
-        return ResponseEntity.ok(
-                productService.updateProduct(
-                        productId,
-                        productRequest.getCategoryId(),
-                        productRequest.getImage(),
-                        productRequest.getName(),
-                        productRequest.getQuantity(),
-                        productRequest.getPrice()));
-    }
 
-    @DeleteMapping("/delete/{productId}")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Response> deleteProduct(@PathVariable Long productId) {
-        return ResponseEntity.ok(productService.deleteProduct(productId));
-    }
+        @DeleteMapping("/delete/{productId}")
+        @PreAuthorize("hasAuthority('ADMIN')")
+        public ResponseEntity<Response> deleteProduct(@PathVariable Long productId) {
+                return ResponseEntity.ok(productService.deleteProduct(productId));
+        }
 
+<<<<<<< Updated upstream
     @GetMapping("/get-by-product-id/{productId}")
     public ResponseEntity<Response> getProductById(@PathVariable Long productId) {
         return ResponseEntity.ok(productService.getProductById(productId));
@@ -97,12 +111,26 @@ public class ProductController {
     public ResponseEntity<Response> getAllProducts() {
         return ResponseEntity.ok(productService.getAllProducts());
     }
+=======
+        @GetMapping("/get-by-product-id/{productId}")
+        public ResponseEntity<Response> getProductById(@PathVariable("productId") Long productId) {
+                return ResponseEntity.ok(productService.getProductById(productId));
+        }
 
-    @GetMapping("/get-by-category-id/{categoryId}")
-    public ResponseEntity<Response> getProductsByCategory(@PathVariable Long categoryId) {
-        return ResponseEntity.ok(productService.getProductsByCategory(categoryId));
-    }
+        @GetMapping("/get-all")
+        public ResponseEntity<Response> getAllProducts(
+                        @RequestParam(value = "page", defaultValue = "0") int page,
+                        @RequestParam(value = "size", defaultValue = "10") long size) {
+                return ResponseEntity.ok(productService.getAllProducts(page, size));
+        }
+>>>>>>> Stashed changes
 
+        @GetMapping("/get-by-category-id/{categoryId}")
+        public ResponseEntity<Response> getProductsByCategory(@PathVariable Long categoryId) {
+                return ResponseEntity.ok(productService.getProductsByCategory(categoryId));
+        }
+
+<<<<<<< Updated upstream
     @GetMapping("/search")
     public ResponseEntity<?> searchProducts(@RequestParam String keyword) {
         try {
@@ -159,4 +187,16 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+=======
+        @GetMapping("/search")
+        public ResponseEntity<?> searchProducts(
+                        @RequestParam(name = "keyword") String keyword,
+                        @RequestParam(defaultValue = "0") int page,
+                        @RequestParam(defaultValue = "10") long size) {
+
+                Response response = productService.searchProductsByKeyword(keyword, page, size);
+
+                return ResponseEntity.ok(response);
+        }
+>>>>>>> Stashed changes
 }

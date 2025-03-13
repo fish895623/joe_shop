@@ -83,7 +83,11 @@
 
     <div id="productContainer"></div>
 
+<<<<<<< Updated upstream
     <div id="page-btn" class="pagination"></div>
+=======
+    <div id="page-btn"></div>
+>>>>>>> Stashed changes
 
     <th:block th:replace="~{common/footer :: footer}" />
 
@@ -186,6 +190,7 @@
 
             paginationProducts.forEach((product) => {
               const productCard = `
+<<<<<<< Updated upstream
                 <div class="card" style="width: 18rem">
                   <img class="card-img-top" src="${
                     product.image || "dress.jpg"
@@ -204,6 +209,26 @@
                   </div>
                 </div>
               `;
+=======
+          <div class="card" style="width: 18rem">
+            <img class="card-img-top" src="${
+              product.image || "dress.jpg"
+            }" alt="Card image cap" />
+            <div class="card-body">
+              <h5 class="card-title">${product.name}</h5>
+              <span>${product.price}</span>
+              <p>Category: ${
+                product.category ? product.category.categoryName : "N/A"
+              }</p> <!-- Show category -->
+            </div>
+            <div class="card-body">
+              <a href="#" class="card-link">
+                <input type="button" value="자세히 보기" />
+              </a>
+            </div>
+          </div>
+        `;
+>>>>>>> Stashed changes
               container.insertAdjacentHTML("beforeend", productCard);
             });
 
@@ -259,6 +284,7 @@
           });
       }
 
+<<<<<<< Updated upstream
       function renderPagination() {
         const totalPages = Math.ceil(totalCount / limit);
         console.log("totalPages:", totalPages);
@@ -291,6 +317,19 @@
           loadProducts(currentCategoryId);
         }
       });
+=======
+      // async function fetchPages() {
+      //   const response = await fetch("/product/get-all", {
+      //     method: "GET",
+      //     include: "credentials",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //   });
+      //   const data = await response.json();
+      //   return data.productList || [];
+      // }
+>>>>>>> Stashed changes
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
