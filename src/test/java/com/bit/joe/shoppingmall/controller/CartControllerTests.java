@@ -58,6 +58,8 @@ class CartControllerTests {
     String userJwtToken;
     User user;
     User admin;
+    Product product;
+    Category category;
 
     @Autowired private MockMvc mockMvc;
     @Autowired private CategoryRepository categoryRepository;
@@ -82,10 +84,11 @@ class CartControllerTests {
                         userEntity.getEmail(), userEntity.getRole().toString(), 36000000L);
 
         // Prepare data
-        Category category = Category.builder().categoryName("Test Category for Cart Test").build();
-        category = categoryRepository.save(category);
+        Category categoryEntity =
+                Category.builder().categoryName("Test Category for Cart Test").build();
+        category = categoryRepository.save(categoryEntity);
 
-        Product product =
+        Product productEntity =
                 Product.builder()
                         .name("Test Product for Cart Test")
                         .category(category)
@@ -93,7 +96,7 @@ class CartControllerTests {
                         .quantity(10)
                         .price(1000)
                         .build();
-        productRepository.save(product);
+        product = productRepository.save(productEntity);
 
         categoryRepository.flush();
         productRepository.flush();
@@ -172,5 +175,83 @@ class CartControllerTests {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(insertData))
                 .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    @DisplayName("Append product to cart TEST")
+    public void appendProductToCartTest() throws Exception {
+        // Create Cart ========================================================================
+
+        // Prepare data
+        var cookie = new Cookie("token", userJwtToken);
+        cookie.setPath("/");
+
+        CartRequest cartRequest = CartRequest.builder().userId(user.getId()).build();
+        var insertData = new ObjectMapper().writeValueAsString(cartRequest);
+
+        mockMvc.perform(
+                        post("/api/cart/create")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(insertData)
+                                .cookie(cookie)) // for Authorization
+                .andExpect(status().isOk());
+
+        // Append product to cart =============================================================
+
+        // Prepare data
+        cartRequest = CartRequest.builder().productId(product.getId()).quantity(3).build();
+        insertData = new ObjectMapper().writeValueAsString(cartRequest);
+
+        mockMvc.perform(
+                        post("/api/cart/append")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(insertData)
+                            .cookie(cookie)) // for Authorization
+                .andExpect(status().isOk());
+
+        mockMvc.perform(
+                post("/api/cart/append")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(insertData)
+                    .cookie(cookie)) // for Authorization
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Remove product from cart TEST")
+    public void removeProductFromCartTest() throws Exception {
+        appendProductToCartTest();
+
+        // prepare data
+        CartRequest cartRequest = CartRequest.builder().productId(product.getId()).quantity(3).build();
+        var insertData = new ObjectMapper().writeValueAsString(cartRequest);
+
+        mockMvc.perform(
+                        post("/api/cart/remove")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(insertData)
+                                .cookie(new Cookie("token", userJwtToken)))
+                .andExpect(status().isOk());
+
+        cartRequest = CartRequest.builder().productId(product.getId()).quantity(4).build();
+        insertData = new ObjectMapper().writeValueAsString(cartRequest);
+
+        mockMvc.perform(
+                post("/api/cart/remove")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(insertData)
+                    .cookie(new Cookie("token", userJwtToken)))
+            .andExpect(status().isOk());
+
+        // prepare data
+        cartRequest = CartRequest.builder().productId(0L).quantity(3).build();
+        insertData = new ObjectMapper().writeValueAsString(cartRequest);
+
+        mockMvc.perform(
+                post("/api/cart/remove")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(insertData)
+                    .cookie(new Cookie("token", userJwtToken)))
+            .andExpect(status().isOk());
     }
 }
