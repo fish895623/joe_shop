@@ -9,15 +9,13 @@
   </head>
   <body>
     <th:block th:replace="~{common/navigation :: adminnavbar}" />
-    <main class="flex-grow-1">
+    <main class="flex-grow-1"> <!--flex-grow로 빈 공간을 메움-->
       <div class="container">
         <div class="container mt-5">
           <h1>User Insights Dashboard</h1>
-          <h3>Average Sales by Gender and Category</h3>
+          <h3 class="first_chart mt-5">Sales by Category(Average and Total)</h3>
           <table class="table table-bordered">
             <thead>
-              <tr>
-                <th>Gender</th>
                 <th>Category</th>
                 <th>Average Sales</th>
                 <th>Total Sales</th>
@@ -26,12 +24,38 @@
             <tbody>
               <th:block th:each="item : ${salesData}">
                 <tr>
-                  <td th:text="${item.gender}"></td>
                   <td th:text="${item.categoryName}"></td>
                   <td th:text="${item.averageSales}"></td>
                   <td th:text="${item.totalSales}"></td>
                 </tr>
               </th:block>
+            </tbody>
+          </table>
+
+          <!-- Table for Top Products by Category -->
+          <h3 class="first_chart mt-5">Top 3 Sales Products by Category</h3>
+          <table class="table table-bordered">
+            <thead>
+            <th>Category</th>
+            <th>First Product</th>
+            <th>First Product Sales</th>
+            <th>Second Product</th>
+            <th>Second Product Sales</th>
+            <th>Third Product</th>
+            <th>Third Product Sales</th>
+            </thead>
+            <tbody>
+            <th:block th:each="category : ${topSalesData}">
+              <tr>
+                <td th:text="${category.categoryName}"></td>
+                <td th:text="${category.firstProduct}"></td>
+                <td th:text="${category.firstProductSales}"></td>
+                <td th:text="${category.secondProduct}"></td>
+                <td th:text="${category.secondProductSales}"></td>
+                <td th:text="${category.thirdProduct}"></td>
+                <td th:text="${category.thirdProductSales}"></td>
+              </tr>
+            </th:block>
             </tbody>
           </table>
         </div>
