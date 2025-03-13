@@ -53,8 +53,17 @@ public class CartItemController {
     }
 
     @GetMapping("/get-all")
-    public ResponseEntity<Response> getAllCartItems(@RequestBody CartItemRequest cartItemRequest) {
+    public ResponseEntity<Response> getAllCartItems() {
+        log.info("get all cart items");
+
+        return ResponseEntity.status(200).body(cartItemService.getAllCartItems());
+    }
+
+    @GetMapping("/get-all-by-user")
+    public ResponseEntity<Response> getCartItemsByUser(
+            @RequestBody CartItemRequest cartItemRequest) {
         log.info("get all cart items by user id");
+
         return ResponseEntity.status(200).body(cartItemService.getCartItems(cartItemRequest));
     }
 
