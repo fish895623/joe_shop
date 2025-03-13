@@ -15,42 +15,84 @@
           The .table-hover class enables a hover state (grey background on mouse
           over) on table rows:
         </p>
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th>주문번호</th>
-              <th>상품명</th>
-              <th>수량</th>
-              <th>총가격</th>
-              <th>주문일자</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>#</td>
-              <td>#</td>
-              <td>#</td>
-              <td>#</td>
-              <td>#</td>
-            </tr>
-            <tr>
-              <td>#</td>
-              <td>#</td>
-              <td>#</td>
-              <td>#</td>
-              <td>#</td>
-            </tr>
-            <tr>
-              <td>#</td>
-              <td>#</td>
-              <td>#</td>
-              <td>#</td>
-              <td>#</td>
-            </tr>
-          </tbody>
-        </table>
+
+        <div class="container mt-5">
+          <h2 class="text-center mb-4">Order History</h2>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th scope="col">주문번호</th>
+                <th scope="col">상품명</th>
+                <th scope="col">수량</th>
+                <th scope="col">총가격</th>
+                <th scope="col">주문일자</th>
+              </tr>
+            </thead>
+            <tbody id="order-items">
+              <!-- 여기서 동적으로 데이터가 채워짐 -->
+            </tbody>
+          </table>
+          <div class="text-center mt-4"></div>
+        </div>
       </div>
     </main>
     <th:block th:replace="~{common/footer :: footer}" />
   </body>
+  <script>
+    // 장바구니 아이템 리스트 가져오기 ============================================================
+    async function getOrderItems() {
+      // 기존 장바구니 아이템 리스트를 비우기 위해 테이블 요소 가져오기
+      const orderItemList = document.getElementById("order-items");
+      orderItemList.innerHTML = ""; // 기존 테이블 내용 비우기
+
+      // 로컬 스토리지에서 현재 로그인된 사용자의 주문 정보 가져오기
+      let orderListData = getValuesFromLocalStorage("orderList");
+
+      // 서버에서 받은 데이터(카트 아이템 리스트)로 테이블 채우기
+      orderListData.forEach((order) => {
+        order.orderItems.forEach((item) => {
+          // 테이블 행 생성
+          const row = document.createElement("tr");
+          // 행 내용 채우기
+          row.innerHTML = `
+                            <td>${order.id}</td>
+                            <td>${item.product.name}</td>
+                            <td>${item.quantity}</td>
+                            <td>${item.price}</td>
+                            <td>${order.orderDate}</td>
+                        `;
+          // 테이블에 행 추가
+          orderItemList.appendChild(row);
+        });
+      });
+    }
+
+    // 주문 아이템 유저 기준으로 가져오기 ============================================================
+    document.addEventListener("DOMContentLoaded", async function () {
+      // 쿠키에서 토큰 가져오기
+      const token = getTokenFromCookie();
+      console.log("token :", token);
+
+      // 토큰이 없으면 로그인 페이지로 이동
+      if (!token) {
+        window.location.href = "/login";
+      }
+
+      // 서버에서 주문 아이템 리스트 가져오기
+      const apiResult = await fetch("api/order/get-all", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      }).then((response) => response.json());
+
+      // 주문 아이템 리스트를 로컬 스토리지에 저장
+      const orderList = apiResult.orderList;
+      localStorage.setItem("orderList", JSON.stringify(orderList));
+
+      // 주문 아이템 리스트 가져오기
+      await getOrderItems();
+    });
+  </script>
 </html>
