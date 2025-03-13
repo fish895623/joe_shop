@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
@@ -83,6 +83,8 @@
 
     <div id="productContainer"></div>
 
+    <div id="page-btn" class="pagination"></div>
+
     <th:block th:replace="~{common/footer :: footer}" />
 
     <script>
@@ -105,7 +107,7 @@
           // Filter and reorder the categories based on the predefined order
           categoryOrder.forEach((categoryName) => {
             const category = categories.find(
-              (cat) => cat.categoryName === categoryName,
+              (cat) => cat.categoryName === categoryName
             );
             if (category) {
               const categoryTab = `<li class="nav-item">
@@ -120,6 +122,16 @@
         })
         .catch((error) => {
           console.error("Error fetching categories:", error);
+        });
+
+      document
+        .getElementById("productContainer")
+        .addEventListener("click", function (event) {
+          if (event.target.id === "detail") {
+            const productId = event.target.getAttribute("data-id");
+
+            window.location.href = `/product?id=${productId}`;
+          }
         });
 
       // Event listener to handle category click and load corresponding products
@@ -140,36 +152,62 @@
         });
 
       // Function to load products based on the selected category
+
+      let currentPage = 1;
+      let totalCount = 0;
+      const limit = 10;
+      const pageCount = 5;
+      let currentCategoryId = "all";
       function loadProducts(categoryId) {
+        currentCategoryId = categoryId;
         fetch(
           categoryId === "all"
             ? "/product/get-all"
-            : `/product/get-by-category-id/${categoryId}`,
+            : `/product/get-by-category-id/${categoryId}`
         )
           .then((response) => response.json())
           .then((data) => {
-            const productList = data.productList;
+            const productList = data.productList || [];
+            totalCount = data.totalCount || productList.length;
+            //console.log("totalCount:", totalCount);
             const container = document.getElementById("productContainer");
             container.innerHTML = ""; // Clear the previous products
 
-            productList.forEach((product) => {
+            const startPage = (currentPage - 1) * limit;
+            const endPage = startPage + limit;
+            const paginationProducts =
+              productList.slice(startPage, endPage) || [];
+            //console.log("paginationProducts:", paginationProducts);
+            console.log("startPage:", startPage, "endPage:", endPage);
+            console.log(
+              "Second Page Products:",
+              productList.slice(startPage, endPage)
+            );
+
+            paginationProducts.forEach((product) => {
               const productCard = `
-          <div class="card" style="width: 18rem">
-            <img class="card-img-top" src="${product.image || "dress.jpg"}" alt="Card image cap" />
-            <div class="card-body">
-              <h5 class="card-title">${product.name}</h5>
-              <span>${product.price}</span>
-              <p>Category: ${product.category ? product.category.categoryName : "N/A"}</p> <!-- Show category -->
-            </div>
-            <div class="card-body">
-              <a href="#" class="card-link">
-                <input type="button" value="자세히 보기" />
-              </a>
-            </div>
-          </div>
-        `;
+                <div class="card" style="width: 18rem">
+                  <img class="card-img-top" src="${
+                    product.image || "dress.jpg"
+                  }" alt="Card image cap" />
+                  <div class="card-body">
+                    <h5 class="card-title">${product.name}</h5>
+                    <span>${product.price}</span>
+                    <p>Category: ${
+                      product.category ? product.category.categoryName : "N/A"
+                    }</p> <!-- Show category -->
+                  </div>
+                  <div class="card-body">
+                    <a href="#" class="card-link">
+                      <input type="button" value="자세히 보기" />
+                    </a>
+                  </div>
+                </div>
+              `;
               container.insertAdjacentHTML("beforeend", productCard);
             });
+
+            renderPagination();
           })
           .catch((error) => {
             console.error("Error fetching products:", error);
@@ -188,10 +226,16 @@
               productList.forEach((product) => {
                 const productCard = `
             <div class="card" style="width: 18rem">
-              <img class="card-img-top" src="${product.image || "dress.jpg"}" alt="Card image cap" />
+              <img class="card-img-top" src="${
+                product.image || "dress.jpg"
+              }" alt="Card image cap" />
               <div class="card-body">
                 <h5 class="card-title">${product.name}</h5>
-                <p>Category: ${product.category && product.category.categoryName ? product.category.categoryName : "N/A"}</p> <!-- Show category -->
+                <p>Category: ${
+                  product.category && product.category.categoryName
+                    ? product.category.categoryName
+                    : "N/A"
+                }</p> <!-- Show category -->
                 <span>${product.price}</span>
               </div>
               <div class="card-body">
@@ -210,10 +254,43 @@
           .catch((error) => {
             console.error(
               "검색 결과를 가져오는 데 오류가 발생했습니다:",
-              error,
+              error
             );
           });
       }
+
+      function renderPagination() {
+        const totalPages = Math.ceil(totalCount / limit);
+        console.log("totalPages:", totalPages);
+        const pagination = document.getElementById("page-btn");
+        if (!pagination) {
+          console.error("페이지버튼 노노");
+        }
+        pagination.innerHTML = "";
+        console.log("Pagination HTML:", pagination.innerHTML);
+
+        if (totalPages === 0) {
+          return;
+        }
+
+        const startPage =
+          Math.floor((currentPage - 1) / pageCount) * pageCount + 1;
+        const endPage = Math.min(startPage + pageCount - 1, totalPages);
+        console.log(currentPage);
+
+        pagination.innerHTML += `
+          <button
+            class="page-btn-child ${i === currentPage ? "active" : ""}"
+            data-page="${i}">${i}
+          </button>`;
+
+      document.getElementById("page-btn").addEventListener("click", (event) => {
+        if (event.target.classList.contains("page-btn")) {
+          currentPage = parseInt(event.target.getAttribute("data-page"));
+          console.log("페이지 변경 확인:", currentPage);
+          loadProducts(currentCategoryId);
+        }
+      });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
