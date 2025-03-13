@@ -29,6 +29,7 @@ import com.bit.joe.shoppingmall.mapper.CartMapper;
 import com.bit.joe.shoppingmall.mapper.CategoryMapper;
 import com.bit.joe.shoppingmall.mapper.ProductMapper;
 import com.bit.joe.shoppingmall.mapper.UserMapper;
+import com.bit.joe.shoppingmall.repository.CartItemRepository;
 import com.bit.joe.shoppingmall.service.Impl.CartService;
 import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
 import com.bit.joe.shoppingmall.service.Impl.ProductServiceImpl;
@@ -73,6 +74,8 @@ public class CartItemControllerTests {
     private Cart cart;
     private Category category;
     private Product product;
+    private Product product2;
+    @Autowired private CartItemRepository cartItemRepository;
 
     @BeforeEach
     public void setUp() {
@@ -113,6 +116,16 @@ public class CartItemControllerTests {
                         .build();
         var productDto = ProductMapper.toDto(productForCreate);
 
+        Product productForCreate2 =
+                Product.builder()
+                        .name("Test Product for CartItem Test 2")
+                        .category(category)
+                        .imageURL("image")
+                        .quantity(10)
+                        .price(1000)
+                        .build();
+        var productDto2 = ProductMapper.toDto(productForCreate2);
+
         product =
                 ProductMapper.toEntity(
                         productService
@@ -122,6 +135,17 @@ public class CartItemControllerTests {
                                         productDto.getName(),
                                         productDto.getQuantity(),
                                         productDto.getPrice())
+                                .getProduct());
+
+        product2 =
+                ProductMapper.toEntity(
+                        productService
+                                .createProduct(
+                                        productDto2.getCategory().getId(),
+                                        productDto2.getImageUrl(),
+                                        productDto2.getName(),
+                                        productDto2.getQuantity(),
+                                        productDto2.getPrice())
                                 .getProduct());
     }
 
@@ -216,5 +240,90 @@ public class CartItemControllerTests {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(getData))
                 .andExpect(status().is4xxClientError());
+    }
+
+    // get-all
+    @Test
+    @DisplayName("Get all cart items")
+    public void getAllCartItemsTest() throws Exception {
+        // prepare request data
+        CartItemRequest cartItemRequest =
+                CartItemRequest.builder()
+                        .cartId(cart.getId())
+                        .productId(product.getId())
+                        .quantity(5)
+                        .build();
+        var insertData = new ObjectMapper().writeValueAsString(cartItemRequest);
+
+        mockMvc.perform(
+                        post("/api/cart-item/create")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(insertData))
+                .andExpect(status().isOk());
+
+        cartItemRequest = CartItemRequest.builder().userId(generalUser.getId()).build();
+        insertData = new ObjectMapper().writeValueAsString(cartItemRequest);
+
+        mockMvc.perform(
+                        get("/api/cart-item/get-all")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(insertData))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.cartItemList[0].quantity").value(5))
+                .andExpect(jsonPath("$.cartItemList.length()").value(1));
+    }
+
+    // clear
+    @Test
+    @DisplayName("Clear cart items Test")
+    public void clearCartTest() throws Exception {
+        // prepare request data
+        CartItemRequest cartItemRequest =
+                CartItemRequest.builder()
+                        .cartId(cart.getId())
+                        .productId(product.getId())
+                        .quantity(5)
+                        .build();
+        var insertData = new ObjectMapper().writeValueAsString(cartItemRequest);
+
+        mockMvc.perform(
+                        post("/api/cart-item/create")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(insertData))
+                .andExpect(status().isOk());
+
+        // prepare request data
+        cartItemRequest =
+                CartItemRequest.builder()
+                        .cartId(cart.getId())
+                        .productId(product2.getId())
+                        .quantity(15)
+                        .build();
+        insertData = new ObjectMapper().writeValueAsString(cartItemRequest);
+
+        mockMvc.perform(
+                        post("/api/cart-item/create")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(insertData))
+                .andExpect(status().isOk());
+
+        cartItemRequest = CartItemRequest.builder().userId(generalUser.getId()).build();
+        insertData = new ObjectMapper().writeValueAsString(cartItemRequest);
+
+        mockMvc.perform(
+                        get("/api/cart-item/get-all")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(insertData))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.cartItemList[0].quantity").value(5))
+                .andExpect(jsonPath("$.cartItemList[1].quantity").value(15))
+                .andExpect(jsonPath("$.cartItemList.length()").value(2));
+
+        mockMvc.perform(
+                        post("/api/cart-item/clear")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(insertData))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.cart.cartItemDto.length()").value(0));
     }
 }
