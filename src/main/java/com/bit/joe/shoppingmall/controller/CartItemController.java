@@ -58,7 +58,7 @@ public class CartItemController {
         return ResponseEntity.status(200).body(cartItemService.getCartItems(cartItemRequest));
     }
 
-    @GetMapping("/clear")
+    @PostMapping("/clear")
     public ResponseEntity<Response> clearCart(@RequestBody CartItemRequest cartItemRequest) {
         log.info("clear cart by user id");
 
