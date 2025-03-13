@@ -278,13 +278,11 @@
         const endPage = Math.min(startPage + pageCount - 1, totalPages);
         console.log(currentPage);
 
-        for (let i = startPage; i <= endPage; i++) {
-          pagination.innerHTML += `
-      <button id="page-btn-child ${
-        i === currentPage ? "active" : ""
-      }" data-page="${i}">${i}</button>`;
-        }
-      }
+        pagination.innerHTML += `
+          <button
+            class="page-btn-child ${i === currentPage ? "active" : ""}"
+            data-page="${i}">${i}
+          </button>`;
 
       document.getElementById("page-btn").addEventListener("click", (event) => {
         if (event.target.classList.contains("page-btn")) {
