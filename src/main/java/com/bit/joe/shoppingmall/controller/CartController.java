@@ -51,8 +51,8 @@ public class CartController {
      * @return ResponseEntity<Response>
      */
     @PostMapping("/remove")
-    public ResponseEntity<Response> removeProductFromCart(@CookieValue("token") String token,
-        @RequestBody CartRequest cartRequest) {
+    public ResponseEntity<Response> removeProductFromCart(
+            @CookieValue("token") String token, @RequestBody CartRequest cartRequest) {
 
         Response resp = cartService.removeProductFromCart(token, cartRequest);
         // Remove product from cart and get response

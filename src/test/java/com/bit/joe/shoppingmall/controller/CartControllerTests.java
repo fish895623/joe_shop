@@ -206,15 +206,15 @@ class CartControllerTests {
                         post("/api/cart/append")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(insertData)
-                            .cookie(cookie)) // for Authorization
+                                .cookie(cookie)) // for Authorization
                 .andExpect(status().isOk());
 
         mockMvc.perform(
-                post("/api/cart/append")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(insertData)
-                    .cookie(cookie)) // for Authorization
-            .andExpect(status().isOk());
+                        post("/api/cart/append")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(insertData)
+                                .cookie(cookie)) // for Authorization
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -223,7 +223,8 @@ class CartControllerTests {
         appendProductToCartTest();
 
         // prepare data
-        CartRequest cartRequest = CartRequest.builder().productId(product.getId()).quantity(3).build();
+        CartRequest cartRequest =
+                CartRequest.builder().productId(product.getId()).quantity(3).build();
         var insertData = new ObjectMapper().writeValueAsString(cartRequest);
 
         mockMvc.perform(
@@ -237,21 +238,21 @@ class CartControllerTests {
         insertData = new ObjectMapper().writeValueAsString(cartRequest);
 
         mockMvc.perform(
-                post("/api/cart/remove")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(insertData)
-                    .cookie(new Cookie("token", userJwtToken)))
-            .andExpect(status().isOk());
+                        post("/api/cart/remove")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(insertData)
+                                .cookie(new Cookie("token", userJwtToken)))
+                .andExpect(status().isOk());
 
         // prepare data
         cartRequest = CartRequest.builder().productId(0L).quantity(3).build();
         insertData = new ObjectMapper().writeValueAsString(cartRequest);
 
         mockMvc.perform(
-                post("/api/cart/remove")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(insertData)
-                    .cookie(new Cookie("token", userJwtToken)))
-            .andExpect(status().isOk());
+                        post("/api/cart/remove")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(insertData)
+                                .cookie(new Cookie("token", userJwtToken)))
+                .andExpect(status().isOk());
     }
 }
