@@ -29,7 +29,6 @@ import com.bit.joe.shoppingmall.mapper.CartMapper;
 import com.bit.joe.shoppingmall.mapper.CategoryMapper;
 import com.bit.joe.shoppingmall.mapper.ProductMapper;
 import com.bit.joe.shoppingmall.mapper.UserMapper;
-import com.bit.joe.shoppingmall.repository.CartItemRepository;
 import com.bit.joe.shoppingmall.service.Impl.CartService;
 import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
 import com.bit.joe.shoppingmall.service.Impl.ProductServiceImpl;
@@ -53,11 +52,21 @@ public class CartItemControllerTests {
                     .gender(UserGender.MALE)
                     .birth("2021-01-01")
                     .build();
-    UserDto userDto =
+    UserDto userDto1 =
             UserDto.builder()
                     .name("user")
                     .password("user")
                     .email("user cartItem")
+                    .role(UserRole.USER)
+                    .gender(UserGender.MALE)
+                    .birth("2021-01-01")
+                    .build();
+
+    UserDto userDto2 =
+            UserDto.builder()
+                    .name("user")
+                    .password("user")
+                    .email("user2 cartItem")
                     .role(UserRole.USER)
                     .gender(UserGender.MALE)
                     .birth("2021-01-01")
@@ -69,33 +78,41 @@ public class CartItemControllerTests {
     @Autowired private CartService cartService;
     @Autowired private UserService userService;
 
-    private User generalUser;
+    private User generalUser1;
+    private User generalUser2;
     private User adminUser;
-    private Cart cart;
+    private Cart cart1;
+    private Cart cart2;
     private Category category;
     private Product product;
     private Product product2;
-    @Autowired private CartItemRepository cartItemRepository;
 
     @BeforeEach
     public void setUp() {
 
         // Create user
         userService.createUser(adminDto);
-        userService.createUser(userDto);
+        userService.createUser(userDto1);
+        userService.createUser(userDto2);
 
         // get user data
-        generalUser = UserMapper.toEntity(userService.getUserByEmail(userDto.getEmail()).getUser());
+        generalUser1 =
+                UserMapper.toEntity(userService.getUserByEmail(userDto1.getEmail()).getUser());
+        generalUser2 =
+                UserMapper.toEntity(userService.getUserByEmail(userDto2.getEmail()).getUser());
         adminUser = UserMapper.toEntity(userService.getUserByEmail(adminDto.getEmail()).getUser());
 
-        assert generalUser != null;
+        assert generalUser1 != null;
         assert adminUser != null;
 
         // Create Cart
-        CartRequest cartRequest = CartRequest.builder().userId(generalUser.getId()).build();
-        cart = CartMapper.toEntity(cartService.createCart(cartRequest).getCart());
+        CartRequest cartRequest = CartRequest.builder().userId(generalUser1.getId()).build();
+        cart1 = CartMapper.toEntity(cartService.createCart(cartRequest).getCart());
+        cartRequest = CartRequest.builder().userId(generalUser2.getId()).build();
+        cart2 = CartMapper.toEntity(cartService.createCart(cartRequest).getCart());
 
-        assert cart != null;
+        assert cart1 != null;
+        assert cart2 != null;
 
         // Prepare data
         Category categoryForCreate =
@@ -157,7 +174,7 @@ public class CartItemControllerTests {
         // prepare request data
         CartItemRequest cartItemRequest =
                 CartItemRequest.builder()
-                        .cartId(cart.getId())
+                        .cartId(cart1.getId())
                         .productId(product.getId())
                         .quantity(1)
                         .build();
@@ -185,7 +202,7 @@ public class CartItemControllerTests {
         // prepare request data
         CartItemRequest updateCartItemRequest =
                 CartItemRequest.builder()
-                        .cartId(cart.getId())
+                        .cartId(cart1.getId())
                         .productId(product.getId())
                         .quantity(2)
                         .build();
@@ -205,7 +222,7 @@ public class CartItemControllerTests {
         // prepare request data
         CartItemRequest getCartItemRequest =
                 CartItemRequest.builder()
-                        .userId(generalUser.getId())
+                        .userId(generalUser1.getId())
                         .productId(product.getId())
                         .build();
 
@@ -223,7 +240,7 @@ public class CartItemControllerTests {
 
         // prepare request data
         CartItemRequest deleteCartItemRequest =
-                CartItemRequest.builder().cartId(cart.getId()).productId(product.getId()).build();
+                CartItemRequest.builder().cartId(cart1.getId()).productId(product.getId()).build();
 
         var deleteData = new ObjectMapper().writeValueAsString(deleteCartItemRequest);
 
@@ -238,7 +255,7 @@ public class CartItemControllerTests {
         // prepare request data
         getCartItemRequest =
                 CartItemRequest.builder()
-                        .userId(generalUser.getId())
+                        .userId(generalUser1.getId())
                         .productId(product.getId())
                         .build();
 
@@ -253,12 +270,12 @@ public class CartItemControllerTests {
 
     // get-all
     @Test
-    @DisplayName("Get all cart items")
+    @DisplayName("Get all cart items by user")
     public void getAllCartItemsTest() throws Exception {
         // prepare request data
         CartItemRequest cartItemRequest =
                 CartItemRequest.builder()
-                        .cartId(cart.getId())
+                        .cartId(cart1.getId())
                         .productId(product.getId())
                         .quantity(5)
                         .build();
@@ -270,7 +287,7 @@ public class CartItemControllerTests {
                                 .content(insertData))
                 .andExpect(status().isOk());
 
-        cartItemRequest = CartItemRequest.builder().userId(generalUser.getId()).build();
+        cartItemRequest = CartItemRequest.builder().userId(generalUser1.getId()).build();
         insertData = new ObjectMapper().writeValueAsString(cartItemRequest);
 
         mockMvc.perform(
@@ -289,7 +306,7 @@ public class CartItemControllerTests {
         // prepare request data
         CartItemRequest cartItemRequest =
                 CartItemRequest.builder()
-                        .cartId(cart.getId())
+                        .cartId(cart1.getId())
                         .productId(product.getId())
                         .quantity(5)
                         .build();
@@ -304,7 +321,7 @@ public class CartItemControllerTests {
         // prepare request data
         cartItemRequest =
                 CartItemRequest.builder()
-                        .cartId(cart.getId())
+                        .cartId(cart1.getId())
                         .productId(product2.getId())
                         .quantity(15)
                         .build();
@@ -316,7 +333,7 @@ public class CartItemControllerTests {
                                 .content(insertData))
                 .andExpect(status().isOk());
 
-        cartItemRequest = CartItemRequest.builder().userId(generalUser.getId()).build();
+        cartItemRequest = CartItemRequest.builder().userId(generalUser1.getId()).build();
         insertData = new ObjectMapper().writeValueAsString(cartItemRequest);
 
         mockMvc.perform(
@@ -334,5 +351,41 @@ public class CartItemControllerTests {
                                 .content(insertData))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.cart.cartItemDto.length()").value(0));
+    }
+
+    @Test
+    @DisplayName("Get all cart items Test")
+    public void getAllCartItems() throws Exception {
+        // prepare request data
+        CartItemRequest cartItemRequest =
+                CartItemRequest.builder()
+                        .cartId(cart1.getId())
+                        .productId(product.getId())
+                        .quantity(5)
+                        .build();
+        var insertData = new ObjectMapper().writeValueAsString(cartItemRequest);
+
+        mockMvc.perform(
+                        post("/api/cart-item/create")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(insertData))
+                .andExpect(status().isOk());
+
+        cartItemRequest =
+                CartItemRequest.builder()
+                        .cartId(cart2.getId())
+                        .productId(product.getId())
+                        .quantity(3)
+                        .build();
+        insertData = new ObjectMapper().writeValueAsString(cartItemRequest);
+        mockMvc.perform(
+                        post("/api/cart-item/create")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(insertData))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/cart-item/get-all"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.cartItemList.length()").value(2));
     }
 }
