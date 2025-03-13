@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.bit.joe.shoppingmall.repository.CartItemRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -30,6 +29,7 @@ import com.bit.joe.shoppingmall.mapper.CartMapper;
 import com.bit.joe.shoppingmall.mapper.CategoryMapper;
 import com.bit.joe.shoppingmall.mapper.ProductMapper;
 import com.bit.joe.shoppingmall.mapper.UserMapper;
+import com.bit.joe.shoppingmall.repository.CartItemRepository;
 import com.bit.joe.shoppingmall.service.Impl.CartService;
 import com.bit.joe.shoppingmall.service.Impl.CategoryServiceImpl;
 import com.bit.joe.shoppingmall.service.Impl.ProductServiceImpl;
@@ -75,8 +75,7 @@ public class CartItemControllerTests {
     private Category category;
     private Product product;
     private Product product2;
-    @Autowired
-    private CartItemRepository cartItemRepository;
+    @Autowired private CartItemRepository cartItemRepository;
 
     @BeforeEach
     public void setUp() {
