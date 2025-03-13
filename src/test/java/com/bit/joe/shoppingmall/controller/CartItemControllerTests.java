@@ -217,4 +217,37 @@ public class CartItemControllerTests {
                                 .content(getData))
                 .andExpect(status().is4xxClientError());
     }
+
+    // get-all
+    @Test
+    @DisplayName("Get all cart items")
+    public void getAllCartItemsTest() throws Exception {
+        // prepare request data
+        CartItemRequest cartItemRequest =
+                CartItemRequest.builder()
+                        .cartId(cart.getId())
+                        .productId(product.getId())
+                        .quantity(5)
+                        .build();
+        var insertData = new ObjectMapper().writeValueAsString(cartItemRequest);
+
+        mockMvc.perform(
+                        post("/api/cart-item/create")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(insertData))
+                .andExpect(status().isOk());
+
+        cartItemRequest = CartItemRequest.builder().userId(generalUser.getId()).build();
+        insertData = new ObjectMapper().writeValueAsString(cartItemRequest);
+
+        mockMvc.perform(
+                        get("/api/cart-item/get-all")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(insertData))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.cartItemList[0].quantity").value(5))
+                .andExpect(jsonPath("$.cartItemList.length()").value(1));
+    }
+
+    // clear
 }
