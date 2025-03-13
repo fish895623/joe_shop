@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
@@ -73,7 +73,26 @@
       .card-link input[type="button"]:hover {
         background-color: #0056b3;
       }
+
+      /* Pagination styles */
+      .pagination-button {
+        margin: 5px;
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+
+      .pagination-button.active {
+        background-color: #007bff;
+        color: white;
+      }
+
+      .pagination-button:hover {
+        background-color: #0056b3;
+        color: white;
+      }
     </style>
+
     <!-- Corrected th:replace to properly include the navbar fragment -->
     <th:block th:replace="~{common/navigation :: navbar}" />
 
@@ -82,10 +101,20 @@
     </ul>
 
     <div id="productContainer"></div>
+    <div
+      id="paginationContainer"
+      style="text-align: center; margin-top: 20px"
+    ></div>
 
     <th:block th:replace="~{common/footer :: footer}" />
 
     <script>
+      // State variables for pagination
+      let currentPage = 0;
+      let totalPages = 1;
+      let currentCategory = "all"; // Track the selected category
+      let currentKeyword = ""; // Store the current search keyword
+
       // Fetch all categories and dynamically generate the category tabs
       fetch("/category/get-all")
         .then((response) => response.json())
@@ -94,8 +123,8 @@
 
           // Add the "All" tab first
           let allTab = `<li class="nav-item">
-                  <a class="nav-link active" href="#" data-category="all">All</a>
-                </li>`;
+              <a class="nav-link active" href="#" data-category="all">All</a>
+            </li>`;
           categoryTabs.innerHTML = allTab;
 
           // Define the required tab order
@@ -105,18 +134,18 @@
           // Filter and reorder the categories based on the predefined order
           categoryOrder.forEach((categoryName) => {
             const category = categories.find(
-              (cat) => cat.categoryName === categoryName,
+              (cat) => cat.categoryName === categoryName
             );
             if (category) {
               const categoryTab = `<li class="nav-item">
-                             <a class="nav-link" href="#" data-category="${category.id}">${category.categoryName}</a>
-                           </li>`;
+                         <a class="nav-link" href="#" data-category="${category.id}">${category.categoryName}</a>
+                       </li>`;
               categoryTabs.insertAdjacentHTML("beforeend", categoryTab);
             }
           });
 
           // Fetch products for the "All" category initially
-          loadProducts("all");
+          loadProducts("all", 0);
         })
         .catch((error) => {
           console.error("Error fetching categories:", error);
@@ -130,7 +159,8 @@
 
           if (event.target.tagName === "A") {
             const categoryId = event.target.getAttribute("data-category");
-            loadProducts(categoryId);
+            currentCategory = categoryId; // Update the current category
+            loadProducts(categoryId, 0); // Load products for the selected category
 
             // Highlight the active tab
             const tabs = document.querySelectorAll(".nav-link");
@@ -139,60 +169,34 @@
           }
         });
 
-      // Function to load products based on the selected category
-      function loadProducts(categoryId) {
-        fetch(
-          categoryId === "all"
-            ? "/product/get-all"
-            : `/product/get-by-category-id/${categoryId}`,
-        )
-          .then((response) => response.json())
-          .then((data) => {
-            const productList = data.productList;
-            const container = document.getElementById("productContainer");
-            container.innerHTML = ""; // Clear the previous products
+      // Function to load products based on the selected category and page number
+      async function loadProducts(categoryId, page = 0) {
+        try {
+          // Fetch products for the selected category
+          const response = await fetch(
+            categoryId === "all"
+              ? `/product/get-all?page=${page}&size=10`
+              : `/product/get-by-category-id/${categoryId}?page=${page}&size=10`
+          );
+          const data = await response.json();
 
+          const productList = data.productList;
+          const container = document.getElementById("productContainer");
+          container.innerHTML = ""; // Clear previous products
+
+          if (productList && productList.length > 0) {
             productList.forEach((product) => {
               const productCard = `
-          <div class="card" style="width: 18rem">
-            <img class="card-img-top" src="${product.image || "dress.jpg"}" alt="Card image cap" />
-            <div class="card-body">
-              <h5 class="card-title">${product.name}</h5>
-              <span>${product.price}</span>
-              <p>Category: ${product.category ? product.category.categoryName : "N/A"}</p> <!-- Show category -->
-            </div>
-            <div class="card-body">
-              <a href="#" class="card-link">
-                <input type="button" value="자세히 보기" />
-              </a>
-            </div>
-          </div>
-        `;
-              container.insertAdjacentHTML("beforeend", productCard);
-            });
-          })
-          .catch((error) => {
-            console.error("Error fetching products:", error);
-          });
-      }
-
-      function loadProductsByKeyword(keyword) {
-        fetch("/product/search?keyword=" + encodeURIComponent(keyword))
-          .then((response) => response.json())
-          .then((data) => {
-            const productList = data.productList || [];
-            const container = document.getElementById("productContainer");
-            container.innerHTML = ""; // Clear the previous products
-
-            if (productList.length > 0) {
-              productList.forEach((product) => {
-                const productCard = `
             <div class="card" style="width: 18rem">
-              <img class="card-img-top" src="${product.image || "dress.jpg"}" alt="Card image cap" />
+              <img class="card-img-top" src="${
+                product.image || "dress.jpg"
+              }" alt="Card image cap" />
               <div class="card-body">
                 <h5 class="card-title">${product.name}</h5>
-                <p>Category: ${product.category && product.category.categoryName ? product.category.categoryName : "N/A"}</p> <!-- Show category -->
                 <span>${product.price}</span>
+                <p>Category: ${
+                  product.category ? product.category.categoryName : "N/A"
+                }</p>
               </div>
               <div class="card-body">
                 <a href="#" class="card-link">
@@ -201,19 +205,108 @@
               </div>
             </div>
           `;
-                container.insertAdjacentHTML("beforeend", productCard); // Add product card
-              });
-            } else {
-              container.innerHTML = "<p>검색 결과가 없습니다.</p>"; // Display message when no results
-            }
-          })
-          .catch((error) => {
-            console.error(
-              "검색 결과를 가져오는 데 오류가 발생했습니다:",
-              error,
-            );
-          });
+              container.insertAdjacentHTML("beforeend", productCard);
+            });
+          } else {
+            container.innerHTML = "<p>No products found for this category.</p>";
+          }
+
+          // Update pagination information
+          totalPages = data.totalPages || 1;
+          currentPage = page;
+          createPaginationButtons();
+        } catch (error) {
+          console.error("Error fetching products:", error);
+        }
       }
+
+      // Function to create pagination buttons
+      function createPaginationButtons() {
+        const paginationContainer = document.getElementById(
+          "paginationContainer"
+        );
+        paginationContainer.innerHTML = ""; // Clear existing buttons
+
+        for (let i = 0; i < totalPages; i++) {
+          const pageButton = document.createElement("button");
+          pageButton.textContent = i + 1;
+          pageButton.classList.add("pagination-button");
+
+          // Highlight the current page
+          if (i === currentPage) {
+            pageButton.classList.add("active");
+          }
+
+          pageButton.addEventListener("click", () => {
+            loadProducts(currentCategory, i); // Load the products for the selected category and page
+          });
+
+          paginationContainer.appendChild(pageButton);
+        }
+      }
+
+      // Function to load products based on keyword search and page number
+      async function loadProductsByKeyword(keyword, page = 0) {
+        currentKeyword = keyword; // Store the keyword for later use
+
+        try {
+          const response = await fetch(
+            `/product/search?keyword=${encodeURIComponent(
+              keyword
+            )}&page=${page}&size=10`
+          );
+          const data = await response.json();
+
+          const productList = data.productList;
+          const container = document.getElementById("productContainer");
+          container.innerHTML = ""; // Clear previous products
+
+          if (productList && productList.length > 0) {
+            productList.forEach((product) => {
+              const productCard = `
+            <div class="card" style="width: 18rem">
+              <img class="card-img-top" src="${
+                product.image || "dress.jpg"
+              }" alt="Card image cap" />
+              <div class="card-body">
+                <h5 class="card-title">${product.name}</h5>
+                <span>${product.price}</span>
+                <p>Category: ${
+                  product.category ? product.category.categoryName : "N/A"
+                }</p>
+              </div>
+              <div class="card-body">
+                <a href="#" class="card-link">
+                  <input type="button" value="자세히 보기" />
+                </a>
+              </div>
+            </div>
+          `;
+              container.insertAdjacentHTML("beforeend", productCard);
+            });
+          } else {
+            container.innerHTML = "<p>No products found for this search.</p>";
+          }
+
+          // Update pagination information
+          totalPages = data.totalPages || 1;
+          currentPage = page;
+          createPaginationButtons();
+        } catch (error) {
+          console.error("Error searching for products:", error);
+        }
+      }
+
+      // Attach search event to search button
+      const searchInput = document.getElementById("searchInput");
+      const searchButton = document.getElementById("searchButton");
+
+      searchButton.addEventListener("click", () => {
+        const keyword = searchInput.value.trim();
+        if (keyword) {
+          loadProductsByKeyword(keyword, 0); // Load products based on keyword search
+        }
+      });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>

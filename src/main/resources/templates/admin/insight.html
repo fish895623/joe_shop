@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -122,7 +122,7 @@
 
       // Prepare data for the line chart (Sales Trend by Date)
       const trendDates = Array.from(
-        new Set(salesTrendData.map((item) => item.orderDate)),
+        new Set(salesTrendData.map((item) => item.orderDate))
       ) // remove duplicates and then
         .sort(); // sort dates
 
