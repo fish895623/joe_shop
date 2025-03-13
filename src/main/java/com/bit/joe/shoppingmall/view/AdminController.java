@@ -100,18 +100,45 @@ public class AdminController {
             row.put("secondProductSales", df.format(row.get("secondProductSales")) + " 원");
             row.put("thirdProductSales", df.format(row.get("thirdProductSales")) + " 원");
         }
+//        System.out.println("Sales by Category (Avg and Total): " + salesData);
+//        System.out.println("Top Sales Products by Category: " + topSalesData);
 
-        // Log to verify the results
-        System.out.println("Sales by Category (Avg and Total): " + salesData);
-        System.out.println("Top Sales Products by Category: " + topSalesData);
+        // SQL for total sales by gender and category (total sales for Female and Male)
+        String genderSalesSql =
+                "SELECT c.category_name AS categoryName, "
+                        + "SUM(CASE WHEN u.gender = 'FEMALE' THEN oi.price * oi.quantity ELSE 0 END) AS femaleSales, "
+                        + "SUM(CASE WHEN u.gender = 'MALE' THEN oi.price * oi.quantity ELSE 0 END) AS maleSales "
+                        + "FROM users u "
+                        + "JOIN orders o ON u.id = o.user_id "
+                        + "JOIN order_items oi ON o.id = oi.order_id "
+                        + "JOIN products p ON oi.product_id = p.product_id "
+                        + "JOIN categories c ON p.category_id = c.category_id "
+                        + "GROUP BY c.category_name";
 
-        // Add both datasets to the model
+        // SQL for sales by date for each category
+        String salesTrendSql =
+                "SELECT DATE(o.order_date) AS orderDate, "
+                        + "c.category_name AS categoryName, "
+                        + "SUM(oi.price * oi.quantity) AS totalSales "
+                        + "FROM order_items oi "
+                        + "JOIN orders o ON oi.order_id = o.id "
+                        + "JOIN products p ON oi.product_id = p.product_id "
+                        + "JOIN categories c ON p.category_id = c.category_id "
+                        + "GROUP BY orderDate, c.category_name "
+                        + "ORDER BY orderDate ASC";
+
+        // Fetching both gender-based sales data and sales trend data
+        List<Map<String, Object>> genderSalesData = jdbcTemplate.queryForList(genderSalesSql);
+        List<Map<String, Object>> salesTrendData = jdbcTemplate.queryForList(salesTrendSql);
+
+        // Add Four datasets to the model
         model.addAttribute("salesData", salesData);
         model.addAttribute("topSalesData", topSalesData);
+        model.addAttribute("genderSalesData", genderSalesData);
+        model.addAttribute("salesTrendData", salesTrendData);
 
         return "admin/insight"; // Display the results in the dashboard view
     }
-
 
     @GetMapping("/inventory")
     public String inventory() {
