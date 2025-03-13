@@ -40,10 +40,14 @@ public class UserServiceImpl implements UserService {
         // Encode password
         user.setActive(true);
         // Set user to active
-
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
         // Save user
-        return Response.builder().status(200).message("User created successfully").build();
+
+        return Response.builder()
+                .status(200)
+                .message("User created successfully")
+                .user(UserMapper.toDto(savedUser))
+                .build();
     }
 
     @Override

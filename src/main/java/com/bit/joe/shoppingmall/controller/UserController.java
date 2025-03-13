@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bit.joe.shoppingmall.dto.UserDto;
+import com.bit.joe.shoppingmall.dto.request.CartRequest;
 import com.bit.joe.shoppingmall.dto.response.Response;
 import com.bit.joe.shoppingmall.enums.UserRole;
+import com.bit.joe.shoppingmall.service.Impl.CartService;
 import com.bit.joe.shoppingmall.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UserController {
 
     private final UserService userService;
+    private final CartService cartService;
 
     @PostMapping("/info")
     public ResponseEntity<Response> getRole(
@@ -75,6 +78,14 @@ public class UserController {
 
         Response resp = userService.createUser(userDto);
         // Create user with userDto and save it to database, then get response
+
+        // Check if user is created successfully
+        if (resp.getStatus() == 200) {
+            // Create cart for user (only for user role)
+            if (resp.getUser().getRole().equals(UserRole.USER))
+                cartService.createCart(
+                        CartRequest.builder().userId(resp.getUser().getId()).build());
+        }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(resp);
         // return success response with status code 201 (CREATED)
