@@ -139,6 +139,39 @@
             .catch((error) => console.error("Error clearing cart:", error));
         });
 
+      // 장바구니 상품들 주문하기
+      document
+        .getElementById("checkout-btn")
+        .addEventListener("click", async function () {
+          // 주문 요청을 위한 데이터 생성
+          const orderdate = new Date().toISOString();
+          const cartData = getValuesFromLocalStorage("cart");
+          const cartItemIds = cartData.cartItemDto.map((item) => item.id);
+          const requestData = {
+            orderDate: orderdate,
+            cartItemIds: cartItemIds,
+          };
+
+          // 주문 요청 API 호출
+          await fetch("api/order/create", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify(requestData),
+          })
+            .then((response) => response.json())
+            .then(async (data) => {
+              alert(data.message);
+              window.location.href = "/history";
+            })
+            .catch((error) => {
+              console.error("Error creating order:", error);
+              alert("주문에 실패했습니다.");
+            });
+        });
+
       // 페이지 로드 시 장바구니 아이템 목록 불러오기
       document.addEventListener("DOMContentLoaded", async () => {
         await getCart();
