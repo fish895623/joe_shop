@@ -13,6 +13,7 @@ import com.bit.joe.shoppingmall.entity.Product;
 import com.bit.joe.shoppingmall.entity.User;
 import com.bit.joe.shoppingmall.exception.NotFoundException;
 import com.bit.joe.shoppingmall.mapper.CartItemMapper;
+import com.bit.joe.shoppingmall.mapper.CartMapper;
 import com.bit.joe.shoppingmall.repository.CartItemRepository;
 import com.bit.joe.shoppingmall.repository.CartRepository;
 import com.bit.joe.shoppingmall.repository.ProductRepository;
@@ -233,13 +234,14 @@ public class CartItemServiceImpl implements CartItemService {
                         .orElseThrow(() -> new NotFoundException("Cart not found"));
         // Get cart
 
-        cart.getCartItems().clear();
-        // Clear cart items
-
-        cartRepository.save(cart);
+        cart = cartRepository.save(cart);
         // Save cart
 
-        return Response.builder().status(200).message("Clear cart successfully").build();
+        return Response.builder()
+                .status(200)
+                .message("Clear cart successfully")
+                .cart(CartMapper.toDto(cart))
+                .build();
         // return success response
     }
 }
