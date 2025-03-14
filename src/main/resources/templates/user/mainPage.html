@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
@@ -83,9 +83,15 @@
 
     <div id="productContainer"></div>
 
+    <div id="pagination"></div>
+    <button id="page-btn"></button>
+
     <th:block th:replace="~{common/footer :: footer}" />
 
     <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        console.log("asdf");
+      });
       // Fetch all categories and dynamically generate the category tabs
       fetch("/category/get-all")
         .then((response) => response.json())
@@ -94,8 +100,8 @@
 
           // Add the "All" tab first
           let allTab = `<li class="nav-item">
-                  <a class="nav-link active" href="#" data-category="all">All</a>
-                </li>`;
+                    <a class="nav-link active" href="#" data-category="all">All</a>
+                  </li>`;
           categoryTabs.innerHTML = allTab;
 
           // Define the required tab order
@@ -105,18 +111,18 @@
           // Filter and reorder the categories based on the predefined order
           categoryOrder.forEach((categoryName) => {
             const category = categories.find(
-              (cat) => cat.categoryName === categoryName,
+              (cat) => cat.categoryName === categoryName
             );
             if (category) {
               const categoryTab = `<li class="nav-item">
-                             <a class="nav-link" href="#" data-category="${category.id}">${category.categoryName}</a>
-                           </li>`;
+                               <a class="nav-link" href="#" data-category="${category.id}">${category.categoryName}</a>
+                             </li>`;
               categoryTabs.insertAdjacentHTML("beforeend", categoryTab);
             }
           });
 
           // Fetch products for the "All" category initially
-          loadProducts("all");
+          loadProducts("all", 0);
         })
         .catch((error) => {
           console.error("Error fetching categories:", error);
@@ -140,11 +146,12 @@
         });
 
       // Function to load products based on the selected category
-      function loadProducts(categoryId) {
+      function loadProducts(categoryId, page = 0) {
+        currentCategoryId = categoryId;
         fetch(
           categoryId === "all"
             ? "/product/get-all"
-            : `/product/get-by-category-id/${categoryId}`,
+            : `/product/get-by-category-id/${categoryId}`
         )
           .then((response) => response.json())
           .then((data) => {
@@ -154,22 +161,27 @@
 
             productList.forEach((product) => {
               const productCard = `
-          <div class="card" style="width: 18rem">
-            <img class="card-img-top" src="${product.image || "dress.jpg"}" alt="Card image cap" />
-            <div class="card-body">
-              <h5 class="card-title">${product.name}</h5>
-              <span>${product.price}</span>
-              <p>Category: ${product.category ? product.category.categoryName : "N/A"}</p> <!-- Show category -->
+            <div class="card" style="width: 18rem">
+              <img class="card-img-top" src="${
+                product.image || "dress.jpg"
+              }" alt="Card image cap" />
+              <div class="card-body">
+                <h5 class="card-title">${product.name}</h5>
+                <span>${product.price}</span>
+                <p>Category: ${
+                  product.category ? product.category.categoryName : "N/A"
+                }</p> <!-- Show category -->
+              </div>
+              <div class="card-body">
+                <a href="#" class="card-link">
+                  <input type="button"  value="자세히 보기"  />
+                </a>
+              </div>
             </div>
-            <div class="card-body">
-              <a href="#" class="card-link">
-                <input type="button" value="자세히 보기" />
-              </a>
-            </div>
-          </div>
-        `;
+          `;
               container.insertAdjacentHTML("beforeend", productCard);
             });
+            updatePagination(data.totalPages, page);
           })
           .catch((error) => {
             console.error("Error fetching products:", error);
@@ -187,20 +199,26 @@
             if (productList.length > 0) {
               productList.forEach((product) => {
                 const productCard = `
-            <div class="card" style="width: 18rem">
-              <img class="card-img-top" src="${product.image || "dress.jpg"}" alt="Card image cap" />
-              <div class="card-body">
-                <h5 class="card-title">${product.name}</h5>
-                <p>Category: ${product.category && product.category.categoryName ? product.category.categoryName : "N/A"}</p> <!-- Show category -->
-                <span>${product.price}</span>
+              <div class="card" style="width: 18rem">
+                <img class="card-img-top" src="${
+                  product.image || "dress.jpg"
+                }" alt="Card image cap" />
+                <div class="card-body">
+                  <h5 class="card-title">${product.name}</h5>
+                  <p>Category: ${
+                    product.category && product.category.categoryName
+                      ? product.category.categoryName
+                      : "N/A"
+                  }</p> <!-- Show category -->
+                  <span>${product.price}</span>
+                </div>
+                <div class="card-body">
+                  <a href="#" class="card-link">
+                    <input type="button" value="자세히 보기" />
+                  </a>
+                </div>
               </div>
-              <div class="card-body">
-                <a href="#" class="card-link">
-                  <input type="button" value="자세히 보기" />
-                </a>
-              </div>
-            </div>
-          `;
+            `;
                 container.insertAdjacentHTML("beforeend", productCard); // Add product card
               });
             } else {
@@ -210,10 +228,77 @@
           .catch((error) => {
             console.error(
               "검색 결과를 가져오는 데 오류가 발생했습니다:",
-              error,
+              error
             );
           });
       }
+      //자세히보기 클릭
+      // document
+      //   .getElementById("productContainer")
+      //   .addEventListener("click", (event) => {
+      //     event.preventDefault();
+
+      //     fetch("/product?id=${product.id}")
+      //       .then((response) => response.json())
+      //       .then((data) => {
+      //         console.log(data);
+      //         if (event.target.value === "자세히보기") {
+      //           const productId = event.target.getAttribute("data-id");
+      //         }
+      //         window.location.href = `/product?id=${productId}`;
+      //       });
+      //   });
+
+      document.getElementById("productContainer").addEventListener;
+      async function fetchPaged() {
+        const response = await fetch("/product/get-all", {
+          method: "GET",
+          include: "credentials",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await response.json();
+        return data.productList || [];
+      }
+      let currentPage = 0;
+      let currentCategoryId = "all"; // Track the current category
+
+      // 페이지네이션 업데이트 함수 (숫자만 표시)
+      function updatePagination(totalPages, currentPage) {
+        const pagination = document.getElementById("pagination");
+        pagination.innerHTML = ""; // 이전에 생성된 버튼을 초기화
+
+        // 페이지 번호를 생성하여 삽입
+        pagination.innerHTML = ""; // Clear previous buttons
+
+        // Create page number buttons dynamically
+        for (let i = 0; i < totalPages; i++) {
+          const pageButton = `<button class="page-btn" data-page="${i}">${
+            i + 1
+          }</button>`;
+          pagination.innerHTML += pageButton;
+        }
+
+        // Add event listeners to page buttons
+        const pageButtons = pagination.querySelectorAll(".page-btn");
+        pageButtons.forEach((button) => {
+          button.addEventListener("click", (event) => {
+            const page = parseInt(event.target.getAttribute("data-page"));
+            loadProducts(currentCategoryId, page); // Load the selected page's products
+          });
+        });
+
+        // Highlight the active page button
+        pageButtons[currentPage].classList.add("active");
+      }
+
+      document.getElementById("page-btn").addEventListener("click", () => {
+        if (currentPage < totalPages - 1) {
+          currentPage++;
+          loadProducts(currentCategoryId, currentPage);
+        }
+      });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
