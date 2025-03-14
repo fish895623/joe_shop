@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>history</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <th:block th:replace="~{common/head :: library}"></th:block>
+  </head>
+  <body>
+    <th:block th:replace="~{common/navigation :: adminnavbar}" />
+    <main class="flex-grow-1">
+      <div class="container">
+        <h2>history</h2>
+
+        <div class="container mt-5">
+          <h2 class="text-center mb-4">Order History</h2>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th scope="col">주문번호</th>
+                <th scope="col">고객명</th>
+                <th scope="col">주문일자</th>
+                <th scope="col">주문상태</th>
+                <th scope="col">상품목록</th>
+              </tr>
+            </thead>
+            <tbody id="order-items">
+              <!-- 여기서 동적으로 데이터가 채워짐 -->
+            </tbody>
+          </table>
+          <div class="text-center mt-4"></div>
+        </div>
+      </div>
+    </main>
+    <th:block th:replace="~{common/footer :: footer}" />
+  </body>
+  <script>
+    function loadTableData(orderList) {
+      const tableBody = document.getElementById("order-items");
+      tableBody.innerHTML = ""; // Clear any previous rows in the table
+
+      if (orderList.length === 0) {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 5; // Span across all columns
+        cell.textContent = "주문 내역이 없습니다.";
+        row.appendChild(cell);
+        tableBody.appendChild(row);
+        return;
+      }
+
+      orderList.forEach((order) => {
+        const row = document.createElement("tr");
+
+        const orderIdCell = document.createElement("td");
+        orderIdCell.textContent = order.id;
+        row.appendChild(orderIdCell);
+
+        const userNameCell = document.createElement("td");
+        userNameCell.textContent = order.user.name;
+        row.appendChild(userNameCell);
+
+        const orderDateCell = document.createElement("td");
+        orderDateCell.textContent = new Date(order.orderDate).toLocaleString();
+        row.appendChild(orderDateCell);
+
+        const orderStatusCell = document.createElement("td");
+        orderStatusCell.textContent = order.status;
+        row.appendChild(orderStatusCell);
+
+        const orderItemsCell = document.createElement("td");
+        const orderItemsList = order.orderItems
+          .map((item) => {
+            return `${item.product.name} (x${item.quantity}) - ₩${item.price.toLocaleString()}`;
+          })
+          .join("<br>");
+        orderItemsCell.innerHTML = orderItemsList;
+        row.appendChild(orderItemsCell);
+
+        tableBody.appendChild(row);
+      });
+    }
+
+    fetch("/api/order/get-all", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data); // Log the response data
+
+        // Check for successful response and ensure orderList exists
+        if (
+          data.status === 200 &&
+          data.orderList &&
+          data.orderList.length > 0
+        ) {
+          loadTableData(data.orderList);
+        } else {
+          console.error("데이터 로드 실패: 주문 데이터가 없습니다.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error loading the JSON data:", error);
+      });
+  </script>
+</html>
