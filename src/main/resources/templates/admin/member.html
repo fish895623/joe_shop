@@ -19,7 +19,6 @@
             <tr>
               <th>Name</th>
               <th>Email</th>
-              <th>Password</th>
               <th>Birth</th>
               <th>Gender</th>
               <th>Role</th>
@@ -37,12 +36,10 @@
         const tableBody = document.querySelector("#dataTable tbody");
         tableBody.innerHTML = "";
         data.forEach((item) => {
-          console.log("Processing item:", item);
           const row = document.createElement("tr");
           row.innerHTML = `
               <td>${item.name}</td>
                     <td>${item.email}</td>
-                    <td>${"*".repeat(8)}</td>
                     <td>${item.birth}</td>
                     <td>${item.gender}</td>
                     <td>${item.role}</td>`;
@@ -57,7 +54,6 @@
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log(data); // 전체 응답 데이터를 로그로 출력
           if (data.status === 200 && data.userList) {
             loadTableData(data.userList);
           } else {
