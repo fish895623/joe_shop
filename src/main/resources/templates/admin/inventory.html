@@ -94,7 +94,7 @@
 
         // Fetch all products from the server
         function loadData() {
-          fetch("/product/get-all", {
+          fetch("/product/get-all?page=0", {
             include: "credentials",
           })
             .then((response) => response.json())

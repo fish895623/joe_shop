@@ -60,22 +60,28 @@
           option.textContent = category.categoryName;
           categorySelect.appendChild(option);
         });
+        document
+          .getElementById("submitBtn")
+          .addEventListener("click", async (event) => {
+            event.preventDefault();
+            const productName = document.getElementById("productName").value;
+            const categoryId = document.getElementById("categorySelect").value;
+            const price = document.getElementById("price").value;
+            const quantity = document.getElementById("quantity").value;
+            const imageUrl = document.getElementById("imageUrl").value;
+
+            // Add new product
+            await addProduct(
+              productName,
+              categoryId,
+              price,
+              quantity,
+              imageUrl,
+            );
+
+            window.close();
+          });
       });
-      document
-        .getElementById("submitBtn")
-        .addEventListener("click", async (event) => {
-          event.preventDefault();
-          const productName = document.getElementById("productName").value;
-          const categoryId = document.getElementById("categorySelect").value;
-          const price = document.getElementById("price").value;
-          const quantity = document.getElementById("quantity").value;
-          const imageUrl = document.getElementById("imageUrl").value;
-
-          // Add new product
-          await addProduct(productName, categoryId, price, quantity, imageUrl);
-
-          window.close();
-        });
     </script>
   </head>
   <body>

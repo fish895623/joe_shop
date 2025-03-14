@@ -93,6 +93,9 @@ public class ProductController {
     public ResponseEntity<Response> getAllProducts(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") long size) {
+        if (page == 0) {
+            return ResponseEntity.ok(productService.getAllProducts());
+        }
         return ResponseEntity.ok(productService.getAllProducts(page, size));
     }
 
