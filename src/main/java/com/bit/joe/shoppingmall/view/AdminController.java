@@ -159,4 +159,9 @@ public class AdminController {
     public String addProduct() {
         return "admin/add-inventory";
     }
+
+    @GetMapping("/checkOrders")
+    public String loadCustomerOrders() {
+        return "admin/customerOrders";
+    }
 }
