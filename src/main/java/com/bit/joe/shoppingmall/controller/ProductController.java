@@ -1,17 +1,18 @@
 package com.bit.joe.shoppingmall.controller;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
 import com.bit.joe.shoppingmall.dto.request.ProductRequest;
 import com.bit.joe.shoppingmall.dto.response.Response;
 import com.bit.joe.shoppingmall.service.ProductService;
 
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -110,8 +111,8 @@ public class ProductController {
     @GetMapping("/search")
     public ResponseEntity<?> searchProducts(
             @RequestParam(name = "keyword") String keyword,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") long size) {
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") long size) {
 
         Response response = productService.searchProductsByKeyword(keyword, page, size);
 
