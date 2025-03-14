@@ -1,5 +1,6 @@
 package com.bit.joe.shoppingmall.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,6 +13,7 @@ import com.bit.joe.shoppingmall.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @RestController
 @RequestMapping("/product")
 @RequiredArgsConstructor
@@ -93,7 +95,8 @@ public class ProductController {
     public ResponseEntity<Response> getAllProducts(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") long size) {
-        if (page == 0) {
+        if (page == -1) {
+            log.info("Fetching all products without pagination");
             return ResponseEntity.ok(productService.getAllProducts());
         }
         return ResponseEntity.ok(productService.getAllProducts(page, size));
