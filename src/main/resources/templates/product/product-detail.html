@@ -1,181 +1,181 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <title>Product Detail</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<head>
+  <title>Product Detail</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <th:block th:replace="~{common/head :: library}"></th:block>
-    <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
-  </head>
-  <body>
-    <th:block th:replace="~{common/navigation :: navbar}" />
-    <main class="flex-grow-1">
-      <div class="container">
-        <h2>Product Detail Page</h2>
+  <th:block th:replace="~{common/head :: library}"></th:block>
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+</head>
+<body>
+<th:block th:replace="~{common/navigation :: navbar}" />
+<main class="flex-grow-1">
+  <div class="container">
+    <h2>Product Detail Page</h2>
 
-        <div class="card">
-          <div class="row no-gutters">
-            <div class="col-md-6">
-              <img
-                id="product-image"
-                class="card-img-left"
-                alt="Card image"
-                src=""
+    <div class="card">
+      <div class="row no-gutters">
+        <div class="col-md-6">
+          <img
+                  id="product-image"
+                  class="card-img-left"
+                  alt="Card image"
+                  src=""
+          />
+        </div>
+        <div class="col-md-6">
+          <div class="card-body">
+            <h4 id="product-name" class="card-title"></h4>
+            <p id="product-category" class="card-text"></p>
+            <p id="product-price" class="card-text"></p>
+            <p id="product-quantity" class="card-text"></p>
+            <p id="product-select-quantity" class="card-text">
+              <label for="quantity">수량:</label>
+              <input
+                      type="number"
+                      id="quantity"
+                      name="quantity"
+                      min="1"
+                      value="1"
+                      placeholder="1"
               />
-            </div>
-            <div class="col-md-6">
-              <div class="card-body">
-                <h4 id="product-name" class="card-title"></h4>
-                <p id="product-category" class="card-text"></p>
-                <p id="product-price" class="card-text"></p>
-                <p id="product-quantity" class="card-text"></p>
-                <p id="product-select-quantity" class="card-text">
-                  <label for="quantity">수량:</label>
-                  <input
-                    type="number"
-                    id="quantity"
-                    name="quantity"
-                    min="1"
-                    value="1"
-                    placeholder="1"
-                  />
-                </p>
-                <button id="add-to-cart-btn" class="btn btn-primary btn-lg">
-                  장바구니 추가
-                </button>
-              </div>
-            </div>
+            </p>
+            <button id="add-to-cart-btn" class="btn btn-primary btn-lg">
+              장바구니 추가
+            </button>
           </div>
         </div>
       </div>
-    </main>
+    </div>
+  </div>
+</main>
 
-    <th:block th:replace="~{common/footer :: footer}" />
+<th:block th:replace="~{common/footer :: footer}" />
 
-    <script>
-      let cartId; // 장바구니 ID
-      let productId = getProductIdFromURL(); // URL에서 상품 ID 가져오기
+<script>
+  let cartId; // 장바구니 ID
+  let productId = getProductIdFromURL(); // URL에서 상품 ID 가져오기
 
-      // URL에서 상품 ID를 가져오는 함수 ============================================================
-      function getProductIdFromURL() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const id = urlParams.get("id");
-        return id ? parseInt(id) : null;
+  // URL에서 상품 ID를 가져오는 함수 ============================================================
+  function getProductIdFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get("id");
+    return id ? parseInt(id) : null;
+  }
+
+  // 쿠키에서 name에 해당하는 값을 가져오는 함수 ================================================
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+  }
+
+  // 토큰에서 사용자 이름을 가져오는 함수 (jwt-decode 라이브러리 사용) ==============================
+  function getUsernameFromToken() {
+    const token = getCookie("token");
+    if (token) {
+      const decodedToken = jwt_decode(token);
+      return decodedToken.username;
+    }
+    return null;
+  }
+
+  // 로그인 여부와 장바구니 ID를 확인하는 작업을 비동기적으로 처리
+  document.addEventListener("DOMContentLoaded", async () => {
+    // Skip cart validation for now since anyone can view the product details
+    const username = getUsernameFromToken();
+    if (username) {
+      // User is logged in, attempt to retrieve the cart
+      await getCart();
+      cartId = JSON.parse(localStorage.getItem("cart")).id;
+    } else {
+      // If not logged in, cartId is not needed
+      cartId = null;
+    }
+  });
+
+  // 카테고리 HTML 요소를 생성하는 함수 ========================================================
+  const createCategoryElement = (category) => {
+    const categoryElement = document.createElement("span");
+    categoryElement.className = "";
+    categoryElement.innerText = category;
+    categoryElement.style.fontSize = "1.2rem";
+    categoryElement.style.fontWeight = "bold";
+    categoryElement.href = ""; // TODO: Make category Link in future
+    return categoryElement;
+  };
+
+  fetch(`/product/get-by-product-id/${productId}`)
+    .then((response) => {
+      if (!response.ok) {
+        window.location.href = "/product/product-list";
       }
+      return response.json();
+    })
+    .then((data) => {
+      if (data && data.product) {
+        const product = data.product;
 
-      // 쿠키에서 name에 해당하는 값을 가져오는 함수 ================================================
-      function getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(";").shift();
+        // HTML 요소에 상품 정보 삽입
+        document.getElementById("product-name").innerText = product.name;
+        document.getElementById("product-price").innerText =
+          "가격: " + product.price;
+        document.getElementById("product-quantity").innerText =
+          "수량: " + product.quantity;
+
+        document.getElementById("product-image").src = product.imageUrl;
+
+        document
+          .getElementById("product-category")
+          .appendChild(
+            createCategoryElement(product.category.categoryName),
+          );
+      } else {
+        document.getElementById("product-name").innerText =
+          "상품을 찾을 수 없습니다.";
       }
+    })
+    .catch((error) => {
+      console.error("Error fetching product data:", error);
+    });
 
-      // 토큰에서 사용자 이름을 가져오는 함수 (jwt-decode 라이브러리 사용) ==============================
-      function getUsernameFromToken() {
-        const token = getCookie("token");
-        if (token) {
-          const decodedToken = jwt_decode(token);
-          return decodedToken.username;
-        }
-        return null;
-      }
+  //===================================
+  document
+    .getElementById("add-to-cart-btn")
+    .addEventListener("click", async function () {
+      let quantity = document.getElementById("quantity").value;
 
-      // 로그인 여부와 장바구니 ID를 확인하는 작업을 비동기적으로 처리
-      document.addEventListener("DOMContentLoaded", async () => {
-        // Skip cart validation for now since anyone can view the product details
-        const username = getUsernameFromToken();
-        if (username) {
-          // User is logged in, attempt to retrieve the cart
-          await getCart();
-          cartId = JSON.parse(localStorage.getItem("cart")).id;
-        } else {
-          // If not logged in, cartId is not needed
-          cartId = null;
-        }
-      });
+      // If the user is logged in and has a cart
+      if (cartId) {
+        const requestData = {
+          cartId: cartId,
+          productId: productId,
+          quantity: quantity,
+        };
 
-      // 카테고리 HTML 요소를 생성하는 함수 ========================================================
-      const createCategoryElement = (category) => {
-        const categoryElement = document.createElement("span");
-        categoryElement.className = "";
-        categoryElement.innerText = category;
-        categoryElement.style.fontSize = "1.2rem";
-        categoryElement.style.fontWeight = "bold";
-        categoryElement.href = ""; // TODO: Make category Link in future
-        return categoryElement;
-      };
-
-      fetch(`/product/get-by-product-id/${productId}`)
-        .then((response) => {
-          if (!response.ok) {
-            window.location.href = "/product/product-list";
-          }
-          return response.json();
+        // fetch로 장바구니에 상품을 추가하는 API 호출
+        await fetch("/api/cart-item/create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestData),
         })
-        .then((data) => {
-          if (data && data.product) {
-            const product = data.product;
-
-            // HTML 요소에 상품 정보 삽입
-            document.getElementById("product-name").innerText = product.name;
-            document.getElementById("product-price").innerText =
-              "가격: " + product.price;
-            document.getElementById("product-quantity").innerText =
-              "수량: " + product.quantity;
-
-            document.getElementById("product-image").src = product.imageUrl;
-
-            document
-              .getElementById("product-category")
-              .appendChild(
-                createCategoryElement(product.category.categoryName),
-              );
-          } else {
-            document.getElementById("product-name").innerText =
-              "상품을 찾을 수 없습니다.";
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching product data:", error);
-        });
-
-      //===================================
-      document
-        .getElementById("add-to-cart-btn")
-        .addEventListener("click", async function () {
-          let quantity = document.getElementById("quantity").value;
-
-          // If the user is logged in and has a cart
-          if (cartId) {
-            const requestData = {
-              cartId: cartId,
-              productId: productId,
-              quantity: quantity,
-            };
-
-            // fetch로 장바구니에 상품을 추가하는 API 호출
-            await fetch("/api/cart-item/create", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(requestData),
-            })
-              .then((response) => response.json())
-              .then(async () => {
-                alert("장바구니에 추가되었습니다!");
-                await getCart();
-                window.location.href = "/cart";
-              })
-              .catch((error) => {
-                console.error("Error:", error);
-                alert("장바구니 추가에 실패했습니다.");
-              });
-          } else {
-            alert("로그인 후 장바구니에 상품을 추가할 수 있습니다.");
-          }
-        });
-    </script>
-  </body>
+          .then((response) => response.json())
+          .then(async () => {
+            alert("장바구니에 추가되었습니다!");
+            await getCart();
+            window.location.href = "/cart";
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("장바구니 추가에 실패했습니다.");
+          });
+      } else {
+        alert("로그인 후 장바구니에 상품을 추가할 수 있습니다.");
+      }
+    });
+</script>
+</body>
 </html>

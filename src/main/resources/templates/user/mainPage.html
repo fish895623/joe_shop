@@ -21,16 +21,14 @@
 
       /* Flexbox layout for product container */
       #productContainer {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-around;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
         gap: 20px;
         padding: 20px;
       }
 
       /* Flex properties for each card */
       .card {
-        flex: 1 1 20%;
         max-width: 300px;
         min-width: 200px;
         margin: 10px;
@@ -90,6 +88,24 @@
         background-color: #0056b3;
         color: white;
       }
+
+      @media (max-width: 1650px) {
+        #productContainer {
+          grid-template-columns: repeat(4, 1fr); /* 4 items per row on smaller screens */
+        }
+      }
+
+      @media (max-width: 1200px) {
+        #productContainer {
+          grid-template-columns: repeat(, 1fr); /* 4 items per row on smaller screens */
+        }
+      }
+
+      @media (max-width: 800px) {
+        #productContainer {
+          grid-template-columns: repeat(2, 1fr); /* 2 items per row on mobile */
+        }
+      }
     </style>
 
     <!-- Corrected th:replace to properly include the navbar fragment -->
@@ -99,21 +115,20 @@
       <!-- Categories will be dynamically inserted here -->
     </ul>
 
-    <main class="flex-grow-1">
-      <div id="productContainer"></div>
-      <div
-        id="paginationContainer"
-        style="text-align: center; margin-top: 20px"
-      ></div>
-    </main>
+    <div id="productContainer"></div>
+    <div
+      id="paginationContainer"
+      style="text-align: center; margin-top: 20px"
+    ></div>
 
     <th:block th:replace="~{common/footer :: footer}" />
 
     <script>
       // State variables for pagination
-      let currentPage = 1;
+      let currentPage = 0;
       let totalPages = 1;
       let currentCategory = "all"; // Track the selected category
+      let currentKeyword = ""; // Store the current search keyword
 
       // Fetch all categories and dynamically generate the category tabs
       fetch("/category/get-all")
@@ -123,8 +138,8 @@
 
           // Add the "All" tab first
           let allTab = `<li class="nav-item">
-          <a class="nav-link active" href="#" data-category="all">All</a>
-        </li>`;
+              <a class="nav-link active" href="#" data-category="all">All</a>
+            </li>`;
           categoryTabs.innerHTML = allTab;
 
           // Define the required tab order
@@ -138,14 +153,14 @@
             );
             if (category) {
               const categoryTab = `<li class="nav-item">
-                     <a class="nav-link" href="#" data-category="${category.id}">${category.categoryName}</a>
-                   </li>`;
+                         <a class="nav-link" href="#" data-category="${category.id}">${category.categoryName}</a>
+                       </li>`;
               categoryTabs.insertAdjacentHTML("beforeend", categoryTab);
             }
           });
 
           // Fetch products for the "All" category initially
-          loadProducts("all", 1);
+          loadProducts("all", 0);
         })
         .catch((error) => {
           console.error("Error fetching categories:", error);
@@ -160,7 +175,7 @@
           if (event.target.tagName === "A") {
             const categoryId = event.target.getAttribute("data-category");
             currentCategory = categoryId; // Update the current category
-            loadProducts(categoryId, 1); // Load products for the selected category
+            loadProducts(categoryId, 0); // Load products for the selected category
 
             // Highlight the active tab
             const tabs = document.querySelectorAll(".nav-link");
@@ -170,7 +185,7 @@
         });
 
       // Function to load products based on the selected category and page number
-      async function loadProducts(categoryId, page = 1) {
+      async function loadProducts(categoryId, page = 0) {
         try {
           // Fetch products for the selected category
           const response = await fetch(
@@ -181,8 +196,6 @@
           const data = await response.json();
 
           const productList = data.productList;
-          const totalPages = data.totalPages || 1; // 서버 응답에서 totalPages가 없으면 기본값을 1로 설정
-
           const container = document.getElementById("productContainer");
           container.innerHTML = ""; // Clear previous products
 
@@ -190,11 +203,15 @@
             productList.forEach((product) => {
               const productCard = `
             <div class="card" style="width: 18rem">
-              <img class="card-img-top" src="${product.image || "dress.jpg"}" alt="Card image cap" />
+              <img class="card-img-top" src="${
+                product.image || "dress.jpg"
+              }" alt="Card image cap" />
               <div class="card-body">
                 <h5 class="card-title">${product.name}</h5>
                 <span>${product.price}</span>
-                <p>Category: ${product.category ? product.category.categoryName : "N/A"}</p>
+                <p>Category: ${
+                  product.category ? product.category.categoryName : "N/A"
+                }</p>
               </div>
               <div class="card-body">
                 <a href="/product?id=${product.id}" class="card-link">
@@ -210,15 +227,16 @@
           }
 
           // Update pagination information
+          totalPages = data.totalPages || 1;
           currentPage = page;
-          createPaginationButtons(totalPages); // Pass totalPages here
+          createPaginationButtons();
         } catch (error) {
           console.error("Error fetching products:", error);
         }
       }
 
       // Function to create pagination buttons
-      function createPaginationButtons(totalPages) {
+      function createPaginationButtons() {
         const paginationContainer = document.getElementById(
           "paginationContainer",
         );
@@ -226,16 +244,16 @@
 
         for (let i = 0; i < totalPages; i++) {
           const pageButton = document.createElement("button");
-          pageButton.textContent = i + 1; // 페이지 번호는 1부터 시작
+          pageButton.textContent = i + 1;
           pageButton.classList.add("pagination-button");
 
-          // 현재 페이지에 active 클래스 추가
-          if (i === currentPage - 1) {
+          // Highlight the current page
+          if (i === currentPage) {
             pageButton.classList.add("active");
           }
 
           pageButton.addEventListener("click", () => {
-            loadProducts(currentCategory, i + 1); // 클릭된 페이지로 로드
+            loadProducts(currentCategory, i); // Load the products for the selected category and page
           });
 
           paginationContainer.appendChild(pageButton);
@@ -243,12 +261,14 @@
       }
 
       // Function to load products based on keyword search and page number
-      async function loadProductsByKeyword(keyword, page = 1) {
+      async function loadProductsByKeyword(keyword, page = 0) {
         currentKeyword = keyword; // Store the keyword for later use
 
         try {
           const response = await fetch(
-            `/product/search?keyword=${encodeURIComponent(keyword)}&page=${page}&size=10`,
+            `/product/search?keyword=${encodeURIComponent(
+              keyword,
+            )}&page=${page}&size=10`,
           );
           const data = await response.json();
 
@@ -260,14 +280,18 @@
             productList.forEach((product) => {
               const productCard = `
             <div class="card" style="width: 18rem">
-              <img class="card-img-top" src="${product.image || "dress.jpg"}" alt="Card image cap" />
+              <img class="card-img-top" src="${
+                product.image || "dress.jpg"
+              }" alt="Card image cap" />
               <div class="card-body">
                 <h5 class="card-title">${product.name}</h5>
                 <span>${product.price}</span>
-                <p>Category: ${product.category ? product.category.categoryName : "N/A"}</p>
+                <p>Category: ${
+                  product.category ? product.category.categoryName : "N/A"
+                }</p>
               </div>
               <div class="card-body">
-                <a href="#" class="card-link">
+                <a href="/product?id=${product.id}" class="card-link">
                   <input type="button" value="자세히 보기" />
                 </a>
               </div>
@@ -282,7 +306,7 @@
           // Update pagination information
           totalPages = data.totalPages || 1;
           currentPage = page;
-          createPaginationButtons(totalPages); // Pass totalPages here
+          createPaginationButtons();
         } catch (error) {
           console.error("Error searching for products:", error);
         }
@@ -295,7 +319,7 @@
       searchButton.addEventListener("click", () => {
         const keyword = searchInput.value.trim();
         if (keyword) {
-          loadProductsByKeyword(keyword, 1); // Load products based on keyword search
+          loadProductsByKeyword(keyword, 0); // Load products based on keyword search
         }
       });
     </script>
