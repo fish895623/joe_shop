@@ -17,24 +17,31 @@
     <main class="flex-grow-1">
       <div class="container mt-5">
         <h2 class="text-center mb-4">상품(재고)관리</h2>
-        <button id="add-product-btn" class="btn btn-primary">상품 추가</button>
-        <button id="update-product-btn" class="btn btn-primary">
-          상품 수정
-        </button>
+        <div class="d-flex justify-content-end mb-4">
+          <button
+            id="add-product-btn"
+            class="btn btn-primary me-sm-1 me-md-2 me-lg-3"
+          >
+            상품 추가
+          </button>
+          <button id="update-product-btn" class="btn btn-primary">
+            상품 수정
+          </button>
+        </div>
+        <hr />
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>product</th>
+              <th>category</th>
+              <th>quantity</th>
+              <th>price</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody" class="editable-table"></tbody>
+        </table>
       </div>
-      <hr />
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>product</th>
-            <th>category</th>
-            <th>quantity</th>
-            <th>price</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody" class="editable-table"></tbody>
-      </table>
     </main>
 
     <script>
