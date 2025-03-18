@@ -95,13 +95,23 @@ public class AdminController {
             row.put("totalSales", df.format(row.get("totalSales")) + " 원");
         }
 
+        // 주의!: sql 실행 시 판매 데이터가 없어도 topSalesData에는 값이 들어감
         for (Map<String, Object> row : topSalesData) {
-            row.put("firstProductSales", df.format(row.get("firstProductSales")) + " 원");
-            row.put("secondProductSales", df.format(row.get("secondProductSales")) + " 원");
-            row.put("thirdProductSales", df.format(row.get("thirdProductSales")) + " 원");
+            Object salesData1, salesData2, salesData3 = null;
+            if (row.get("firstProductSales") == null) {
+                salesData1 = 0;
+                salesData2 = 0;
+                salesData3 = 0;
+            } else {
+                salesData1 = row.get("firstProductSales");
+                salesData2 = row.get("secondProductSales");
+                salesData3 = row.get("thirdProductSales");
+            }
+
+            row.put("firstProductSales", df.format(salesData1) + " 원");
+            row.put("secondProductSales", df.format(salesData2) + " 원");
+            row.put("thirdProductSales", df.format(salesData3) + " 원");
         }
-        //        System.out.println("Sales by Category (Avg and Total): " + salesData);
-        //        System.out.println("Top Sales Products by Category: " + topSalesData);
 
         // SQL for total sales by gender and category (total sales for Female and Male)
         String genderSalesSql =
